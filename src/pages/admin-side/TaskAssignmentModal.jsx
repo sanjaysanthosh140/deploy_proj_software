@@ -54,12 +54,19 @@ const TaskAssignmentModal = ({ open, onClose, projectData, onSave }) => {
             setIsUpdate(true); // Data exists, use PUT for updates
             const dbTasks = existingData.employeeTasks;
 
+            // Helper to stringify ids perfectly
+            const sanitizeTask = (t) => {
+              const rawId = t._id || t.task_id || `temp-${Math.random()}`;
+              const strId = typeof rawId === 'object' ? rawId.$oid || rawId.toString() : String(rawId);
+              return { ...t, _id: strId };
+            };
+
             // 3. Hydrate Specialists
             const hydratedSpecialists = initialSpecialists.map((s) => {
               // Find all tasks assigned to this specialist in the DB array
               const matchingTasks = dbTasks
                 .filter((item) => item.employee === s.stableId)
-                .map((item) => item.tasks);
+                .map((item) => sanitizeTask(item.tasks));
               return { ...s, assignedTasks: matchingTasks };
             });
             setSpecialists(hydratedSpecialists);
@@ -68,19 +75,30 @@ const TaskAssignmentModal = ({ open, onClose, projectData, onSave }) => {
             const assignedTaskTitles = dbTasks.map((item) => item.tasks.title);
             const filteredBacklog = (projectData.todos || []).filter(
               (todo) => !assignedTaskTitles.includes(todo.title),
-            );
+            ).map(sanitizeTask);
             setUnassignedTasks(filteredBacklog);
           } else {
             setIsUpdate(false);
             // No existing data, use default initialization
             setSpecialists(initialSpecialists);
-            setUnassignedTasks(projectData.todos || []);
+
+            const sanitizeTask = (t) => {
+              const rawId = t._id || t.task_id || `temp-${Math.random()}`;
+              const strId = typeof rawId === 'object' ? rawId.$oid || rawId.toString() : String(rawId);
+              return { ...t, _id: strId };
+            };
+            setUnassignedTasks((projectData.todos || []).map(sanitizeTask));
           }
         } catch (error) {
           console.error("Error fetching assignments:", error);
           setIsUpdate(false);
           // Fallback to default state on error
-          setUnassignedTasks(projectData.todos || []);
+          const sanitizeTask = (t) => {
+            const rawId = t._id || t.task_id || `temp-${Math.random()}`;
+            const strId = typeof rawId === 'object' ? rawId.$oid || rawId.toString() : String(rawId);
+            return { ...t, _id: strId };
+          };
+          setUnassignedTasks((projectData.todos || []).map(sanitizeTask));
           setSpecialists(
             (projectData.teamMembers || []).map((member, index) => ({
               ...member,
@@ -126,9 +144,11 @@ const TaskAssignmentModal = ({ open, onClose, projectData, onSave }) => {
       setSpecialists((prev) =>
         prev.map((s) => {
           if (s.stableId === specialistId) {
+            const newTasks = Array.from(s.assignedTasks);
+            newTasks.splice(destination.index, 0, task);
             return {
               ...s,
-              assignedTasks: [...s.assignedTasks, task],
+              assignedTasks: newTasks,
             };
           }
           return s;
@@ -348,8 +368,8 @@ const TaskAssignmentModal = ({ open, onClose, projectData, onSave }) => {
                   >
                     {unassignedTasks.map((task, index) => (
                       <Draggable
-                        key={task._id || `task-${index}`}
-                        draggableId={task._id || `task-${index}`}
+                        key={task._id}
+                        draggableId={task._id}
                         index={index}
                       >
                         {(provided, snapshot) => {
@@ -541,11 +561,8 @@ const TaskAssignmentModal = ({ open, onClose, projectData, onSave }) => {
                             {/* Assigned Tasks */}
                             {specialist.assignedTasks.map((task, index) => (
                               <Draggable
-                                key={
-                                  task._id ||
-                                  `task-${specialist.stableId}-${index}`
-                                }
-                                draggableId={`assigned-${specialist.stableId}-${task._id || index}`}
+                                key={task._id}
+                                draggableId={task._id}
                                 index={index}
                               >
                                 {(provided, snapshot) => {

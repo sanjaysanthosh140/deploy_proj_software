@@ -71,20 +71,23 @@ const CreateProjectDialog = ({ open, onClose, onSubmit }) => {
         })
         .then((data) => {
           // Map backend data to expected format
-          const mappedEmployees = data.data.map((emp) => ({
-            userId: emp._id, // Map _id to userId
-            _id: emp._id, // Keep _id for draggable key
-            name: emp.name,
-            role: emp.department, // Map department to role
-            department: emp.department,
-            email: emp.email,
-            avatar: emp.name
-              .split(" ")
-              .map((n) => n[0])
-              .join("")
-              .toUpperCase()
-              .slice(0, 2), // Generate avatar initials
-          }));
+          const mappedEmployees = data.data.map((emp) => {
+            const empIdStr = typeof emp._id === 'object' ? emp._id.$oid || emp._id.toString() : String(emp._id);
+            return {
+              userId: empIdStr, // Map _id to userId
+              _id: empIdStr, // Keep _id for draggable key
+              name: emp.name,
+              role: emp.department, // Map department to role
+              department: emp.department,
+              email: emp.email,
+              avatar: emp.name
+                .split(" ")
+                .map((n) => n[0])
+                .join("")
+                .toUpperCase()
+                .slice(0, 2), // Generate avatar initials
+            };
+          });
           setAvailableEmployees(mappedEmployees);
         });
 
@@ -858,7 +861,7 @@ const CreateProjectDialog = ({ open, onClose, onSubmit }) => {
                           {selectedTeam.map((employee, index) => (
                             <Draggable
                               key={employee._id}
-                              draggableId={`team-${employee._id}`}
+                              draggableId={employee._id}
                               index={index}
                             >
                               {(provided, snapshot) => {
