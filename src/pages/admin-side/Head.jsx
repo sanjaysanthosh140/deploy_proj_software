@@ -30,6 +30,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import FolderIcon from "@mui/icons-material/Folder";
 import AssessmentIcon from "@mui/icons-material/Assessment";
+import DashboardCustomizeIcon from "@mui/icons-material/DashboardCustomize";
 
 import axios from "axios";
 import CreateProjectDialog from "../../components/CreateProjectDialog";
@@ -441,6 +442,30 @@ const Head = () => {
           }}
         >
           View Projects
+        </Button>
+        <Button
+          variant="contained"
+          startIcon={<DashboardCustomizeIcon />}
+          onClick={() => navigate("/head/project-overview")}
+          sx={{
+            background: "linear-gradient(135deg, #f59e0b, #f97316)",
+            color: "#020617",
+            fontWeight: 700,
+            fontSize: { xs: "0.9rem", md: "1rem" },
+            textTransform: "uppercase",
+            letterSpacing: 1,
+            py: { xs: 1.2, md: 1.5 },
+            px: { xs: 2, md: 3 },
+            borderRadius: 2,
+            transition: "all 0.3s ease",
+            "&:hover": {
+              background: "linear-gradient(135deg, #f59e0bdd, #f97316dd)",
+              transform: "translateY(-2px)",
+              boxShadow: "0 8px 25px #f59e0b40",
+            },
+          }}
+        >
+          Project Overview
         </Button>
       </Box>
 
