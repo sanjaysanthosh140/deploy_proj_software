@@ -615,6 +615,7 @@ const HeadProjectOverview = () => {
         const res = await axios.get("http://localhost:8080/admin/headProj", {
           headers: { Authorization: token, "Content-Type": "application/json" },
         });
+        console.log(res.data);
         setProjects(res.data);
       } catch (err) {
         console.error("Error fetching projects:", err);
@@ -638,8 +639,44 @@ const HeadProjectOverview = () => {
           headers: { Authorization: token, "Content-Type": "application/json" },
         },
       );
-      setOverviewData(res.data);
-      console.log(res.data);
+
+      const rawData = res.data;
+
+      const formattedData = rawData.map(item => {
+        const empId = item.emp_datas?._id;
+        const empName = item.emp_datas?.name || "Unknown Employee";
+
+        // Filter tasks to only include those assigned to this employee
+        const empTasksRaw = (item.employeeTasks || []).filter(t => t.employee === empId);
+
+        // Map tasks and attach subtasks
+        const tasks = empTasksRaw.map(taskObj => {
+          const actualTask = taskObj.tasks || {};
+          const taskId = taskObj._id;
+
+          // Find the subtask grouping for this task
+          const subtaskGroup = (item.sub_tasks || []).find(st => st.task_id === taskId);
+          const userSubTaks = subtaskGroup ? subtaskGroup.user_subTaks : [];
+
+          return {
+            _id: taskId,
+            task_id: actualTask.task_id,
+            title: actualTask.title,
+            priority: actualTask.priority,
+            duedate: actualTask.duedate,
+            status: actualTask.status,
+            user_subTaks: userSubTaks
+          };
+        });
+
+        return {
+          employee: empName,
+          tasks: tasks
+        };
+      });
+
+      setOverviewData(formattedData);
+      console.log("Formatted Overview Data:", formattedData);
     } catch (err) {
       console.error("Error fetching overview:", err);
       setOverviewError(
