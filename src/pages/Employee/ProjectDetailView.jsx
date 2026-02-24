@@ -68,19 +68,16 @@ const ProjectDetailView = () => {
 
         if (projectMetadata) {
           // Flatten the aggregated tasks from backend
-          // Structure: [{ employeeTasks: { tasks: { ... }, _id: "..." } }, ...]
-          const normalizedTasks = tasksRes.data.map((item, index) => {
-            const rawId = item.employeeTasks._id || item._id;
-            const backendTaskId = typeof rawId === 'object' ? rawId.$oid || rawId.toString() : rawId;
-            const backendTodoList = item.employeeTasks.todolist || item.employeeTasks.tasks?.todolist || item.employeeTasks.tasks?.subTasks || [];
-
-            return {
-              ...item.employeeTasks.tasks,
-              _id: backendTaskId || `task-${index}-${Date.now()}`,
-              originalTaskId: backendTaskId || item.employeeTasks.tasks?.task_id,
-              subTasks: backendTodoList, // map the db todolist to our local subTasks array
-            };
-          });
+          // Structure: [{ employeeTasks: { tasks: { ... } } }, ...]
+          const normalizedTasks = tasksRes.data.map((item, index) => ({
+            _id: item.employeeTasks.tasks.task_id
+              ? `${item.employeeTasks.tasks.task_id}-${index}`
+              : `task-${index}-${Date.now()}`,
+            ...item.employeeTasks.tasks,
+            ...item.employeeTasks.tasks,
+            originalTaskId: item.employeeTasks.tasks.task_id,
+            subTasks: item.employeeTasks.tasks.subTasks || [], // Initialize subTasks
+          }));
 
           setProject({
             ...projectMetadata,
@@ -206,52 +203,12 @@ const ProjectDetailView = () => {
     }));
 
     setNewSubTaskInputs((prev) => ({ ...prev, [taskId]: "" }));
-  };
 
-  const handleSaveAllSubTasks = async (taskId) => {
-    const todo = project.todos.find((t) => t._id === taskId);
-    if (!todo) return;
-    const newSubTasks = todo.subTasks.filter((st) => st.isNew);
-    if (newSubTasks.length === 0) return;
-
+    // Prepare API call (future backend integration)
     try {
-      const headers = {
-        Authorization: `${token}`,
-        "Content-Type": "application/json",
-      };
-
-      const payload = {
-        task_id: todo.originalTaskId || todo._id,
-        proj_id: projectId,
-        todolist: newSubTasks.map(st => ({
-          todo_id: st._id,
-          title: st.title,
-          status: st.status,
-          createdAt: st.createdAt.split("T")[0]
-        }))
-      };
-      console.log("payload", payload);
-      await axios.post("http://localhost:8080/add_multiple_todos", payload, { headers });
-
-      // remove isNew flag on success
-      setProject((prev) => ({
-        ...prev,
-        todos: prev.todos.map((t) => {
-          if (t._id === taskId) {
-            return {
-              ...t,
-              subTasks: t.subTasks.map((st) => {
-                if (st.isNew) {
-                  const { isNew, ...rest } = st;
-                  return rest;
-                }
-                return st;
-              }),
-            };
-          }
-          return t;
-        }),
-      }));
+      // await axios.post(`/api/tasks/${taskId}/subtasks`, { title: content });
+      // console.log("API call to add subtask prepared:", { taskId, content });
+      console.log(taskId, content, projectId);
     } catch (error) {
       console.error("Failed to save subtasks", error);
     }
@@ -273,21 +230,8 @@ const ProjectDetailView = () => {
         return t;
       }),
     }));
-
-    if (subTask && !subTask.isNew) {
-      try {
-        const headers = { Authorization: `${token}` };
-        const payload = {
-          _id: subTaskId,
-          task_id: todo.originalTaskId || todo._id,
-          proj_id: projectId
-        };
-        console.log("delete payload", payload);
-        await axios.post(`http://localhost:8080/delete_todo`, payload, { headers });
-      } catch (error) {
-        console.error("Failed to delete subtask from server", error);
-      }
-    }
+    // Prepare API call
+    console.log("API call to delete subtask prepared:", { taskId, subTaskId });
   };
 
   const handleToggleSubTaskStatus = async (taskId, subTaskId) => {
@@ -308,7 +252,7 @@ const ProjectDetailView = () => {
               st._id === subTaskId
                 ? {
                   ...st,
-                  status: newStatus,
+                  status: st.status === "completed" ? "pending" : "completed",
                 }
                 : st,
             ),
@@ -317,22 +261,8 @@ const ProjectDetailView = () => {
         return t;
       }),
     }));
-
-    if (!subTask.isNew) {
-      try {
-        const headers = { Authorization: `${token}` };
-        const payload = {
-          _id: subTaskId,
-          status: newStatus,
-          task_id: todo.originalTaskId || todo._id,
-          proj_id: projectId
-        };
-        console.log("update status payload", payload);
-        await axios.post(`http://localhost:8080/update_todo_status`, payload, { headers });
-      } catch (error) {
-        console.error("Failed to update status on server", error);
-      }
-    }
+    // Prepare API call
+    console.log("API call to toggle subtask prepared:", { taskId, subTaskId });
   };
 
   if (loading) {
@@ -975,6 +905,25 @@ const ProjectDetailView = () => {
                             </Button>
                           )}
 
+                          {todo.subTasks &&
+                            todo.subTasks.some((st) => st.isNew) && (
+                              <Button
+                                variant="contained"
+                                onClick={() => handleSaveAllSubTasks(todo._id)}
+                                sx={{
+                                  mb: 2,
+                                  bgcolor: "#00e676",
+                                  color: "#000",
+                                  fontWeight: 600,
+                                  borderRadius: "8px",
+                                  textTransform: "none",
+                                  "&:hover": { bgcolor: "#00c853" },
+                                }}
+                              >
+                                Save All New To-dos
+                              </Button>
+                            )}
+
                           {/* Sub-tasks List */}
                           <Box
                             sx={{
@@ -1037,19 +986,6 @@ const ProjectDetailView = () => {
                                     >
                                       {subTask.title}
                                     </Typography>
-                                    {subTask.isNew && (
-                                      <Chip
-                                        label="Unsaved"
-                                        size="small"
-                                        sx={{
-                                          height: 20,
-                                          fontSize: '0.65rem',
-                                          bgcolor: 'rgba(255, 171, 0, 0.2)',
-                                          color: '#ffab00',
-                                          ml: 1
-                                        }}
-                                      />
-                                    )}
                                   </Box>
                                   <IconButton
                                     size="small"
