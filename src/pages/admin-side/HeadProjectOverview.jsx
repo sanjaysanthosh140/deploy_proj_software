@@ -641,39 +641,79 @@ const HeadProjectOverview = () => {
       );
 
       const rawData = res.data;
+      console.log("Raw Backend Data:", rawData);
 
-      const formattedData = rawData.map(item => {
-        const empId = item.emp_datas?._id;
+      // We need to group by employee and match sub_tasks to their corresponding tasks.
+      const grouped = {};
+
+      rawData.forEach((item) => {
+        const empId = item.emp_datas?._id ? String(item.emp_datas._id) : null;
         const empName = item.emp_datas?.name || "Unknown Employee";
 
-        // Filter tasks to only include those assigned to this employee
-        const empTasksRaw = (item.employeeTasks || []).filter(t => t.employee === empId);
+        if (!empId) return;
 
-        // Map tasks and attach subtasks
-        const tasks = empTasksRaw.map(taskObj => {
-          const actualTask = taskObj.tasks || {};
-          const taskId = taskObj._id;
+        if (!grouped[empId]) {
+          // Find tasks assigned to this specific employee
+          let empTasks = [];
 
-          // Find the subtask grouping for this task
-          const subtaskGroup = (item.sub_tasks || []).find(st => st.task_id === taskId);
-          const userSubTaks = subtaskGroup ? subtaskGroup.user_subTaks : [];
+          if (Array.isArray(item.employeeTasks)) {
+            // employeeTasks is an array of objects like { employee: "id", tasks: { task_id, title... } }
+            item.employeeTasks.forEach((et) => {
+              if (String(et.employee) === empId || String(et.employee?._id) === empId) {
+                // If it's the current employee's task, push the inner `.tasks` object
+                if (et.tasks && typeof et.tasks === 'object' && !Array.isArray(et.tasks)) {
+                  empTasks.push({ ...et.tasks, user_subTaks: [] });
+                } else if (Array.isArray(et.tasks)) {
+                  empTasks.push(...et.tasks.map((t) => ({ ...t, user_subTaks: [] })));
+                }
+              }
+            });
+          } else if (Array.isArray(item.tasks)) {
+            empTasks = item.tasks.map((t) => ({ ...t, user_subTaks: [] }));
+          }
 
-          return {
-            _id: taskId,
-            task_id: actualTask.task_id,
-            title: actualTask.title,
-            priority: actualTask.priority,
-            duedate: actualTask.duedate,
-            status: actualTask.status,
-            user_subTaks: userSubTaks
+          grouped[empId] = {
+            employee: empName,
+            tasks: empTasks,
           };
-        });
+        }
 
-        return {
-          employee: empName,
-          tasks: tasks
-        };
+        // Sub_tasks can be an object (if unwound) or an array
+        const subTasks = Array.isArray(item.sub_tasks)
+          ? item.sub_tasks
+          : item.sub_tasks
+            ? [item.sub_tasks]
+            : [];
+
+        // Match sub_tasks to their respective tasks
+        subTasks.forEach((st) => {
+          if (!st) return;
+          const stTaskId = st.task_id?._id ? String(st.task_id._id) : String(st.task_id);
+
+          const taskToUpdate = grouped[empId].tasks.find(
+            (t) => String(t.task_id) === stTaskId || String(t._id) === stTaskId
+          );
+
+          if (taskToUpdate && Array.isArray(st.user_subTaks)) {
+            st.user_subTaks.forEach((actualTodo) => {
+              if (!actualTodo) return;
+              // Avoid duplicate subtasks if the same one appears multiple times
+              // Specifically check for _id OR todo_id to prevent "undefined === undefined" bug!
+              const actualId = actualTodo._id || actualTodo.todo_id || actualTodo.title;
+              const exists = taskToUpdate.user_subTaks.find((existing) => {
+                const existingId = existing._id || existing.todo_id || existing.title;
+                return String(existingId) === String(actualId);
+              });
+
+              if (!exists) {
+                taskToUpdate.user_subTaks.push(actualTodo);
+              }
+            });
+          }
+        });
       });
+
+      const formattedData = Object.values(grouped);
 
       setOverviewData(formattedData);
       console.log("Formatted Overview Data:", formattedData);

@@ -229,7 +229,7 @@ const ProjectDetailView = () => {
       };
 
       const payload = {
-        task_id: todo.originalTaskId || todo._id,
+        task_id: todo.task_id,
         proj_id: projectId,
         todolist: newSubTasks.map((st) => ({
           todo_id: st._id,
@@ -289,7 +289,7 @@ const ProjectDetailView = () => {
         const headers = { Authorization: `${token}` };
         const payload = {
           _id: subTaskId,
-          task_id: todo.originalTaskId || todo._id,
+          task_id: todo.task_id,
           proj_id: projectId,
         };
         console.log("delete payload", payload);
@@ -336,7 +336,7 @@ const ProjectDetailView = () => {
         const payload = {
           _id: subTaskId,
           status: newStatus,
-          task_id: todo.originalTaskId || todo._id,
+          task_id: todo.task_id,
           proj_id: projectId,
         };
         console.log("update status payload", payload);

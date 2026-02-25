@@ -63,7 +63,6 @@ const TaskAssignmentModal = ({ open, onClose, projectData, onSave }) => {
 
             // 3. Hydrate Specialists
             const hydratedSpecialists = initialSpecialists.map((s) => {
-              // Find all tasks assigned to this specialist in the DB array
               const matchingTasks = dbTasks
                 .filter((item) => item.employee === s.stableId)
                 .map((item) => sanitizeTask(item.tasks));
@@ -217,7 +216,8 @@ const TaskAssignmentModal = ({ open, onClose, projectData, onSave }) => {
 
   const handleSave = async () => {
     try {
-      // Format data as requested: { employee: _id, tasks: [...] }
+      // task_id: reuse the stable ID if the task already has one (hydrated from DB),
+      // or generate a fresh UUID for any new task being assigned for the first time.
       const submissionData = {
         projectId: projectData._id,
         headId: projectData.head_id,
@@ -227,7 +227,7 @@ const TaskAssignmentModal = ({ open, onClose, projectData, onSave }) => {
             s.assignedTasks.map((t) => ({
               employee: s.userId || s._id || s.stableId,
               tasks: {
-                task_id: t._id,
+                task_id: t.task_id || crypto.randomUUID(), // stable if exists, new UUID otherwise
                 title: t.title,
                 priority: t.priority,
                 duedate: t.dueDate || t.duedate,
@@ -244,6 +244,7 @@ const TaskAssignmentModal = ({ open, onClose, projectData, onSave }) => {
           `http://localhost:8080/admin/assigned_tasks/${id}`,
           submissionData,
         );
+        console.log(submissionData);
       } else {
         console.log("Creating Assignments (POST):", submissionData);
         await axios.post(
