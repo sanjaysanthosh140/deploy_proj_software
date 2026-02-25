@@ -615,6 +615,7 @@ const HeadProjectOverview = () => {
         const res = await axios.get("http://localhost:8080/admin/headProj", {
           headers: { Authorization: token, "Content-Type": "application/json" },
         });
+        console.log(res.data);
         setProjects(res.data);
       } catch (err) {
         console.error("Error fetching projects:", err);
@@ -638,8 +639,19 @@ const HeadProjectOverview = () => {
           headers: { Authorization: token, "Content-Type": "application/json" },
         },
       );
-      setOverviewData(res.data);
-      console.log(res.data);
+
+      const rawData = res.data;
+      console.log("Raw Backend Data:", rawData);
+
+      // The backend now returns data grouped by employee:
+      // [{ emp_datas: { _id, name }, tasks: [...] }]
+      const formattedData = rawData.map((item) => ({
+        employee: item.emp_datas?.name || "Unknown Employee",
+        tasks: item.tasks || [],
+      }));
+
+      setOverviewData(formattedData);
+      console.log("Formatted Overview Data:", formattedData);
     } catch (err) {
       console.error("Error fetching overview:", err);
       setOverviewError(
