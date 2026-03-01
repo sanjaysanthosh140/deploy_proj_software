@@ -18,6 +18,7 @@ import {
   Paper,
   Fade,
   Alert,
+  alpha,
 } from "@mui/material";
 import { motion, AnimatePresence } from "framer-motion";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
@@ -28,6 +29,13 @@ import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import GroupsIcon from "@mui/icons-material/Groups";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import axios from "axios";
+
+// --- Theme Constants ---
+const GLASS_BG = "rgba(255, 255, 255, 0.75)";
+const GLASS_BORDER = "rgba(10, 15, 25, 0.08)";
+const PRIMARY_SLATE = "#0f172a";
+const SECONDARY_SLATE = "#475569";
+const INDIGO_ACCENT = "#4f46e5";
 
 const CreateProjectDialog = ({ open, onClose, onSubmit }) => {
   const [activeStep, setActiveStep] = useState(0);
@@ -315,11 +323,14 @@ const CreateProjectDialog = ({ open, onClose, onSubmit }) => {
       fullWidth
       PaperProps={{
         sx: {
-          background: "linear-gradient(135deg, #020617, #1a1f3a)",
-          borderRadius: 3,
-          border: "2px solid #00d4ff40",
-          boxShadow: "0 12px 50px #00d4ff30",
-          minHeight: "600px",
+          background: GLASS_BG,
+          backdropFilter: "blur(48px) saturate(160%)",
+          WebkitBackdropFilter: "blur(48px) saturate(160%)",
+          borderRadius: "32px",
+          border: `1px solid ${GLASS_BORDER}`,
+          boxShadow: "0 40px 80px -20px rgba(10, 15, 25, 0.12)",
+          minHeight: "650px",
+          overflow: "hidden",
         },
       }}
     >
@@ -330,58 +341,75 @@ const CreateProjectDialog = ({ open, onClose, onSubmit }) => {
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          background: "linear-gradient(135deg, #00d4ff20, transparent)",
-          borderBottom: "1px solid #1e293b",
-          py: 2.5,
+          background: "linear-gradient(135deg, rgba(255, 255, 255, 0.4), transparent)",
+          borderBottom: `1px solid ${GLASS_BORDER}`,
+          py: 3,
+          px: 4
         }}
       >
         <Typography
           variant="h5"
           sx={{
-            color: "#e5e7eb",
-            fontWeight: 700,
+            color: PRIMARY_SLATE,
+            fontWeight: 900,
             display: "flex",
             alignItems: "center",
-            gap: 1.5,
+            gap: 2,
+            letterSpacing: "-0.02em"
           }}
         >
           <Box
             sx={{
-              width: 40,
-              height: 40,
-              borderRadius: "10px",
-              background: "linear-gradient(135deg, #00d4ff, #0099cc)",
+              width: 48,
+              height: 48,
+              borderRadius: "14px",
+              background: "linear-gradient(135deg, #0f172a 0%, #334155 100%)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
+              boxShadow: "0 8px 16px rgba(10, 15, 25, 0.08)"
             }}
           >
-            <AddIcon sx={{ color: "#fff" }} />
+            <AddIcon sx={{ color: "#fff", fontSize: 28 }} />
           </Box>
           Create New Project
         </Typography>
-        <IconButton onClick={handleClose} sx={{ color: "#94a3b8" }}>
+        <IconButton
+          onClick={handleClose}
+          sx={{
+            color: alpha(PRIMARY_SLATE, 0.2),
+            "&:hover": { color: PRIMARY_SLATE, background: "rgba(15, 23, 42, 0.05)" }
+          }}
+        >
           <CloseIcon />
         </IconButton>
       </DialogTitle>
 
       <DialogContent sx={{ py: 4, px: 3, overflow: "visible" }}>
         {/* Stepper */}
-        <Stepper activeStep={activeStep} sx={{ mb: 4 }}>
+        <Stepper activeStep={activeStep} sx={{ mb: 5, px: 2 }}>
           {steps.map((label) => (
             <Step key={label}>
               <StepLabel
                 sx={{
                   "& .MuiStepLabel-label": {
-                    color: "#94a3b8",
-                    fontWeight: 600,
+                    color: SECONDARY_SLATE,
+                    fontWeight: 800,
+                    fontSize: "0.85rem",
+                    textTransform: "uppercase",
+                    letterSpacing: 1
                   },
                   "& .MuiStepLabel-label.Mui-active": {
-                    color: "#00d4ff",
+                    color: INDIGO_ACCENT,
                   },
                   "& .MuiStepLabel-label.Mui-completed": {
-                    color: "#4ade80",
+                    color: "#10b981",
                   },
+                  "& .MuiStepIcon-root": {
+                    color: alpha(SECONDARY_SLATE, 0.1),
+                    "&.Mui-active": { color: INDIGO_ACCENT },
+                    "&.Mui-completed": { color: "#10b981" }
+                  }
                 }}
               >
                 {label}
@@ -395,7 +423,14 @@ const CreateProjectDialog = ({ open, onClose, onSubmit }) => {
           <Alert
             severity="error"
             onClose={() => setError(null)}
-            sx={{ mb: 3, background: "#ff4d4f20", color: "#ff4d4f" }}
+            sx={{
+              mb: 3,
+              background: "rgba(239, 68, 68, 0.08)",
+              color: "#ef4444",
+              fontWeight: 700,
+              borderRadius: "12px",
+              border: "1px solid rgba(239, 68, 68, 0.1)"
+            }}
           >
             {error}
           </Alert>
@@ -419,14 +454,15 @@ const CreateProjectDialog = ({ open, onClose, onSubmit }) => {
                   onChange={handleProjectChange}
                   fullWidth
                   required
-                  placeholder="Enter project title"
-                  InputLabelProps={{ sx: { color: "#94a3b8" } }}
+                  placeholder="e.g., Quantum Edge Infrastructure"
+                  InputLabelProps={{ sx: { color: SECONDARY_SLATE, fontWeight: 700 } }}
                   sx={{
-                    input: { color: "#e5e7eb" },
+                    input: { color: PRIMARY_SLATE, fontWeight: 600 },
                     "& .MuiOutlinedInput-root": {
-                      "& fieldset": { borderColor: "#1e293b" },
-                      "&:hover fieldset": { borderColor: "#00d4ff" },
-                      "&.Mui-focused fieldset": { borderColor: "#00d4ff" },
+                      bgcolor: "rgba(15, 23, 42, 0.02)",
+                      "& fieldset": { borderColor: GLASS_BORDER },
+                      "&:hover fieldset": { borderColor: alpha(PRIMARY_SLATE, 0.2) },
+                      "&.Mui-focused fieldset": { borderColor: INDIGO_ACCENT },
                     },
                   }}
                 />
@@ -440,14 +476,16 @@ const CreateProjectDialog = ({ open, onClose, onSubmit }) => {
                   required
                   multiline
                   rows={4}
-                  placeholder="Enter project description"
-                  InputLabelProps={{ sx: { color: "#94a3b8" } }}
+                  placeholder="Describe the operational scope..."
+                  InputLabelProps={{ sx: { color: SECONDARY_SLATE, fontWeight: 700 } }}
                   sx={{
                     "& .MuiOutlinedInput-root": {
-                      color: "#e5e7eb",
-                      "& fieldset": { borderColor: "#1e293b" },
-                      "&:hover fieldset": { borderColor: "#00d4ff" },
-                      "&.Mui-focused fieldset": { borderColor: "#00d4ff" },
+                      color: PRIMARY_SLATE,
+                      bgcolor: "rgba(15, 23, 42, 0.02)",
+                      fontWeight: 500,
+                      "& fieldset": { borderColor: GLASS_BORDER },
+                      "&:hover fieldset": { borderColor: alpha(PRIMARY_SLATE, 0.2) },
+                      "&.Mui-focused fieldset": { borderColor: INDIGO_ACCENT },
                     },
                   }}
                 />
@@ -461,13 +499,22 @@ const CreateProjectDialog = ({ open, onClose, onSubmit }) => {
                     onChange={handleProjectChange}
                     fullWidth
                     required
-                    InputLabelProps={{ shrink: true, sx: { color: "#94a3b8" } }}
+                    InputLabelProps={{ shrink: true, sx: { color: SECONDARY_SLATE, fontWeight: 700 } }}
                     sx={{
-                      input: { color: "#e5e7eb" },
+                      input: {
+                        color: PRIMARY_SLATE,
+                        fontWeight: 600,
+                        colorScheme: "light"
+                      },
                       "& .MuiOutlinedInput-root": {
-                        "& fieldset": { borderColor: "#1e293b" },
-                        "&:hover fieldset": { borderColor: "#00d4ff" },
-                        "&.Mui-focused fieldset": { borderColor: "#00d4ff" },
+                        bgcolor: "rgba(15, 23, 42, 0.02)",
+                        "& fieldset": { borderColor: GLASS_BORDER },
+                        "&:hover fieldset": { borderColor: alpha(PRIMARY_SLATE, 0.2) },
+                        "&.Mui-focused fieldset": { borderColor: INDIGO_ACCENT },
+                      },
+                      "& .MuiInputBase-input::-webkit-calendar-picker-indicator": {
+                        cursor: "pointer",
+                        filter: "contrast(0.8) brightness(0.4)",
                       },
                     }}
                   />
@@ -479,20 +526,22 @@ const CreateProjectDialog = ({ open, onClose, onSubmit }) => {
                     value={projectData.priority}
                     onChange={handleProjectChange}
                     fullWidth
-                    InputLabelProps={{ sx: { color: "#94a3b8" } }}
+                    InputLabelProps={{ sx: { color: SECONDARY_SLATE, fontWeight: 700 } }}
                     sx={{
                       "& .MuiOutlinedInput-root": {
-                        color: "#e5e7eb",
-                        "& fieldset": { borderColor: "#1e293b" },
-                        "&:hover fieldset": { borderColor: "#00d4ff" },
-                        "&.Mui-focused fieldset": { borderColor: "#00d4ff" },
+                        color: PRIMARY_SLATE,
+                        bgcolor: "rgba(15, 23, 42, 0.02)",
+                        fontWeight: 700,
+                        "& fieldset": { borderColor: GLASS_BORDER },
+                        "&:hover fieldset": { borderColor: alpha(PRIMARY_SLATE, 0.2) },
+                        "&.Mui-focused fieldset": { borderColor: INDIGO_ACCENT },
                       },
                     }}
                   >
-                    <MenuItem value="Low">Low</MenuItem>
-                    <MenuItem value="Medium">Medium</MenuItem>
-                    <MenuItem value="High">High</MenuItem>
-                    <MenuItem value="Critical">Critical</MenuItem>
+                    <MenuItem value="Low" sx={{ color: PRIMARY_SLATE, fontWeight: 600 }}>Low</MenuItem>
+                    <MenuItem value="Medium" sx={{ color: PRIMARY_SLATE, fontWeight: 600 }}>Medium</MenuItem>
+                    <MenuItem value="High" sx={{ color: PRIMARY_SLATE, fontWeight: 600 }}>High</MenuItem>
+                    <MenuItem value="Critical" sx={{ color: PRIMARY_SLATE, fontWeight: 600 }}>Critical</MenuItem>
                   </TextField>
                 </Box>
               </Box>
@@ -511,18 +560,18 @@ const CreateProjectDialog = ({ open, onClose, onSubmit }) => {
                 {/* Add Todo Form */}
                 <Paper
                   sx={{
-                    p: 2.5,
-                    mb: 3,
-                    background: "rgba(255, 255, 255, 0.02)",
-                    border: "1px solid #1e293b",
-                    borderRadius: 2,
+                    p: 3,
+                    mb: 4,
+                    background: "rgba(15, 23, 42, 0.02)",
+                    border: `1px solid ${GLASS_BORDER}`,
+                    borderRadius: "24px",
                   }}
                 >
                   <Typography
                     variant="subtitle1"
-                    sx={{ color: "#e5e7eb", mb: 2, fontWeight: 600 }}
+                    sx={{ color: PRIMARY_SLATE, mb: 3, fontWeight: 900, letterSpacing: "-0.01em" }}
                   >
-                    Add Task
+                    Add Task Intelligence
                   </Typography>
                   <Box
                     sx={{ display: "flex", flexDirection: "column", gap: 2 }}
@@ -534,13 +583,14 @@ const CreateProjectDialog = ({ open, onClose, onSubmit }) => {
                       onChange={handleTodoChange}
                       fullWidth
                       size="small"
-                      placeholder="Enter task title"
-                      InputLabelProps={{ sx: { color: "#94a3b8" } }}
+                      placeholder="e.g., Define System Architecture"
+                      InputLabelProps={{ sx: { color: SECONDARY_SLATE, fontWeight: 700 } }}
                       sx={{
-                        input: { color: "#e5e7eb" },
+                        input: { color: PRIMARY_SLATE, fontWeight: 600 },
                         "& .MuiOutlinedInput-root": {
-                          "& fieldset": { borderColor: "#1e293b" },
-                          "&:hover fieldset": { borderColor: "#00d4ff" },
+                          bgcolor: "#fff",
+                          "& fieldset": { borderColor: GLASS_BORDER },
+                          "&:hover fieldset": { borderColor: alpha(PRIMARY_SLATE, 0.2) },
                         },
                       }}
                     />
@@ -555,12 +605,14 @@ const CreateProjectDialog = ({ open, onClose, onSubmit }) => {
                         sx={{
                           flex: 1,
                           "& .MuiOutlinedInput-root": {
-                            color: "#e5e7eb",
-                            "& fieldset": { borderColor: "#1e293b" },
-                            "&:hover fieldset": { borderColor: "#00d4ff" },
+                            color: PRIMARY_SLATE,
+                            bgcolor: "#fff",
+                            fontWeight: 700,
+                            "& fieldset": { borderColor: GLASS_BORDER },
+                            "&:hover fieldset": { borderColor: alpha(PRIMARY_SLATE, 0.2) },
                           },
                         }}
-                        InputLabelProps={{ sx: { color: "#94a3b8" } }}
+                        InputLabelProps={{ sx: { color: SECONDARY_SLATE, fontWeight: 700 } }}
                       >
                         <MenuItem value="Low">Low</MenuItem>
                         <MenuItem value="Medium">Medium</MenuItem>
@@ -576,15 +628,24 @@ const CreateProjectDialog = ({ open, onClose, onSubmit }) => {
                         size="small"
                         sx={{
                           flex: 1,
-                          input: { color: "#e5e7eb" },
+                          input: {
+                            color: PRIMARY_SLATE,
+                            fontWeight: 600,
+                            colorScheme: "light"
+                          },
                           "& .MuiOutlinedInput-root": {
-                            "& fieldset": { borderColor: "#1e293b" },
-                            "&:hover fieldset": { borderColor: "#00d4ff" },
+                            bgcolor: "#fff",
+                            "& fieldset": { borderColor: GLASS_BORDER },
+                            "&:hover fieldset": { borderColor: alpha(PRIMARY_SLATE, 0.2) },
+                          },
+                          "& .MuiInputBase-input::-webkit-calendar-picker-indicator": {
+                            cursor: "pointer",
+                            filter: "contrast(0.8) brightness(0.4)",
                           },
                         }}
                         InputLabelProps={{
                           shrink: true,
-                          sx: { color: "#94a3b8" },
+                          sx: { color: SECONDARY_SLATE, fontWeight: 700 },
                         }}
                       />
                     </Box>
@@ -593,16 +654,20 @@ const CreateProjectDialog = ({ open, onClose, onSubmit }) => {
                       startIcon={<AddIcon />}
                       onClick={handleAddTodo}
                       sx={{
-                        background: "linear-gradient(135deg, #00d4ff, #0099cc)",
+                        background: "linear-gradient(135deg, #0f172a 0%, #334155 100%)",
                         color: "#fff",
-                        fontWeight: 600,
+                        fontWeight: 900,
+                        py: 1,
+                        borderRadius: "12px",
+                        boxShadow: "0 8px 16px rgba(10, 15, 25, 0.12)",
+                        transition: "all 0.3s ease",
                         "&:hover": {
-                          background:
-                            "linear-gradient(135deg, #00bbee, #0088bb)",
+                          transform: "translateY(-1px)",
+                          boxShadow: "0 12px 20px rgba(10, 15, 25, 0.2)",
                         },
                       }}
                     >
-                      Add Task
+                      Capture Task
                     </Button>
                   </Box>
                 </Paper>
@@ -610,17 +675,17 @@ const CreateProjectDialog = ({ open, onClose, onSubmit }) => {
                 {/* Todos List */}
                 <Typography
                   variant="subtitle1"
-                  sx={{ color: "#e5e7eb", mb: 2, fontWeight: 600 }}
+                  sx={{ color: PRIMARY_SLATE, mb: 2, fontWeight: 800 }}
                 >
-                  Tasks ({todos.length})
+                  Project Backlog ({todos.length} units)
                 </Typography>
                 <Box sx={{ maxHeight: 300, overflowY: "auto" }}>
                   {todos.length === 0 ? (
                     <Typography
                       variant="body2"
-                      sx={{ color: "#94a3b8", textAlign: "center", py: 4 }}
+                      sx={{ color: SECONDARY_SLATE, textAlign: "center", py: 6, fontWeight: 600 }}
                     >
-                      No tasks added yet. Add your first task above.
+                      The project backlog is currently void. Add task units to begin.
                     </Typography>
                   ) : (
                     todos.map((todo) => (
@@ -628,19 +693,26 @@ const CreateProjectDialog = ({ open, onClose, onSubmit }) => {
                         key={todo._id}
                         sx={{
                           p: 2,
-                          mb: 1.5,
-                          background: "rgba(255, 255, 255, 0.02)",
-                          border: "1px solid #1e293b",
-                          borderRadius: 2,
+                          mb: 2,
+                          background: "rgba(255, 255, 255, 0.6)",
+                          backdropFilter: "blur(12px)",
+                          border: `1px solid ${GLASS_BORDER}`,
+                          borderRadius: "16px",
                           display: "flex",
                           justifyContent: "space-between",
                           alignItems: "center",
+                          boxShadow: "0 4px 12px rgba(10, 15, 25, 0.02)",
+                          transition: "all 0.3s ease",
+                          "&:hover": {
+                            background: "rgba(255, 255, 255, 0.8)",
+                            transform: "translateY(-1px)"
+                          }
                         }}
                       >
                         <Box sx={{ flex: 1 }}>
                           <Typography
                             variant="body1"
-                            sx={{ color: "#e5e7eb", fontWeight: 600, mb: 0.5 }}
+                            sx={{ color: PRIMARY_SLATE, fontWeight: 800, mb: 0.5 }}
                           >
                             {todo.title}
                           </Typography>
@@ -649,10 +721,11 @@ const CreateProjectDialog = ({ open, onClose, onSubmit }) => {
                               label={todo.priority}
                               size="small"
                               sx={{
-                                bgcolor: `${getPriorityColor(todo.priority)}20`,
+                                bgcolor: alpha(getPriorityColor(todo.priority), 0.1),
                                 color: getPriorityColor(todo.priority),
-                                fontWeight: 600,
-                                fontSize: "0.7rem",
+                                fontWeight: 800,
+                                fontSize: "0.65rem",
+                                borderRadius: "6px"
                               }}
                             />
                             {todo.dueDate && (
@@ -660,9 +733,11 @@ const CreateProjectDialog = ({ open, onClose, onSubmit }) => {
                                 label={`Due: ${new Date(todo.dueDate).toLocaleDateString()}`}
                                 size="small"
                                 sx={{
-                                  bgcolor: "rgba(255, 255, 255, 0.05)",
-                                  color: "#94a3b8",
-                                  fontSize: "0.7rem",
+                                  bgcolor: "rgba(15, 23, 42, 0.05)",
+                                  color: SECONDARY_SLATE,
+                                  fontSize: "0.65rem",
+                                  fontWeight: 700,
+                                  borderRadius: "6px"
                                 }}
                               />
                             )}
@@ -670,7 +745,10 @@ const CreateProjectDialog = ({ open, onClose, onSubmit }) => {
                         </Box>
                         <IconButton
                           onClick={() => handleDeleteTodo(todo._id)}
-                          sx={{ color: "#ff5b5b" }}
+                          sx={{
+                            color: alpha("#ff5b5b", 0.4),
+                            "&:hover": { color: "#ff5b5b", background: "rgba(255, 91, 91, 0.1)" }
+                          }}
                         >
                           <DeleteIcon />
                         </IconButton>
@@ -702,12 +780,12 @@ const CreateProjectDialog = ({ open, onClose, onSubmit }) => {
                         mb: 2,
                       }}
                     >
-                      <PersonAddIcon sx={{ color: "#94a3b8" }} />
+                      <PersonAddIcon sx={{ color: SECONDARY_SLATE }} />
                       <Typography
                         variant="subtitle1"
-                        sx={{ color: "#e5e7eb", fontWeight: 600 }}
+                        sx={{ color: PRIMARY_SLATE, fontWeight: 900, letterSpacing: "-0.01em" }}
                       >
-                        Available Employees ({availableEmployees.length})
+                        Global Talent Pool ({availableEmployees.length})
                       </Typography>
                     </Box>
                     <Droppable droppableId="available">
@@ -719,11 +797,11 @@ const CreateProjectDialog = ({ open, onClose, onSubmit }) => {
                             p: 2,
                             minHeight: 350,
                             background: snapshot.isDraggingOver
-                              ? "rgba(0, 212, 255, 0.05)"
-                              : "rgba(255, 255, 255, 0.02)",
-                            border: `2px dashed ${snapshot.isDraggingOver ? "#00d4ff" : "#1e293b"}`,
-                            borderRadius: 2,
-                            transition: "all 0.3s ease",
+                              ? "rgba(79, 70, 229, 0.04)"
+                              : "rgba(15, 23, 42, 0.02)",
+                            border: `2px dashed ${snapshot.isDraggingOver ? INDIGO_ACCENT : GLASS_BORDER}`,
+                            borderRadius: "24px",
+                            transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
                           }}
                         >
                           {availableEmployees.map((employee, index) => (
@@ -742,36 +820,40 @@ const CreateProjectDialog = ({ open, onClose, onSubmit }) => {
                                       p: 1.5,
                                       mb: 1.5,
                                       background: snapshot.isDragging
-                                        ? "linear-gradient(135deg, #00d4ff40, #00d4ff20)"
-                                        : "rgba(255, 255, 255, 0.05)",
+                                        ? "rgba(255, 255, 255, 0.95)"
+                                        : "rgba(255, 255, 255, 0.7)",
+                                      backdropFilter: "blur(8px)",
                                       border: snapshot.isDragging
-                                        ? "2px solid #00d4ff"
-                                        : "1px solid #1e293b",
-                                      borderRadius: 2,
+                                        ? `2px solid ${INDIGO_ACCENT}`
+                                        : `1px solid ${GLASS_BORDER}`,
+                                      borderRadius: "16px",
                                       display: "flex",
                                       alignItems: "center",
-                                      gap: 1.5,
+                                      gap: 2,
                                       cursor: snapshot.isDragging
                                         ? "grabbing"
                                         : "grab",
                                       transition: "all 0.2s ease",
                                       boxShadow: snapshot.isDragging
-                                        ? "0 8px 24px rgba(0, 212, 255, 0.3)"
-                                        : "none",
+                                        ? "0 20px 40px -12px rgba(10, 15, 25, 0.15)"
+                                        : "0 4px 12px rgba(10, 15, 25, 0.02)",
                                       transform: snapshot.isDragging
-                                        ? "rotate(2deg) scale(1.05)"
+                                        ? "rotate(1deg) scale(1.02)"
                                         : "none",
                                       "&:hover": {
-                                        background: "rgba(255, 255, 255, 0.08)",
+                                        background: "rgba(255, 255, 255, 0.9)",
+                                        borderColor: alpha(PRIMARY_SLATE, 0.1)
                                       },
                                     }}
                                   >
                                     <Avatar
                                       sx={{
-                                        bgcolor: "#00d4ff",
-                                        width: 36,
-                                        height: 36,
-                                        fontSize: "0.9rem",
+                                        background: "linear-gradient(135deg, #0f172a 0%, #334155 100%)",
+                                        width: 40,
+                                        height: 40,
+                                        fontSize: "0.85rem",
+                                        fontWeight: 900,
+                                        boxShadow: "0 4px 8px rgba(0,0,0,0.1)"
                                       }}
                                     >
                                       {employee.avatar}
@@ -780,15 +862,15 @@ const CreateProjectDialog = ({ open, onClose, onSubmit }) => {
                                       <Typography
                                         variant="body2"
                                         sx={{
-                                          color: "#e5e7eb",
-                                          fontWeight: 600,
+                                          color: PRIMARY_SLATE,
+                                          fontWeight: 800,
                                         }}
                                       >
                                         {employee.name}
                                       </Typography>
                                       <Typography
                                         variant="caption"
-                                        sx={{ color: "#94a3b8" }}
+                                        sx={{ color: SECONDARY_SLATE, fontWeight: 700 }}
                                       >
                                         {employee.department}
                                       </Typography>
@@ -811,12 +893,13 @@ const CreateProjectDialog = ({ open, onClose, onSubmit }) => {
                             <Typography
                               variant="body2"
                               sx={{
-                                color: "#94a3b8",
+                                color: SECONDARY_SLATE,
                                 textAlign: "center",
-                                py: 4,
+                                py: 6,
+                                fontWeight: 700
                               }}
                             >
-                              All employees assigned
+                              All intelligence nodes assigned.
                             </Typography>
                           )}
                         </Paper>
@@ -834,12 +917,12 @@ const CreateProjectDialog = ({ open, onClose, onSubmit }) => {
                         mb: 2,
                       }}
                     >
-                      <GroupsIcon sx={{ color: "#4ade80" }} />
+                      <GroupsIcon sx={{ color: "#10b981" }} />
                       <Typography
                         variant="subtitle1"
-                        sx={{ color: "#e5e7eb", fontWeight: 600 }}
+                        sx={{ color: PRIMARY_SLATE, fontWeight: 900, letterSpacing: "-0.01em" }}
                       >
-                        Project Team ({selectedTeam.length})
+                        Project Consortium ({selectedTeam.length})
                       </Typography>
                     </Box>
                     <Droppable droppableId="team">
@@ -851,11 +934,11 @@ const CreateProjectDialog = ({ open, onClose, onSubmit }) => {
                             p: 2,
                             minHeight: 350,
                             background: snapshot.isDraggingOver
-                              ? "rgba(74, 222, 128, 0.05)"
-                              : "rgba(74, 222, 128, 0.02)",
-                            border: `2px dashed ${snapshot.isDraggingOver ? "#4ade80" : "#1e293b"}`,
-                            borderRadius: 2,
-                            transition: "all 0.3s ease",
+                              ? "rgba(16, 185, 129, 0.04)"
+                              : "rgba(16, 185, 129, 0.01)",
+                            border: `2px dashed ${snapshot.isDraggingOver ? "#10b981" : alpha("#10b981", 0.1)}`,
+                            borderRadius: "24px",
+                            transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
                           }}
                         >
                           {selectedTeam.map((employee, index) => (
@@ -874,36 +957,40 @@ const CreateProjectDialog = ({ open, onClose, onSubmit }) => {
                                       p: 1.5,
                                       mb: 1.5,
                                       background: snapshot.isDragging
-                                        ? "linear-gradient(135deg, #4ade8040, #4ade8020)"
-                                        : "rgba(74, 222, 128, 0.05)",
+                                        ? "rgba(255, 255, 255, 0.95)"
+                                        : "rgba(255, 255, 255, 0.8)",
+                                      backdropFilter: "blur(12px)",
                                       border: snapshot.isDragging
-                                        ? "2px solid #4ade80"
-                                        : "1px solid rgba(74, 222, 128, 0.2)",
-                                      borderRadius: 2,
+                                        ? "2px solid #10b981"
+                                        : `1px solid ${alpha("#10b981", 0.2)}`,
+                                      borderRadius: "16px",
                                       display: "flex",
                                       alignItems: "center",
-                                      gap: 1.5,
+                                      gap: 2,
                                       cursor: snapshot.isDragging
                                         ? "grabbing"
                                         : "grab",
                                       transition: "all 0.2s ease",
                                       boxShadow: snapshot.isDragging
-                                        ? "0 8px 24px rgba(74, 222, 128, 0.3)"
-                                        : "none",
+                                        ? "0 20px 40px -12px rgba(10, 15, 25, 0.15)"
+                                        : "0 4px 12px rgba(16, 185, 129, 0.04)",
                                       transform: snapshot.isDragging
-                                        ? "rotate(-2deg) scale(1.05)"
+                                        ? "rotate(-1deg) scale(1.02)"
                                         : "none",
                                       "&:hover": {
-                                        background: "rgba(74, 222, 128, 0.1)",
+                                        background: "rgba(255, 255, 255, 0.95)",
+                                        borderColor: "#10b981"
                                       },
                                     }}
                                   >
                                     <Avatar
                                       sx={{
-                                        bgcolor: "#4ade80",
-                                        width: 36,
-                                        height: 36,
-                                        fontSize: "0.9rem",
+                                        background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
+                                        width: 40,
+                                        height: 40,
+                                        fontSize: "0.85rem",
+                                        fontWeight: 900,
+                                        boxShadow: "0 4px 8px rgba(16, 185, 129, 0.2)"
                                       }}
                                     >
                                       {employee.avatar}
@@ -912,21 +999,21 @@ const CreateProjectDialog = ({ open, onClose, onSubmit }) => {
                                       <Typography
                                         variant="body2"
                                         sx={{
-                                          color: "#e5e7eb",
-                                          fontWeight: 600,
+                                          color: PRIMARY_SLATE,
+                                          fontWeight: 800,
                                         }}
                                       >
                                         {employee.name}
                                       </Typography>
                                       <Typography
                                         variant="caption"
-                                        sx={{ color: "#94a3b8" }}
+                                        sx={{ color: SECONDARY_SLATE, fontWeight: 700 }}
                                       >
                                         {employee.department}
                                       </Typography>
                                     </Box>
                                     <CheckCircleIcon
-                                      sx={{ color: "#4ade80", fontSize: 20 }}
+                                      sx={{ color: "#10b981", fontSize: 22 }}
                                     />
                                   </Paper>
                                 );
@@ -946,12 +1033,13 @@ const CreateProjectDialog = ({ open, onClose, onSubmit }) => {
                             <Typography
                               variant="body2"
                               sx={{
-                                color: "#94a3b8",
+                                color: SECONDARY_SLATE,
                                 textAlign: "center",
-                                py: 4,
+                                py: 6,
+                                fontWeight: 700
                               }}
                             >
-                              Drag employees here to assign them
+                              Consortium is empty. Deploy intelligence units here.
                             </Typography>
                           )}
                         </Paper>
@@ -970,9 +1058,13 @@ const CreateProjectDialog = ({ open, onClose, onSubmit }) => {
             onClick={handleBack}
             disabled={activeStep === 0}
             sx={{
-              color: "#94a3b8",
-              fontWeight: 600,
-              "&:disabled": { opacity: 0.3 },
+              color: SECONDARY_SLATE,
+              fontWeight: 800,
+              textTransform: "uppercase",
+              letterSpacing: 1,
+              px: 4,
+              "&:disabled": { opacity: 0.2 },
+              "&:hover": { background: "rgba(15, 23, 42, 0.05)" }
             }}
           >
             Back
@@ -983,16 +1075,21 @@ const CreateProjectDialog = ({ open, onClose, onSubmit }) => {
                 variant="contained"
                 onClick={handleNext}
                 sx={{
-                  background: "linear-gradient(135deg, #00d4ff, #0099cc)",
+                  background: "linear-gradient(135deg, #0f172a 0%, #334155 100%)",
                   color: "#fff",
-                  fontWeight: 600,
-                  px: 4,
+                  fontWeight: 900,
+                  px: 6,
+                  py: 1.2,
+                  borderRadius: "14px",
+                  boxShadow: "0 12px 24px rgba(10, 15, 25, 0.15)",
+                  transition: "all 0.3s ease",
                   "&:hover": {
-                    background: "linear-gradient(135deg, #00bbee, #0088bb)",
+                    transform: "translateY(-1px)",
+                    boxShadow: "0 16px 32px rgba(10, 15, 25, 0.2)",
                   },
                 }}
               >
-                Next
+                Continue
               </Button>
             ) : (
               <Button
@@ -1000,17 +1097,22 @@ const CreateProjectDialog = ({ open, onClose, onSubmit }) => {
                 onClick={handleSubmit}
                 disabled={loading}
                 sx={{
-                  background: "linear-gradient(135deg, #4ade80, #4ade80cc)",
-                  color: "#020617",
-                  fontWeight: 700,
-                  px: 4,
+                  background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
+                  color: "#fff",
+                  fontWeight: 900,
+                  px: 6,
+                  py: 1.2,
+                  borderRadius: "14px",
+                  boxShadow: "0 12px 24px rgba(16, 185, 129, 0.2)",
+                  transition: "all 0.3s ease",
                   "&:hover": {
-                    background: "linear-gradient(135deg, #4ade80dd, #4ade80)",
+                    transform: "translateY(-1px)",
+                    boxShadow: "0 16px 32px rgba(16, 185, 129, 0.3)",
                   },
                   "&:disabled": { opacity: 0.6 },
                 }}
               >
-                {loading ? "Creating..." : "Create Project"}
+                {loading ? "Initializing..." : "Protocol Deployment"}
               </Button>
             )}
           </Box>

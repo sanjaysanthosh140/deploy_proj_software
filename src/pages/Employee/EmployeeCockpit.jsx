@@ -1,9 +1,13 @@
+/**
+ * AntyGravity Instruction:
+ * Apply rules from /docs/component_analysis_prompt.md
+ */
 import React, { useState, useEffect } from "react";
-import { Box, Grid, Typography, useTheme, Fade } from "@mui/material";
+import { Box, Grid, Typography, useTheme, alpha } from "@mui/material";
+import { motion, AnimatePresence } from "framer-motion";
 import { useParams } from "react-router-dom";
 import ActiveProjectTracker from "../../components/dashboard/ActiveProjectTracker";
 import ProjectBoard from "../../components/dashboard/ProjectBoard";
-import TaskHistory from "../../components/dashboard/TaskHistory";
 import WorkReportForm from "../../components/dashboard/WorkReportForm";
 import AttendanceWidget from "../../components/AttendanceWidget";
 import DeadlineNotifications from "../../components/dashboard/DeadlineNotifications";
@@ -18,6 +22,11 @@ const mockActiveProject = {
   progress: 78,
   deadline: "2024-11-30",
 };
+
+const PRIMARY_SLATE = "#0f172a";
+const SECONDARY_SLATE = "#475569";
+const INDIGO_ACCENT = "#4f46e5";
+const GLASS_BORDER = "rgba(10, 15, 25, 0.08)";
 
 const EmployeeCockpit = (props) => {
   const { deptId: paramDeptId } = useParams();
@@ -88,22 +97,85 @@ const EmployeeCockpit = (props) => {
   }, [deptId]);
 
   return (
-    <Box sx={{ width: "100%", height: "100%", pb: 4 }}>
-      <Fade in={true} timeout={800}>
-        <Box>
+    <Box
+      sx={{
+        width: "100%",
+        minHeight: "100vh",
+        pb: 6,
+        bgcolor: "#f8fafc",
+        position: "relative",
+        overflow: "hidden"
+      }}
+    >
+      {/* Background Mesh Gradients */}
+      <Box
+        sx={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          zIndex: 0,
+          pointerEvents: "none",
+        }}
+      >
+        <Box
+          sx={{
+            position: "absolute",
+            top: "-5%",
+            right: "5%",
+            width: "50vw",
+            height: "50vw",
+            background: "radial-gradient(circle, rgba(79, 70, 229, 0.04) 0%, rgba(255,255,255,0) 70%)",
+            filter: "blur(80px)",
+          }}
+        />
+        <Box
+          sx={{
+            position: "absolute",
+            bottom: "10%",
+            left: "5%",
+            width: "40vw",
+            height: "40vw",
+            background: "radial-gradient(circle, rgba(15, 23, 42, 0.03) 0%, rgba(255,255,255,0) 70%)",
+            filter: "blur(100px)",
+          }}
+        />
+      </Box>
+
+      <motion.div
+        initial={{ opacity: 0, y: 20, scale: 0.98 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{
+          type: "spring",
+          stiffness: 125,
+          damping: 22,
+          mass: 1
+        }}
+        style={{ position: "relative", zIndex: 1 }}
+      >
+        <Box sx={{ p: { xs: 2, md: 4 } }}>
           <Typography
             variant="h4"
             sx={{
               mb: 1,
-              fontWeight: 800,
-              color: "#fff",
-              letterSpacing: "-0.5px",
+              fontWeight: 900,
+              color: PRIMARY_SLATE,
+              letterSpacing: "-0.03em",
             }}
           >
             Mission Control
           </Typography>
-          <Typography variant="body1" sx={{ mb: 4, color: "#a0aec0" }}>
-            Welcome back, Agent. Here is your daily briefing.
+          <Typography
+            variant="body1"
+            sx={{
+              mb: 4,
+              color: SECONDARY_SLATE,
+              fontWeight: 500,
+              maxWidth: "600px"
+            }}
+          >
+            Welcome back, Specialist. Systems are nominal. Resuming orchestration of active protocols.
           </Typography>
 
           {/* Deadline Notifications */}
@@ -129,10 +201,15 @@ const EmployeeCockpit = (props) => {
           </Grid>
 
           {/* Middle Row: Kanban Board */}
-          <Box sx={{ mb: 4 }}>
+          <Box sx={{ mb: 6 }}>
             <Typography
               variant="h5"
-              sx={{ mb: 2, fontWeight: 700, color: "#fff" }}
+              sx={{
+                mb: 3,
+                fontWeight: 800,
+                color: PRIMARY_SLATE,
+                letterSpacing: "-0.02em"
+              }}
             >
               Active Operations
             </Typography>
@@ -144,11 +221,8 @@ const EmployeeCockpit = (props) => {
           </Box>
 
           {/* Bottom Row: History */}
-          <Box>
-            <TaskHistory />
-          </Box>
         </Box>
-      </Fade>
+      </motion.div>
     </Box>
   );
 };

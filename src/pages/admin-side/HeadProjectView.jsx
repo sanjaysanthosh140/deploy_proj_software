@@ -1,3 +1,8 @@
+
+/**
+ * AntyGravity Instruction:
+ * Apply rules from /docs/component_analysis_prompt.md
+ */
 import React, { useEffect, useState } from "react";
 import {
   Box,
@@ -14,6 +19,8 @@ import {
   AvatarGroup,
   LinearProgress,
   Tooltip,
+  alpha,
+  Skeleton,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import FilterListIcon from "@mui/icons-material/FilterList";
@@ -26,6 +33,37 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import axios from "axios";
 import TaskAssignmentModal from "./TaskAssignmentModal";
+
+// --- Styled Components & Theme Constants ---
+const GLASS_BG = "rgba(255, 255, 255, 0.75)";
+const GLASS_BORDER = "rgba(10, 15, 25, 0.08)";
+
+const GlassCard = ({ children, sx = {}, hoverEffect = true }) => (
+  <Card
+    component={motion.div}
+    whileHover={hoverEffect ? {
+      translateY: -8,
+      borderColor: "rgba(10, 15, 25, 0.15)",
+      boxShadow: "0 20px 40px rgba(10, 15, 25, 0.08)",
+    } : {}}
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ type: "spring", stiffness: 150, damping: 20 }}
+    sx={{
+      background: GLASS_BG,
+      backdropFilter: "blur(24px) saturate(160%)",
+      WebkitBackdropFilter: "blur(24px) saturate(160%)",
+      border: `1px solid ${GLASS_BORDER}`,
+      borderRadius: "24px",
+      boxShadow: "0 8px 32px 0 rgba(10, 15, 25, 0.04)",
+      color: "#0f172a",
+      overflow: "visible",
+      ...sx,
+    }}
+  >
+    {children}
+  </Card>
+);
 
 const HeadProjectView = () => {
   const navigate = useNavigate();
@@ -106,23 +144,42 @@ const HeadProjectView = () => {
     <Box
       sx={{
         minHeight: "100vh",
-        p: { xs: 2, sm: 3, md: 6 },
-        background: "linear-gradient(135deg, #020617 0%, #0f172a 100%)",
+        bgcolor: "#f1f5f9",
         position: "relative",
         overflow: "hidden",
-        "&::after": {
-          content: '""',
-          position: "absolute",
-          top: "-10%",
-          right: "-10%",
-          width: "40%",
-          height: "40%",
-          background:
-            "radial-gradient(circle, rgba(56, 189, 248, 0.05) 0%, transparent 70%)",
-          zIndex: 0,
-        },
+        p: { xs: 2, sm: 3, md: 6 },
+        color: "#0f172a",
       }}
     >
+      {/* Background Mesh Blobs */}
+      <Box sx={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, zIndex: 0, pointerEvents: "none" }}>
+        <motion.div
+          animate={{ scale: [1, 1.2, 1], rotate: [0, 90, 0] }}
+          transition={{ duration: 22, repeat: Infinity }}
+          style={{
+            position: "absolute",
+            top: "-15%",
+            right: "-10%",
+            width: "65vw",
+            height: "65vw",
+            background: "radial-gradient(circle, rgba(99, 102, 241, 0.08) 0%, transparent 70%)",
+            filter: "blur(90px)",
+          }}
+        />
+        <motion.div
+          animate={{ scale: [1.2, 1, 1.2], rotate: [0, -90, 0] }}
+          transition={{ duration: 28, repeat: Infinity }}
+          style={{
+            position: "absolute",
+            bottom: "-15%",
+            left: "-5%",
+            width: "60vw",
+            height: "60vw",
+            background: "radial-gradient(circle, rgba(6, 182, 212, 0.08) 0%, transparent 70%)",
+            filter: "blur(110px)",
+          }}
+        />
+      </Box>
       {/* Header Section */}
       <Box
         sx={{
@@ -146,73 +203,78 @@ const HeadProjectView = () => {
               onClick={() => navigate("/head")}
               sx={{
                 color: "#64748b",
-                mb: 2,
+                mb: 3,
                 textTransform: "none",
-                fontSize: "0.9rem",
+                fontWeight: 700,
+                fontSize: "0.95rem",
+                borderRadius: "14px",
+                px: 2,
                 "&:hover": {
-                  color: "#38bdf8",
-                  background: "rgba(56, 189, 248, 0.05)",
+                  color: "#0f172a",
+                  background: "rgba(15, 23, 42, 0.05)",
                 },
               }}
             >
-              Back to Dashboard
+              Back to Command Center
             </Button>
             <Typography
-              variant="h2"
+              variant="h1"
               sx={{
-                color: "#f8fafc",
-                fontWeight: 800,
-                fontSize: { xs: "2.5rem", md: "3.5rem" },
-                letterSpacing: "-0.02em",
+                fontWeight: 900,
+                fontSize: { xs: "2.5rem", md: "4rem" },
+                letterSpacing: "-0.03em",
                 mb: 1,
-                background: "linear-gradient(to right, #fff, #94a3b8)",
+                background: "linear-gradient(135deg, #0f172a 0%, #475569 100%)",
                 backgroundClip: "text",
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
+                lineHeight: 1.1,
               }}
             >
-              Enterprise Projects
+              Enterprise Portfolios
             </Typography>
             <Typography
               variant="h6"
-              sx={{ color: "#64748b", fontWeight: 400, maxWidth: 600 }}
+              sx={{ color: "#64748b", fontWeight: 500, maxWidth: 700, lineHeight: 1.6, letterSpacing: 0.2 }}
             >
-              Sophisticated management interface for high-level departmental
-              oversight and resource orchestration.
+              Strategic departmental oversight and high-fidelity resource orchestration for organization-wide intelligence.
             </Typography>
           </motion.div>
         </Box>
 
         <Box sx={{ display: "flex", gap: 3, alignItems: "center" }}>
           <TextField
-            placeholder="Explore projects..."
+            placeholder="Search Project Streams..."
             variant="outlined"
-            size="medium"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <SearchIcon sx={{ color: "#38bdf8" }} />
+                  <SearchIcon sx={{ color: "#0f172a", fontSize: 24, ml: 1 }} />
                 </InputAdornment>
               ),
             }}
             sx={{
-              width: { xs: "100%", sm: 400 },
+              width: { xs: "100%", sm: 450 },
               "& .MuiOutlinedInput-root": {
-                color: "#f1f5f9",
-                bgcolor: "rgba(15, 23, 42, 0.6)",
+                color: "#0f172a",
+                background: "rgba(255, 255, 255, 0.6)",
                 backdropFilter: "blur(12px)",
-                borderRadius: 3,
-                border: "1px solid rgba(148, 163, 184, 0.1)",
-                transition: "all 0.3s ease",
+                borderRadius: "20px",
+                fontWeight: 600,
+                px: 1,
+                py: 0.5,
+                border: `1px solid ${GLASS_BORDER}`,
+                transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
                 "& fieldset": { border: "none" },
                 "&:hover": {
-                  bgcolor: "rgba(15, 23, 42, 0.8)",
-                  boxShadow: "0 0 20px rgba(56, 189, 248, 0.1)",
+                  background: "rgba(255, 255, 255, 0.8)",
+                  borderColor: "rgba(15, 23, 42, 0.15)",
                 },
                 "&.Mui-focused": {
-                  boxShadow: "0 0 30px rgba(56, 189, 248, 0.15)",
+                  background: "#fff",
+                  boxShadow: "0 4px 24px rgba(15, 23, 42, 0.06)",
                 },
               },
             }}
@@ -222,30 +284,39 @@ const HeadProjectView = () => {
 
       {/* Projects Grid */}
       {loading ? (
-        <Box sx={{ display: "flex", justifyContent: "center", mt: 10 }}>
-          <Box sx={{ width: "300px" }}>
-            <LinearProgress
-              sx={{
-                height: 4,
-                borderRadius: 2,
-                bgcolor: "rgba(56, 189, 248, 0.1)",
-                "& .MuiLinearProgress-bar": { bgcolor: "#38bdf8" },
-              }}
-            />
-            <Typography
-              sx={{
-                color: "#64748b",
-                textAlign: "center",
-                mt: 2,
-                fontSize: "0.8rem",
-                textTransform: "uppercase",
-                letterSpacing: 2,
-              }}
-            >
-              Synchronizing Infrastructure
-            </Typography>
-          </Box>
-        </Box>
+        <Grid container spacing={5}>
+          {[1, 2].map((i) => (
+            <Grid item xs={12} key={i}>
+              <GlassCard sx={{ p: 3 }}>
+                <Skeleton
+                  variant="rounded"
+                  width={56}
+                  height={56}
+                  sx={{ bgcolor: "rgba(15, 23, 42, 0.05)", borderRadius: "16px", mb: 2.5 }}
+                />
+                <Skeleton
+                  variant="text"
+                  width="40%"
+                  sx={{ bgcolor: "rgba(15, 23, 42, 0.03)", mb: 1, height: 20 }}
+                />
+                <Skeleton
+                  variant="text"
+                  width="80%"
+                  sx={{ bgcolor: "rgba(15, 23, 42, 0.05)", mb: 2.5, height: 32 }}
+                />
+                <Skeleton
+                  variant="rounded"
+                  height={60}
+                  sx={{ bgcolor: "rgba(15, 23, 42, 0.02)", borderRadius: "16px", mb: 2.5 }}
+                />
+                <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                  <Skeleton variant="circular" width={32} height={32} sx={{ bgcolor: "rgba(15, 23, 42, 0.05)" }} />
+                  <Skeleton variant="rounded" width={80} height={32} sx={{ bgcolor: "rgba(15, 23, 42, 0.05)", borderRadius: "8px" }} />
+                </Box>
+              </GlassCard>
+            </Grid>
+          ))}
+        </Grid>
       ) : (
         <Grid container spacing={5} sx={{ position: "relative", zIndex: 1 }}>
           {filteredProjects.map((project, index) => {
@@ -261,337 +332,274 @@ const HeadProjectView = () => {
             const statusColor = getStatusColor(project.status || "Active");
 
             return (
-              <Grid size={{ xs: 12, md: 6, lg: 4 }} key={project._id}>
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  whileHover={{ y: -8, transition: { duration: 0.2 } }}
-                  onClick={() => {
+              <Grid item xs={12} key={project._id}>
+                <GlassCard
+                  sx={{ cursor: "pointer", p: 0, height: "100%" }}
+                  onSelect={() => {
                     setSelectedProject(project);
                     setIsModalOpen(true);
                   }}
                 >
-                  <Card
+                  <Box
                     sx={{
-                      cursor: "pointer",
-                      background: "rgba(15, 23, 42, 0.4)",
-                      backdropFilter: "blur(20px)",
-                      border: "1px solid rgba(255, 255, 255, 0.05)",
-                      borderRadius: 6,
-                      position: "relative",
-                      overflow: "visible",
+                      p: 3,
                       height: "100%",
-                      transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
-                      "&:hover": {
-                        background: "rgba(15, 23, 42, 0.6)",
-                        borderColor: "rgba(56, 189, 248, 0.3)",
-                        boxShadow: `0 20px 40px -20px ${statusColor}40`,
-                        "& .project-icon": {
-                          transform: "scale(1.1) rotate(5deg)",
-                          color: statusColor,
-                        },
-                      },
+                      display: "flex",
+                      flexDirection: "column",
+                    }}
+                    onClick={() => {
+                      setSelectedProject(project);
+                      setIsModalOpen(true);
                     }}
                   >
-                    {/* Status Glow */}
+                    {/* Top Row */}
                     <Box
                       sx={{
-                        position: "absolute",
-                        top: -20,
-                        right: 20,
-                        width: 80,
-                        height: 80,
-                        background: `radial-gradient(circle, ${statusColor}15 0%, transparent 70%)`,
-                        zIndex: -1,
-                      }}
-                    />
-
-                    <CardContent
-                      sx={{
-                        p: 4,
-                        height: "100%",
                         display: "flex",
-                        flexDirection: "column",
+                        justifyContent: "space-between",
+                        alignItems: "flex-start",
+                        mb: 2.5,
                       }}
                     >
-                      {/* Top Row */}
                       <Box
                         sx={{
+                          width: 56,
+                          height: 56,
+                          borderRadius: "16px",
+                          background: "rgba(15, 23, 42, 0.05)",
                           display: "flex",
-                          justifyContent: "space-between",
-                          alignItems: "flex-start",
-                          mb: 4,
+                          alignItems: "center",
+                          justifyContent: "center",
+                          color: statusColor,
+                          border: `1px solid ${alpha(statusColor, 0.2)}`,
                         }}
                       >
-                        <Avatar
-                          variant="rounded"
-                          className="project-icon"
-                          sx={{
-                            width: 56,
-                            height: 56,
-                            bgcolor: "rgba(15, 23, 42, 0.8)",
-                            border: `1px solid ${statusColor}30`,
-                            color: "#94a3b8",
-                            transition: "all 0.4s ease",
-                            borderRadius: 3,
-                          }}
-                        >
-                          <FolderIcon fontSize="large" />
-                        </Avatar>
-
-                        <Box sx={{ display: "flex", gap: 1 }}>
-                          <Chip
-                            label={project.status || "Active"}
-                            size="small"
-                            sx={{
-                              bgcolor: `${statusColor}10`,
-                              color: statusColor,
-                              fontWeight: 700,
-                              fontSize: "0.65rem",
-                              textTransform: "uppercase",
-                              letterSpacing: 1,
-                              border: `1px solid ${statusColor}20`,
-                            }}
-                          />
-                          <IconButton
-                            size="small"
-                            sx={{
-                              color: "rgba(255, 255, 255, 0.2)",
-                              "&:hover": { color: "#fff" },
-                            }}
-                          >
-                            <MoreVertIcon />
-                          </IconButton>
-                        </Box>
+                        <FolderIcon sx={{ fontSize: 32 }} />
                       </Box>
 
-                      {/* Title & Info */}
-                      <Typography
-                        variant="caption"
-                        sx={{
-                          color: "#38bdf8",
-                          fontWeight: 700,
-                          letterSpacing: 2,
-                          textTransform: "uppercase",
-                          mb: 1,
-                          display: "block",
-                        }}
-                      >
-                        Ref:{" "}
-                        {project._id
-                          .substring(project._id.length - 6)
-                          .toUpperCase()}
-                      </Typography>
-
-                      <Typography
-                        variant="h5"
-                        sx={{
-                          color: "#f8fafc",
-                          fontWeight: 700,
-                          mb: 2,
-                          lineHeight: 1.3,
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                          display: "-webkit-box",
-                          WebkitLineClamp: 2,
-                          WebkitBoxOrient: "vertical",
-                        }}
-                      >
-                        {project.title}
-                      </Typography>
-
-                      <Typography
-                        variant="body2"
-                        sx={{
-                          color: "#64748b",
-                          mb: 4,
-                          lineHeight: 1.6,
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                          display: "-webkit-box",
-                          WebkitLineClamp: 3,
-                          WebkitBoxOrient: "vertical",
-                          minHeight: 68,
-                        }}
-                      >
-                        {project.description}
-                      </Typography>
-
-                      {/* Progress Section */}
-                      <Box
-                        sx={{
-                          mb: 4,
-                          bgcolor: "rgba(15, 23, 42, 0.4)",
-                          p: 2,
-                          borderRadius: 4,
-                          border: "1px solid rgba(255, 255, 255, 0.03)",
-                        }}
-                      >
-                        <Box
+                      <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+                        <Chip
+                          label={project.status || "Active"}
+                          size="small"
                           sx={{
-                            display: "flex",
-                            justifyContent: "space-between",
-                            alignItems: "center",
-                            mb: 1.5,
-                          }}
-                        >
-                          <Typography
-                            variant="caption"
-                            sx={{ color: "#94a3b8", fontWeight: 600 }}
-                          >
-                            Completion Strategy
-                          </Typography>
-                          <Typography
-                            variant="caption"
-                            sx={{ color: statusColor, fontWeight: 800 }}
-                          >
-                            {progress}%
-                          </Typography>
-                        </Box>
-                        <LinearProgress
-                          variant="determinate"
-                          value={progress}
-                          sx={{
-                            height: 6,
-                            borderRadius: 3,
-                            bgcolor: "rgba(255, 255, 255, 0.05)",
-                            "& .MuiLinearProgress-bar": {
-                              background: `linear-gradient(90deg, ${statusColor}, ${statusColor}dd)`,
-                              borderRadius: 3,
-                              boxShadow: `0 0 10px ${statusColor}40`,
-                            },
+                            bgcolor: alpha(statusColor, 0.1),
+                            color: statusColor,
+                            fontWeight: 900,
+                            fontSize: "0.7rem",
+                            textTransform: "uppercase",
+                            letterSpacing: 1,
+                            borderRadius: "8px",
                           }}
                         />
+                        <IconButton
+                          size="small"
+                          sx={{
+                            color: "rgba(15, 23, 42, 0.2)",
+                            "&:hover": { color: "#0f172a" },
+                          }}
+                        >
+                          <MoreVertIcon />
+                        </IconButton>
                       </Box>
+                    </Box>
 
-                      {/* Metadata Grid */}
-                      <Grid container spacing={2} sx={{ mb: 4 }}>
-                        <Grid size={{ xs: 6 }}>
-                          <Box
-                            sx={{
-                              borderLeft: `2px solid ${getPriorityColor(project.priority)}`,
-                              pl: 1.5,
-                            }}
-                          >
-                            <Typography
-                              variant="caption"
-                              sx={{
-                                color: "#64748b",
-                                display: "block",
-                                mb: 0.5,
-                              }}
-                            >
-                              Priority
-                            </Typography>
-                            <Typography
-                              variant="body2"
-                              sx={{ color: "#f1f5f9", fontWeight: 700 }}
-                            >
-                              {project.priority || "Medium"}
-                            </Typography>
-                          </Box>
-                        </Grid>
-                        <Grid size={{ xs: 6 }}>
-                          <Box
-                            sx={{
-                              borderLeft: "2px solid rgba(148, 163, 184, 0.2)",
-                              pl: 1.5,
-                            }}
-                          >
-                            <Typography
-                              variant="caption"
-                              sx={{
-                                color: "#64748b",
-                                display: "block",
-                                mb: 0.5,
-                              }}
-                            >
-                              Deadline
-                            </Typography>
-                            <Typography
-                              variant="body2"
-                              sx={{ color: "#f1f5f9", fontWeight: 700 }}
-                            >
-                              {project.deadline || "n/a"}
-                            </Typography>
-                          </Box>
-                        </Grid>
-                      </Grid>
+                    {/* Title & Info */}
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        color: "#64748b",
+                        fontWeight: 800,
+                        letterSpacing: 2,
+                        textTransform: "uppercase",
+                        mb: 1,
+                        display: "block",
+                        fontSize: "0.7rem"
+                      }}
+                    >
+                      ID:{" "}
+                      {project._id
+                        .substring(project._id.length - 6)
+                        .toUpperCase()}
+                    </Typography>
 
-                      {/* Footer Actions */}
+                    <Typography
+                      sx={{
+                        color: "#0f172a",
+                        fontWeight: 900,
+                        fontSize: "1.5rem",
+                        mb: 1.5,
+                        lineHeight: 1.2,
+                        letterSpacing: "-0.02em"
+                      }}
+                    >
+                      {project.title}
+                    </Typography>
+
+                    <Typography
+                      sx={{
+                        color: "#475569",
+                        mb: 2.5,
+                        lineHeight: 1.5,
+                        fontWeight: 500,
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        display: "-webkit-box",
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: "vertical",
+                        minHeight: 48,
+                      }}
+                    >
+                      {project.description}
+                    </Typography>
+
+                    {/* Progress Section */}
+                    <Box
+                      sx={{
+                        mb: 2.5,
+                        bgcolor: "rgba(15, 23, 42, 0.03)",
+                        p: 2,
+                        borderRadius: "16px",
+                        border: `1px solid ${GLASS_BORDER}`,
+                      }}
+                    >
                       <Box
                         sx={{
-                          mt: "auto",
-                          pt: 3,
                           display: "flex",
                           justifyContent: "space-between",
                           alignItems: "center",
-                          borderTop: "1px solid rgba(255, 255, 255, 0.05)",
+                          mb: 1.5,
                         }}
                       >
-                        <AvatarGroup
-                          max={4}
+                        <Typography
+                          variant="caption"
+                          sx={{ color: "#64748b", fontWeight: 800, textTransform: "uppercase", letterSpacing: 0.5 }}
+                        >
+                          Execution Velocity
+                        </Typography>
+                        <Typography
+                          variant="caption"
+                          sx={{ color: statusColor, fontWeight: 900, fontSize: "0.85rem" }}
+                        >
+                          {progress}%
+                        </Typography>
+                      </Box>
+                      <LinearProgress
+                        variant="determinate"
+                        value={progress}
+                        sx={{
+                          height: 8,
+                          borderRadius: 4,
+                          bgcolor: "rgba(15, 23, 42, 0.05)",
+                          "& .MuiLinearProgress-bar": {
+                            background: `linear-gradient(90deg, ${statusColor}, ${alpha(statusColor, 0.6)})`,
+                            borderRadius: 4,
+                          },
+                        }}
+                      />
+                    </Box>
+
+                    {/* Metadata Grid */}
+                    <Grid container spacing={3} sx={{ mb: 2.5 }}>
+                      <Grid item xs={6}>
+                        <Box sx={{ borderLeft: `3px solid ${getPriorityColor(project.priority)}`, pl: 2 }}>
+                          <Typography
+                            sx={{ color: "#64748b", fontSize: "0.7rem", fontWeight: 800, textTransform: "uppercase", mb: 0.5 }}
+                          >
+                            Priority
+                          </Typography>
+                          <Typography
+                            sx={{ color: "#0f172a", fontWeight: 800, fontSize: "0.95rem" }}
+                          >
+                            {project.priority || "Medium"}
+                          </Typography>
+                        </Box>
+                      </Grid>
+                      <Grid item xs={6}>
+                        <Box sx={{ borderLeft: "3px solid rgba(15, 23, 42, 0.05)", pl: 2 }}>
+                          <Typography
+                            sx={{ color: "#64748b", fontSize: "0.7rem", fontWeight: 800, textTransform: "uppercase", mb: 0.5 }}
+                          >
+                            Deadline
+                          </Typography>
+                          <Typography
+                            sx={{ color: "#0f172a", fontWeight: 800, fontSize: "0.95rem" }}
+                          >
+                            {project.deadline || "TBD"}
+                          </Typography>
+                        </Box>
+                      </Grid>
+                    </Grid>
+
+                    {/* Footer Actions */}
+                    <Box
+                      sx={{
+                        mt: "auto",
+                        pt: 3,
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        borderTop: `1px solid ${GLASS_BORDER}`,
+                      }}
+                    >
+                      <AvatarGroup
+                        max={4}
+                        sx={{
+                          "& .MuiAvatar-root": {
+                            width: 36,
+                            height: 36,
+                            fontSize: "0.85rem",
+                            border: `2px solid ${GLASS_BG}`,
+                            background: "linear-gradient(135deg, #0f172a, #334155)",
+                            color: "#fff",
+                            fontWeight: 800
+                          },
+                        }}
+                      >
+                        {teamMembers.map((m, i) => (
+                          <Tooltip key={i} title={m.name || "Specialist"}>
+                            <Avatar>
+                              {m.name
+                                ?.split(" ")
+                                .map((n) => n[0])
+                                .join("") || "S"}
+                            </Avatar>
+                          </Tooltip>
+                        ))}
+                      </AvatarGroup>
+
+                      <Box sx={{ display: "flex", gap: 1.5 }}>
+                        <IconButton
+                          size="small"
                           sx={{
-                            "& .MuiAvatar-root": {
-                              width: 32,
-                              height: 32,
-                              fontSize: "0.75rem",
-                              border: "2px solid #0f172a",
-                              background:
-                                "linear-gradient(135deg, #1e293b, #0f172a)",
-                              color: "#38bdf8",
+                            color: "#64748b",
+                            bgcolor: "rgba(15, 23, 42, 0.03)",
+                            borderRadius: "10px",
+                            "&:hover": {
+                              color: "#0f172a",
+                              bgcolor: "rgba(15, 23, 42, 0.06)",
                             },
                           }}
                         >
-                          {teamMembers.map((m, i) => (
-                            <Tooltip key={i} title={m.name || "Specialist"}>
-                              <Avatar>
-                                {m.name
-                                  ?.split(" ")
-                                  .map((n) => n[0])
-                                  .join("") || "S"}
-                              </Avatar>
-                            </Tooltip>
-                          ))}
-                        </AvatarGroup>
-
-                        <Box sx={{ display: "flex", gap: 1 }}>
-                          <Tooltip title="Configure Parameters">
-                            <IconButton
-                              size="small"
-                              sx={{
-                                color: "#64748b",
-                                bgcolor: "rgba(255, 255, 255, 0.03)",
-                                "&:hover": {
-                                  color: "#4ade80",
-                                  bgcolor: "rgba(74, 222, 128, 0.1)",
-                                },
-                              }}
-                            >
-                              <EditIcon sx={{ fontSize: 18 }} />
-                            </IconButton>
-                          </Tooltip>
-                          <Tooltip title="Decommission Project">
-                            <IconButton
-                              size="small"
-                              sx={{
-                                color: "#64748b",
-                                bgcolor: "rgba(255, 255, 255, 0.03)",
-                                "&:hover": {
-                                  color: "#f43f5e",
-                                  bgcolor: "rgba(244, 63, 94, 0.1)",
-                                },
-                              }}
-                            >
-                              <DeleteIcon sx={{ fontSize: 18 }} />
-                            </IconButton>
-                          </Tooltip>
-                        </Box>
+                          <EditIcon sx={{ fontSize: 20 }} />
+                        </IconButton>
+                        <IconButton
+                          size="small"
+                          sx={{
+                            color: "#64748b",
+                            bgcolor: "rgba(15, 23, 42, 0.03)",
+                            borderRadius: "10px",
+                            "&:hover": {
+                              color: "#f43f5e",
+                              bgcolor: alpha("#f43f5e", 0.1),
+                            },
+                          }}
+                        >
+                          <DeleteIcon sx={{ fontSize: 20 }} />
+                        </IconButton>
                       </Box>
-                    </CardContent>
-                  </Card>
-                </motion.div>
+                    </Box>
+                  </Box>
+                </GlassCard>
               </Grid>
             );
           })}
@@ -604,28 +612,28 @@ const HeadProjectView = () => {
           <Box sx={{ textAlign: "center", mt: 15 }}>
             <Box
               sx={{
-                width: 120,
-                height: 120,
-                borderRadius: "50%",
-                background: "rgba(15, 23, 42, 0.4)",
+                width: 140,
+                height: 140,
+                borderRadius: "40px",
+                background: "rgba(15, 23, 42, 0.03)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 margin: "0 auto 32px",
-                border: "1px solid rgba(255, 255, 255, 0.05)",
-                color: "#64748b",
+                border: `1px solid ${GLASS_BORDER}`,
+                color: alpha("#0f172a", 0.1),
               }}
             >
-              <SearchIcon sx={{ fontSize: 48 }} />
+              <SearchIcon sx={{ fontSize: 64 }} />
             </Box>
             <Typography
-              variant="h5"
-              sx={{ color: "#f8fafc", fontWeight: 700, mb: 1 }}
+              variant="h4"
+              sx={{ color: "#0f172a", fontWeight: 900, mb: 1.5, letterSpacing: "-0.02em" }}
             >
-              No Data Matched Your Query
+              Zero Stream Matches
             </Typography>
-            <Typography sx={{ color: "#64748b" }}>
-              Try adjusting your parameters or contact the system administrator.
+            <Typography sx={{ color: "#64748b", fontWeight: 600, maxWidth: 400, mx: "auto" }}>
+              The system was unable to identify any project intelligence matching your current query parameters.
             </Typography>
           </Box>
         </motion.div>

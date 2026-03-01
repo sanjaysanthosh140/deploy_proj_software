@@ -1,4 +1,8 @@
-import React, { useState } from "react";
+
+/**
+ * AntyGravity Instruction:
+ * Apply rules from /docs/component_analysis_prompt.md
+ */import React, { useState } from "react";
 import { Box, Typography } from "@mui/material";
 import { DragDropContext, Droppable } from "@hello-pangea/dnd";
 import TaskCard from "./TaskCard";

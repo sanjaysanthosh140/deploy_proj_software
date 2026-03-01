@@ -1,3 +1,7 @@
+/**
+ * AntyGravity Instruction:
+ * Apply rules from /docs/component_analysis_prompt.md
+ */
 import React from "react";
 import { Box, useTheme, useMediaQuery, CssBaseline } from "@mui/material";
 import Sidebar from "./Sidebar";
@@ -14,7 +18,7 @@ const EmployeeLayout = () => {
       sx={{
         display: "flex",
         minHeight: "100vh",
-        bgcolor: "background.default",
+        bgcolor: "#f8fafc",
       }}
     >
       <CssBaseline />
@@ -45,9 +49,10 @@ const EmployeeLayout = () => {
           component="main"
           sx={{
             flexGrow: 1,
-            p: 3,
+            p: { xs: 2, sm: 3, md: 4 },
             overflowX: "hidden",
-            background: `radial-gradient(circle at 50% 0%, ${theme.palette.primary.dark}15 0%, transparent 50%)`,
+            position: "relative",
+            zIndex: 1,
           }}
         >
           <Outlet />

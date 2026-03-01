@@ -1,3 +1,7 @@
+/**
+ * AntyGravity Instruction:
+ * Apply rules from /docs/component_analysis_prompt.md
+ */
 import React, { useState, useEffect } from "react";
 import {
   Box,
@@ -698,8 +702,8 @@ const ProjectDetailView = () => {
                               ? "rgba(0, 230, 118, 0.05)"
                               : "rgba(255, 255, 255, 0.02)",
                           border: `1px solid ${todo.status === "completed"
-                              ? "rgba(0, 230, 118, 0.2)"
-                              : "rgba(255, 255, 255, 0.05)"
+                            ? "rgba(0, 230, 118, 0.2)"
+                            : "rgba(255, 255, 255, 0.05)"
                             }`,
                           display: "flex",
                           alignItems: "center",

@@ -1,4 +1,7 @@
-import React from "react";
+/**
+ * AntyGravity Instruction:
+ * Apply rules from /docs/component_analysis_prompt.md
+ */import React from "react";
 import { Box, CssBaseline } from "@mui/material";
 import { Outlet } from "react-router-dom";
 import { useLocation } from "react-router-dom";

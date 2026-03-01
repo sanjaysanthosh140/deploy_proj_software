@@ -1,3 +1,7 @@
+/**
+ * AntyGravity Instruction:
+ * Apply rules from /docs/component_analysis_prompt.md
+ */
 import React, { useState, useEffect } from "react";
 import {
   Box,
@@ -48,29 +52,34 @@ import AssessmentIcon from "@mui/icons-material/Assessment";
 import ScheduleIcon from "@mui/icons-material/Schedule";
 import BlockIcon from "@mui/icons-material/Block";
 import WarningIcon from "@mui/icons-material/Warning";
+import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
 
 // --- Styled Components & Theme Constants ---
-const GLASS_BG = "rgba(17, 25, 40, 0.75)";
-const GLASS_BORDER = "rgba(255, 255, 255, 0.125)";
+const GLASS_BG = "rgba(255, 255, 255, 0.75)";
+const GLASS_BORDER = "rgba(10, 15, 25, 0.08)";
 
 const GlassCard = ({ children, sx = {}, hoverEffect = true }) => (
   <Card
+    component={motion.div}
+    whileHover={hoverEffect ? {
+      translateY: -5,
+      scale: 1.01,
+      borderColor: "rgba(255, 255, 255, 0.2)",
+      boxShadow: "0 20px 40px rgba(0, 0, 0, 0.4), 0 0 20px rgba(56, 189, 248, 0.1)"
+    } : {}}
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ type: "spring", stiffness: 150, damping: 20 }}
     sx={{
       background: GLASS_BG,
-      backdropFilter: "blur(16px) saturate(180%)",
+      backdropFilter: "blur(24px) saturate(160%)",
+      WebkitBackdropFilter: "blur(24px) saturate(160%)",
       border: `1px solid ${GLASS_BORDER}`,
-      borderRadius: "16px",
-      boxShadow: "0 8px 32px 0 rgba(0, 0, 0, 0.37)",
-      color: "#e2e8f0",
-      transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-      "&:hover": hoverEffect
-        ? {
-            transform: "translateY(-4px)",
-            boxShadow: "0 12px 40px 0 rgba(0, 0, 0, 0.5)",
-            border: "1px solid rgba(255, 255, 255, 0.2)",
-          }
-        : {},
+      borderRadius: "24px",
+      boxShadow: "0 8px 32px 0 rgba(10, 15, 25, 0.05)",
+      color: "#0f172a",
+      overflow: "hidden",
       ...sx,
     }}
   >
@@ -323,9 +332,9 @@ const HRDashboard = () => {
             variant="h3"
             fontWeight="800"
             sx={{
-              background: `linear-gradient(135deg, white, ${alpha(
+              background: `linear-gradient(135deg, #0f172a, ${alpha(
                 color,
-                0.5,
+                0.7,
               )})`,
               backgroundClip: "text",
               textFillColor: "transparent",
@@ -333,7 +342,7 @@ const HRDashboard = () => {
           >
             {value}
           </Typography>
-          <Typography variant="body2" sx={{ color: "#94a3b8", mt: 0.5 }}>
+          <Typography variant="body2" sx={{ color: "#475569", mt: 0.5 }}>
             {title}
           </Typography>
         </Box>
@@ -345,40 +354,77 @@ const HRDashboard = () => {
     <Box
       sx={{
         minHeight: "100vh",
-        background: "#0f172a",
-        backgroundImage: `
-          radial-gradient(circle at 0% 0%, rgba(56, 189, 248, 0.1) 0%, transparent 50%),
-          radial-gradient(circle at 100% 100%, rgba(139, 92, 246, 0.1) 0%, transparent 50%)
-        `,
+        bgcolor: "#f1f5f9",
+        position: "relative",
+        overflow: "hidden",
         p: { xs: 2, md: 4 },
-        color: "#e2e8f0",
+        color: "#0f172a",
       }}
     >
+      {/* Background Mesh Blobs */}
+      <Box sx={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, zIndex: 0, pointerEvents: "none" }}>
+        <motion.div
+          animate={{ scale: [1, 1.2, 1], rotate: [0, 90, 0] }}
+          transition={{ duration: 20, repeat: Infinity }}
+          style={{
+            position: "absolute",
+            top: "-10%",
+            right: "10%",
+            width: "50vw",
+            height: "50vw",
+            background: "radial-gradient(circle, rgba(56, 189, 248, 0.05) 0%, transparent 70%)",
+            filter: "blur(60px)",
+          }}
+        />
+        <motion.div
+          animate={{ scale: [1.2, 1, 1.2], rotate: [0, -90, 0] }}
+          transition={{ duration: 25, repeat: Infinity }}
+          style={{
+            position: "absolute",
+            bottom: "-10%",
+            left: "10%",
+            width: "50vw",
+            height: "50vw",
+            background: "radial-gradient(circle, rgba(139, 92, 246, 0.05) 0%, transparent 70%)",
+            filter: "blur(80px)",
+          }}
+        />
+      </Box>
+
       {/* Header */}
       <Fade in={true} timeout={800}>
-        <Box sx={{ mb: 6, textAlign: "center" }}>
+        <Box sx={{ mb: 6, textAlign: "center", position: "relative", zIndex: 1 }}>
           <Typography
             variant="h2"
             sx={{
-              fontWeight: 800,
+              fontWeight: 900,
               mb: 1,
-              background: "linear-gradient(135deg, #38bdf8 0%, #818cf8 100%)",
-              backgroundClip: "text",
+              letterSpacing: -1,
+              background: "linear-gradient(135deg, #0f172a 0%, #475569 100%)",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
-              filter: "drop-shadow(0 0 20px rgba(56, 189, 248, 0.3))",
+              filter: "drop-shadow(0 0 20px rgba(0,0,0,0.05))",
             }}
           >
             HR Command Center
           </Typography>
-          <Typography variant="h6" sx={{ color: "#64748b" }}>
-            Overview & Management
+          <Typography
+            variant="h6"
+            sx={{
+              color: "#64748b",
+              fontWeight: 500,
+              letterSpacing: 1,
+              textTransform: "uppercase",
+              fontSize: "0.9rem"
+            }}
+          >
+            Enterprise Management Suite
           </Typography>
         </Box>
       </Fade>
 
       {/* Stats Grid */}
-      <Grid container spacing={3} sx={{ mb: 6 }}>
+      <Grid container spacing={3} sx={{ mb: 6, position: "relative", zIndex: 1 }}>
         {[
           {
             title: "Total Employees",
@@ -421,7 +467,9 @@ const HRDashboard = () => {
         <Box
           sx={{
             borderBottom: `1px solid ${GLASS_BORDER}`,
-            background: "rgba(0,0,0,0.2)",
+            background: "rgba(0,0,0,0.3)",
+            backdropFilter: "blur(10px)",
+            px: 2,
           }}
         >
           <Tabs
@@ -432,8 +480,8 @@ const HRDashboard = () => {
               "& .MuiTabs-indicator": {
                 height: "4px",
                 borderRadius: "4px 4px 0 0",
-                background: "#38bdf8",
-                boxShadow: "0 0 10px #38bdf8",
+                background: "linear-gradient(90deg, #38bdf8, #818cf8)",
+                boxShadow: "0 0 15px rgba(56, 189, 248, 0.5)",
               },
             }}
           >
@@ -445,16 +493,24 @@ const HRDashboard = () => {
             ].map((tab, idx) => (
               <Tab
                 key={idx}
-                icon={<tab.icon />}
+                icon={<tab.icon sx={{ fontSize: 20, mb: 0.5 }} />}
                 label={tab.label}
                 sx={{
-                  color: "#94a3b8",
-                  minHeight: 72,
-                  fontSize: "0.95rem",
-                  textTransform: "none",
-                  fontWeight: 600,
-                  "&.Mui-selected": { color: "#38bdf8" },
-                  transition: "all 0.3s",
+                  color: "#64748b",
+                  minHeight: 80,
+                  fontSize: "0.85rem",
+                  textTransform: "uppercase",
+                  letterSpacing: 1.5,
+                  fontWeight: 700,
+                  transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
+                  "&.Mui-selected": {
+                    color: "#0f172a",
+                    textShadow: "0 0 10px rgba(10, 15, 25, 0.05)"
+                  },
+                  "&:hover": {
+                    color: "#cbd5e1",
+                    transform: "translateY(-2px)"
+                  }
                 }}
               />
             ))}
@@ -482,11 +538,18 @@ const HRDashboard = () => {
                     startIcon={<AddIcon />}
                     onClick={() => handleUserDialogOpen()}
                     sx={{
-                      background: "linear-gradient(135deg, #38bdf8, #2563eb)",
-                      boxShadow: "0 4px 15px rgba(56, 189, 248, 0.4)",
+                      background: "linear-gradient(135deg, #38bdf8 0%, #2563eb 100%)",
+                      borderRadius: "14px",
+                      textTransform: "none",
+                      fontWeight: 800,
+                      px: 3,
+                      boxShadow: "0 8px 20px -5px rgba(56, 189, 248, 0.4)",
+                      transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
                       "&:hover": {
-                        background: "linear-gradient(135deg, #0ea5e9, #1d4ed8)",
-                      },
+                        background: "linear-gradient(135deg, #0ea5e9 0%, #1d4ed8 100%)",
+                        transform: "translateY(-2px)",
+                        boxShadow: "0 12px 25px -5px rgba(56, 189, 248, 0.5)",
+                      }
                     }}
                   >
                     Add Employee
@@ -525,11 +588,14 @@ const HRDashboard = () => {
                       {users.map((user) => (
                         <TableRow
                           key={user._id}
+                          component={motion.tr}
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
                           sx={{
                             "&:hover": {
-                              background: "rgba(255,255,255,0.02)",
+                              background: "rgba(0, 0, 0, 0.03)",
                             },
-                            transition: "background 0.2s",
+                            transition: "background 0.3s ease",
                           }}
                         >
                           <TableCell
@@ -544,21 +610,19 @@ const HRDashboard = () => {
                             >
                               <Avatar
                                 sx={{
-                                  background: `linear-gradient(135deg, ${
-                                    ["#f472b6", "#c084fc", "#818cf8"][
-                                      user.name.length % 3
+                                  background: `linear-gradient(135deg, ${["#f472b6", "#c084fc", "#818cf8"][
+                                    user.name.length % 3
+                                  ]
+                                    }, ${["#db2777", "#9333ea", "#4f46e5"][
+                                    user.name.length % 3
                                     ]
-                                  }, ${
-                                    ["#db2777", "#9333ea", "#4f46e5"][
-                                      user.name.length % 3
-                                    ]
-                                  })`,
-                                  color: "white",
+                                    })`,
+                                  color: "#f8fafc",
                                 }}
                               >
                                 {user.name.charAt(0).toUpperCase()}
                               </Avatar>
-                              <Typography fontWeight="600" color="#e2e8f0">
+                              <Typography fontWeight="600" color="#0f172a">
                                 {user.name}
                               </Typography>
                             </Box>
@@ -692,8 +756,18 @@ const HRDashboard = () => {
                     startIcon={<AddIcon />}
                     onClick={() => handleDeptDialogOpen()}
                     sx={{
-                      background: "linear-gradient(135deg, #f472b6, #db2777)",
-                      boxShadow: "0 4px 15px rgba(244, 114, 182, 0.4)",
+                      background: "linear-gradient(135deg, #f472b6 0%, #db2777 100%)",
+                      borderRadius: "14px",
+                      textTransform: "none",
+                      fontWeight: 800,
+                      px: 3,
+                      boxShadow: "0 8px 20px -5px rgba(244, 114, 182, 0.4)",
+                      transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                      "&:hover": {
+                        background: "linear-gradient(135deg, #ec4899 0%, #be185d 100%)",
+                        transform: "translateY(-2px)",
+                        boxShadow: "0 12px 25px -5px rgba(244, 114, 182, 0.5)",
+                      }
                     }}
                   >
                     Add Department
@@ -755,25 +829,35 @@ const HRDashboard = () => {
                         </CardContent>
                         <Box
                           sx={{
-                            p: 2,
+                            p: 2.5,
                             borderTop: `1px solid ${GLASS_BORDER}`,
                             display: "flex",
                             justifyContent: "flex-end",
-                            gap: 1,
-                            background: "rgba(0,0,0,0.1)",
+                            gap: 1.5,
+                            background: "rgba(0,0,0,0.2)",
                           }}
                         >
                           <Button
                             size="small"
                             onClick={() => handleDeptDialogOpen(dept)}
-                            sx={{ color: dept.color || "#38bdf8" }}
+                            sx={{
+                              color: dept.color || "#38bdf8",
+                              fontWeight: 700,
+                              borderRadius: "10px",
+                              "&:hover": { background: alpha(dept.color || "#38bdf8", 0.1) }
+                            }}
                           >
                             Edit
                           </Button>
                           <Button
                             size="small"
-                            color="error"
                             onClick={() => handleDeleteDept(dept._id)}
+                            sx={{
+                              color: "#ef4444",
+                              fontWeight: 700,
+                              borderRadius: "10px",
+                              "&:hover": { background: alpha("#ef4444", 0.1) }
+                            }}
                           >
                             Delete
                           </Button>
@@ -832,13 +916,12 @@ const HRDashboard = () => {
                         letterSpacing: "0.1em",
                         fontSize: "0.85rem",
                         fontWeight: 700,
-                        borderLeft: `4px solid ${
-                          category === "Digital Marketing"
-                            ? "#f472b6"
-                            : category === "IT Department"
-                              ? "#38bdf8"
-                              : "#fbbf24"
-                        }`,
+                        borderLeft: `4px solid ${category === "Digital Marketing"
+                          ? "#f472b6"
+                          : category === "IT Department"
+                            ? "#38bdf8"
+                            : "#fbbf24"
+                          }`,
                         pl: 2,
                       }}
                     >
@@ -856,13 +939,12 @@ const HRDashboard = () => {
                           <GlassCard
                             sx={{
                               height: "100%",
-                              borderLeft: `4px solid ${
-                                category === "Digital Marketing"
-                                  ? "#f472b6"
-                                  : category === "IT Department"
-                                    ? "#38bdf8"
-                                    : "#fbbf24"
-                              }`,
+                              borderLeft: `4px solid ${category === "Digital Marketing"
+                                ? "#f472b6"
+                                : category === "IT Department"
+                                  ? "#38bdf8"
+                                  : "#fbbf24"
+                                }`,
                             }}
                           >
                             <CardContent sx={{ p: 3 }}>
@@ -908,13 +990,13 @@ const HRDashboard = () => {
                               <Typography
                                 variant="h6"
                                 fontWeight="bold"
-                                sx={{ mb: 1, color: "#e2e8f0" }}
+                                sx={{ mb: 1, color: "#0f172a" }}
                               >
                                 {report.title}
                               </Typography>
                               <Typography
                                 variant="body2"
-                                sx={{ color: "#94a3b8", mb: 0 }}
+                                sx={{ color: "#475569", mb: 0 }}
                               >
                                 {report.desc || report.content}
                               </Typography>
@@ -982,13 +1064,12 @@ const HRDashboard = () => {
                         letterSpacing: "0.1em",
                         fontSize: "0.85rem",
                         fontWeight: 700,
-                        borderLeft: `4px solid ${
-                          category === "Digital Marketing"
-                            ? "#f472b6"
-                            : category === "IT Department"
-                              ? "#38bdf8"
-                              : "#fbbf24"
-                        }`,
+                        borderLeft: `4px solid ${category === "Digital Marketing"
+                          ? "#f472b6"
+                          : category === "IT Department"
+                            ? "#38bdf8"
+                            : "#fbbf24"
+                          }`,
                         pl: 2,
                       }}
                     >
@@ -1056,7 +1137,7 @@ const HRDashboard = () => {
                               <TableCell
                                 sx={{
                                   borderBottom: `1px solid ${GLASS_BORDER}`,
-                                  color: "#e2e8f0",
+                                  color: "#0f172a",
                                 }}
                               >
                                 <Box
@@ -1098,7 +1179,7 @@ const HRDashboard = () => {
                                   size="small"
                                   variant="outlined"
                                   sx={{
-                                    color: "#94a3b8",
+                                    color: "#475569",
                                     borderColor: "#475569",
                                   }}
                                 />
@@ -1106,25 +1187,23 @@ const HRDashboard = () => {
                               <TableCell
                                 sx={{
                                   borderBottom: `1px solid ${GLASS_BORDER}`,
-                                  color: "#e2e8f0",
+                                  color: "#0f172a",
                                 }}
                               >
                                 {log.first
-                                  ? `${log.first.timeIn} - ${
-                                      log.first.timeOut || "..."
-                                    }`
+                                  ? `${log.first.timeIn} - ${log.first.timeOut || "..."
+                                  }`
                                   : "-"}
                               </TableCell>
                               <TableCell
                                 sx={{
                                   borderBottom: `1px solid ${GLASS_BORDER}`,
-                                  color: "#e2e8f0",
+                                  color: "#0f172a",
                                 }}
                               >
                                 {log.second
-                                  ? `${log.second.timeIn} - ${
-                                      log.second.timeOut || "..."
-                                    }`
+                                  ? `${log.second.timeIn} - ${log.second.timeOut || "..."
+                                  }`
                                   : "-"}
                               </TableCell>
                             </TableRow>
@@ -1140,249 +1219,275 @@ const HRDashboard = () => {
         </Box>
       </GlassCard>
 
-      {/* MODALS */}
-      {/* User Dialog */}
-      <Dialog
-        open={openUserDialog}
-        onClose={handleUserDialogClose}
-        PaperProps={{
-          style: {
-            background: "#1e293b",
-            color: "#e2e8f0",
-            border: `1px solid ${GLASS_BORDER}`,
-            borderRadius: "16px",
-          },
-        }}
-        fullWidth
-        maxWidth="sm"
-      >
-        <DialogTitle sx={{ borderBottom: `1px solid ${GLASS_BORDER}` }}>
-          {editingUser ? "Edit Information" : "Onboard New Employee"}
-        </DialogTitle>
-        <DialogContent sx={{ mt: 2 }}>
-          <Stack spacing={3} sx={{ mt: 1 }}>
-            <TextField
-              label="Full Name"
-              value={userForm.name}
-              onChange={(e) =>
-                setUserForm({ ...userForm, name: e.target.value })
-              }
-              fullWidth
-              variant="outlined"
-              sx={{
-                "& .MuiOutlinedInput-root": {
-                  color: "#e2e8f0",
-                  "& fieldset": { borderColor: "#475569" },
-                },
-                "& .MuiInputLabel-root": { color: "#94a3b8" },
-              }}
-            />
-            <TextField
-              label="Email Address"
-              value={userForm.email}
-              onChange={(e) =>
-                setUserForm({ ...userForm, email: e.target.value })
-              }
-              fullWidth
-              sx={{
-                "& .MuiOutlinedInput-root": {
-                  color: "#e2e8f0",
-                  "& fieldset": { borderColor: "#475569" },
-                },
-                "& .MuiInputLabel-root": { color: "#94a3b8" },
-              }}
-            />
-            <FormControl fullWidth>
-              <InputLabel sx={{ color: "#94a3b8" }}>
-                Department Assignment
-              </InputLabel>
-              <Select
-                value={userForm.department}
-                onChange={(e) =>
-                  setUserForm({ ...userForm, department: e.target.value })
-                }
-                label="Department Assignment"
-                sx={{
-                  color: "#e2e8f0",
-                  "& .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "#475569",
-                  },
-                }}
-              >
-                <MenuItem value="IT">IT</MenuItem>
-                <MenuItem value="DM">DM</MenuItem>
-              </Select>
-            </FormControl>
-            {!editingUser && (
-              <TextField
-                label="Set Password"
-                type="password"
-                value={userForm.password}
-                onChange={(e) =>
-                  setUserForm({ ...userForm, password: e.target.value })
-                }
-                fullWidth
-                sx={{
-                  "& .MuiOutlinedInput-root": {
-                    color: "#e2e8f0",
-                    "& fieldset": { borderColor: "#475569" },
-                  },
-                  "& .MuiInputLabel-root": { color: "#94a3b8" },
-                }}
-              />
-            )}
-            <Button
-              variant="contained"
-              onClick={handleUserSubmit}
-              size="large"
-              sx={{
-                background: "linear-gradient(135deg, #38bdf8, #2563eb)",
-                height: 48,
-                fontSize: "1rem",
-              }}
-            >
-              Save Changes
-            </Button>
-          </Stack>
-        </DialogContent>
-      </Dialog>
-
-      {/* Dept Dialog */}
-      <Dialog
-        open={openDeptDialog}
-        onClose={handleDeptDialogClose}
-        PaperProps={{
-          style: {
-            background: "#1e293b",
-            color: "#e2e8f0",
-            border: `1px solid ${GLASS_BORDER}`,
-            borderRadius: "16px",
-          },
-        }}
-        fullWidth
-        maxWidth="sm"
-      >
-        <DialogTitle sx={{ borderBottom: `1px solid ${GLASS_BORDER}` }}>
-          {editingDept ? "Edit Department" : "Create Department"}
-        </DialogTitle>
-        <DialogContent sx={{ mt: 2 }}>
-          <Stack spacing={3} sx={{ mt: 1 }}>
-            <TextField
-              label="Department ID"
-              value={deptForm.id}
-              onChange={(e) => setDeptForm({ ...deptForm, id: e.target.value })}
-              fullWidth
-              sx={{
-                "& .MuiOutlinedInput-root": {
-                  color: "#e2e8f0",
-                  "& fieldset": { borderColor: "#475569" },
-                },
-                "& .MuiInputLabel-root": { color: "#94a3b8" },
-              }}
-            />
-            <TextField
-              label="Title"
-              value={deptForm.title}
-              onChange={(e) =>
-                setDeptForm({ ...deptForm, title: e.target.value })
-              }
-              fullWidth
-              sx={{
-                "& .MuiOutlinedInput-root": {
-                  color: "#e2e8f0",
-                  "& fieldset": { borderColor: "#475569" },
-                },
-                "& .MuiInputLabel-root": { color: "#94a3b8" },
-              }}
-            />
-            <TextField
-              label="Color (Hex)"
-              value={deptForm.color}
-              onChange={(e) =>
-                setDeptForm({ ...deptForm, color: e.target.value })
-              }
-              fullWidth
-              sx={{
-                "& .MuiOutlinedInput-root": {
-                  color: "#e2e8f0",
-                  "& fieldset": { borderColor: "#475569" },
-                },
-                "& .MuiInputLabel-root": { color: "#94a3b8" },
-              }}
-            />
-            <TextField
-              label="Description"
-              value={deptForm.description}
-              multiline
-              rows={3}
-              onChange={(e) =>
-                setDeptForm({ ...deptForm, description: e.target.value })
-              }
-              fullWidth
-              sx={{
-                "& .MuiOutlinedInput-root": {
-                  color: "#e2e8f0",
-                  "& fieldset": { borderColor: "#475569" },
-                },
-                "& .MuiInputLabel-root": { color: "#94a3b8" },
-              }}
-            />
-            <Button
-              variant="contained"
-              onClick={handleDeptSubmit}
-              size="large"
-              sx={{ background: "linear-gradient(135deg, #f472b6, #db2777)" }}
-            >
-              Save Department
-            </Button>
-          </Stack>
-        </DialogContent>
-      </Dialog>
-
-      {/* Delete Dialog */}
-      <Dialog
-        open={openDeleteDialog}
-        onClose={cancelDeleteUser}
-        PaperProps={{
-          style: {
-            background: "#0f172a",
-            color: "#e2e8f0",
-            border: "1px solid #ef4444",
-            borderRadius: "16px",
-          },
-        }}
-      >
-        <DialogTitle
-          sx={{
-            color: "#ef4444",
-            display: "flex",
-            alignItems: "center",
-            gap: 1,
-          }}
-        >
-          <WarningIcon /> Confirm Deletion
-        </DialogTitle>
-        <DialogContent>
-          <Typography>
-            Are you sure you want to delete <b>{userToDelete?.name}</b>? This
-            action is irreversible.
-          </Typography>
-          <Box
-            sx={{ mt: 3, display: "flex", gap: 2, justifyContent: "flex-end" }}
+      <AnimatePresence>
+        {openUserDialog && (
+          <Dialog
+            open={openUserDialog}
+            onClose={handleUserDialogClose}
+            TransitionComponent={Fade}
+            transitionDuration={400}
+            PaperProps={{
+              sx: {
+                background: "rgba(255, 255, 255, 0.9)",
+                backdropFilter: "blur(40px) saturate(180%)",
+                WebkitBackdropFilter: "blur(40px) saturate(180%)",
+                border: `1px solid ${GLASS_BORDER}`,
+                borderRadius: "32px",
+                boxShadow: "0 25px 50px -12px rgba(10, 15, 25, 0.1)",
+                color: "#0f172a",
+                overflow: "hidden"
+              },
+            }}
+            fullWidth
+            maxWidth="sm"
           >
-            <Button onClick={cancelDeleteUser} sx={{ color: "#94a3b8" }}>
-              Cancel
-            </Button>
-            <Button
-              variant="contained"
-              color="error"
-              onClick={confirmDeleteUser}
+            <DialogTitle sx={{ borderBottom: `1px solid ${GLASS_BORDER}`, p: 3, fontWeight: 800 }}>
+              {editingUser ? "Edit Information" : "Onboard New Employee"}
+            </DialogTitle>
+            <DialogContent sx={{ p: 4 }}>
+              <Stack spacing={4} sx={{ mt: 2 }}>
+                <TextField
+                  label="Full Name"
+                  value={userForm.name}
+                  onChange={(e) => setUserForm({ ...userForm, name: e.target.value })}
+                  fullWidth
+                  variant="outlined"
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "14px",
+                      color: "#0f172a",
+                      "& fieldset": { borderColor: "rgba(10, 15, 25, 0.1)" },
+                      "&.Mui-focused fieldset": { borderColor: "#38bdf8" },
+                    },
+                    "& .MuiInputLabel-root": { color: "#475569" },
+                  }}
+                />
+                <TextField
+                  label="Email Address"
+                  value={userForm.email}
+                  onChange={(e) => setUserForm({ ...userForm, email: e.target.value })}
+                  fullWidth
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "14px",
+                      color: "#0f172a",
+                      "& fieldset": { borderColor: "rgba(10, 15, 25, 0.1)" },
+                      "&.Mui-focused fieldset": { borderColor: "#38bdf8" },
+                    },
+                    "& .MuiInputLabel-root": { color: "#475569" },
+                  }}
+                />
+                <FormControl fullWidth>
+                  <InputLabel sx={{ color: "#64748b" }}>Department Assignment</InputLabel>
+                  <Select
+                    value={userForm.department}
+                    onChange={(e) => setUserForm({ ...userForm, department: e.target.value })}
+                    label="Department Assignment"
+                    sx={{
+                      borderRadius: "14px",
+                      color: "#0f172a",
+                      "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(10, 15, 25, 0.1)" },
+                    }}
+                  >
+                    <MenuItem value="IT">IT</MenuItem>
+                    <MenuItem value="DM">DM</MenuItem>
+                  </Select>
+                </FormControl>
+                {!editingUser && (
+                  <TextField
+                    label="Set Password"
+                    type="password"
+                    value={userForm.password}
+                    onChange={(e) => setUserForm({ ...userForm, password: e.target.value })}
+                    fullWidth
+                    sx={{
+                      "& .MuiOutlinedInput-root": {
+                        borderRadius: "14px",
+                        color: "#f1f5f9",
+                        "& fieldset": { borderColor: "rgba(241, 245, 249, 0.1)" },
+                        "&.Mui-focused fieldset": { borderColor: "#38bdf8" },
+                      },
+                      "& .MuiInputLabel-root": { color: "#64748b" },
+                    }}
+                  />
+                )}
+                <Button
+                  variant="contained"
+                  onClick={handleUserSubmit}
+                  size="large"
+                  sx={{
+                    background: "linear-gradient(135deg, #38bdf8 0%, #2563eb 100%)",
+                    height: 56,
+                    borderRadius: "16px",
+                    fontWeight: 800,
+                    fontSize: "1rem",
+                    boxShadow: "0 10px 20px -5px rgba(56, 189, 248, 0.4)",
+                    textTransform: "none",
+                    "&:hover": {
+                      background: "linear-gradient(135deg, #0ea5e9 0%, #1d4ed8 100%)",
+                      transform: "translateY(-2px)",
+                      boxShadow: "0 15px 30px -5px rgba(56, 189, 248, 0.5)",
+                    }
+                  }}
+                >
+                  {editingUser ? "Update Information" : "Create Account"}
+                </Button>
+              </Stack>
+            </DialogContent>
+          </Dialog>
+        )}
+
+        {openDeptDialog && (
+          <Dialog
+            open={openDeptDialog}
+            onClose={handleDeptDialogClose}
+            TransitionComponent={Fade}
+            PaperProps={{
+              sx: {
+                background: "rgba(15, 23, 42, 0.8)",
+                backdropFilter: "blur(40px) saturate(180%)",
+                WebkitBackdropFilter: "blur(40px) saturate(180%)",
+                border: `1px solid ${GLASS_BORDER}`,
+                borderRadius: "32px",
+                color: "#0f172a",
+                overflow: "hidden"
+              },
+            }}
+            fullWidth
+            maxWidth="sm"
+          >
+            <DialogTitle sx={{ borderBottom: `1px solid ${GLASS_BORDER}`, p: 3, fontWeight: 800 }}>
+              {editingDept ? "Configure Department" : "Initialize Department"}
+            </DialogTitle>
+            <DialogContent sx={{ p: 4 }}>
+              <Stack spacing={4} sx={{ mt: 2 }}>
+                <TextField
+                  label="Department ID"
+                  value={deptForm.id}
+                  onChange={(e) => setDeptForm({ ...deptForm, id: e.target.value })}
+                  fullWidth
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "14px",
+                      color: "#f1f5f9",
+                      "& fieldset": { borderColor: "rgba(241, 245, 249, 0.1)" },
+                    },
+                  }}
+                />
+                <TextField
+                  label="Title"
+                  value={deptForm.title}
+                  onChange={(e) => setDeptForm({ ...deptForm, title: e.target.value })}
+                  fullWidth
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "14px",
+                      color: "#f1f5f9",
+                      "& fieldset": { borderColor: "rgba(241, 245, 249, 0.1)" },
+                    },
+                  }}
+                />
+                <TextField
+                  label="Visual Accent (Hex)"
+                  value={deptForm.color}
+                  onChange={(e) => setDeptForm({ ...deptForm, color: e.target.value })}
+                  fullWidth
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "14px",
+                      color: "#f1f5f9",
+                      "& fieldset": { borderColor: "rgba(241, 245, 249, 0.1)" },
+                    },
+                  }}
+                />
+                <TextField
+                  label="Description"
+                  value={deptForm.description}
+                  multiline
+                  rows={3}
+                  onChange={(e) => setDeptForm({ ...deptForm, description: e.target.value })}
+                  fullWidth
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "14px",
+                      color: "#f1f5f9",
+                      "& fieldset": { borderColor: "rgba(241, 245, 249, 0.1)" },
+                    },
+                  }}
+                />
+                <Button
+                  variant="contained"
+                  onClick={handleDeptSubmit}
+                  size="large"
+                  sx={{
+                    background: "linear-gradient(135deg, #f472b6 0%, #db2777 100%)",
+                    height: 56,
+                    borderRadius: "16px",
+                    fontWeight: 800,
+                    boxShadow: "0 10px 20px -5px rgba(244, 114, 182, 0.4)",
+                    textTransform: "none",
+                  }}
+                >
+                  Confirm Configuration
+                </Button>
+              </Stack>
+            </DialogContent>
+          </Dialog>
+        )}
+
+        {openDeleteDialog && (
+          <Dialog
+            open={openDeleteDialog}
+            onClose={cancelDeleteUser}
+            PaperProps={{
+              sx: {
+                background: "rgba(15, 23, 42, 0.95)",
+                backdropFilter: "blur(40px)",
+                color: "#f8fafc",
+                border: "1px solid rgba(239, 68, 68, 0.2)",
+                borderRadius: "24px",
+                p: 2
+              },
+            }}
+          >
+            <DialogTitle
+              sx={{
+                color: "#ef4444",
+                display: "flex",
+                alignItems: "center",
+                gap: 1.5,
+                fontWeight: 800
+              }}
             >
-              Delete
-            </Button>
-          </Box>
-        </DialogContent>
-      </Dialog>
+              <WarningIcon /> Security Override
+            </DialogTitle>
+            <DialogContent>
+              <Typography sx={{ color: "#94a3b8", mb: 2 }}>
+                Confirm immediate deletion of <b>{userToDelete?.name}</b>. This state change is permanent.
+              </Typography>
+              <Box sx={{ mt: 4, display: "flex", gap: 2, justifyContent: "flex-end" }}>
+                <Button onClick={cancelDeleteUser} sx={{ color: "#64748b", fontWeight: 700 }}>
+                  Abort
+                </Button>
+                <Button
+                  variant="contained"
+                  sx={{
+                    bgcolor: "rgba(239, 68, 68, 0.1)",
+                    color: "#ef4444",
+                    border: "1px solid rgba(239, 68, 68, 0.2)",
+                    borderRadius: "12px",
+                    fontWeight: 800,
+                    "&:hover": { bgcolor: "rgba(239, 68, 68, 0.2)" }
+                  }}
+                  onClick={confirmDeleteUser}
+                >
+                  Execute Deletion
+                </Button>
+              </Box>
+            </DialogContent>
+          </Dialog>
+        )}
+      </AnimatePresence>
 
       {/* Alert Snackbar */}
       {alertOpen && (

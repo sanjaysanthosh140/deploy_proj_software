@@ -1,3 +1,8 @@
+/**
+ * AntyGravity Instruction:
+ * Apply rules from /docs/component_analysis_prompt.md
+ */
+
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -24,6 +29,8 @@ import {
   TableRow,
   Paper,
   Alert,
+  Fade,
+  alpha,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
@@ -32,8 +39,41 @@ import FolderIcon from "@mui/icons-material/Folder";
 import AssessmentIcon from "@mui/icons-material/Assessment";
 import DashboardCustomizeIcon from "@mui/icons-material/DashboardCustomize";
 
+import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
 import CreateProjectDialog from "../../components/CreateProjectDialog";
+
+// --- Styled Components & Theme Constants ---
+const GLASS_BG = "rgba(255, 255, 255, 0.75)";
+const GLASS_BORDER = "rgba(10, 15, 25, 0.08)";
+
+const GlassCard = ({ children, sx = {}, hoverEffect = true }) => (
+  <Card
+    component={motion.div}
+    whileHover={hoverEffect ? {
+      translateY: -5,
+      scale: 1.01,
+      borderColor: "rgba(10, 15, 25, 0.15)",
+      boxShadow: "0 20px 40px rgba(10, 15, 25, 0.08)",
+    } : {}}
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ type: "spring", stiffness: 150, damping: 20 }}
+    sx={{
+      background: GLASS_BG,
+      backdropFilter: "blur(24px) saturate(160%)",
+      WebkitBackdropFilter: "blur(24px) saturate(160%)",
+      border: `1px solid ${GLASS_BORDER}`,
+      borderRadius: "24px",
+      boxShadow: "0 8px 32px 0 rgba(10, 15, 25, 0.04)",
+      color: "#0f172a",
+      overflow: "hidden",
+      ...sx,
+    }}
+  >
+    {children}
+  </Card>
+);
 
 const Head = () => {
   const navigate = useNavigate();
@@ -168,8 +208,8 @@ const Head = () => {
       console.error("Error:", error);
       setError(
         error.response?.data?.message ||
-          error.message ||
-          "Failed to create task",
+        error.message ||
+        "Failed to create task",
       );
     } finally {
       setLoading(false);
@@ -205,10 +245,42 @@ const Head = () => {
     <Box
       sx={{
         minHeight: "100vh",
+        bgcolor: "#f1f5f9",
+        position: "relative",
+        overflow: "hidden",
         p: { xs: 2, sm: 3, md: 4 },
-        background: "radial-gradient(circle at top, #0f172a 0%, #020617 70%)",
+        color: "#0f172a",
       }}
     >
+      {/* Background Mesh Blobs */}
+      <Box sx={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, zIndex: 0, pointerEvents: "none" }}>
+        <motion.div
+          animate={{ scale: [1, 1.2, 1], rotate: [0, 90, 0] }}
+          transition={{ duration: 20, repeat: Infinity }}
+          style={{
+            position: "absolute",
+            top: "-10%",
+            right: "10%",
+            width: "50vw",
+            height: "50vw",
+            background: "radial-gradient(circle, rgba(56, 189, 248, 0.1) 0%, transparent 70%)",
+            filter: "blur(60px)",
+          }}
+        />
+        <motion.div
+          animate={{ scale: [1.2, 1, 1.2], rotate: [0, -90, 0] }}
+          transition={{ duration: 25, repeat: Infinity }}
+          style={{
+            position: "absolute",
+            bottom: "-10%",
+            left: "10%",
+            width: "50vw",
+            height: "50vw",
+            background: "radial-gradient(circle, rgba(139, 92, 246, 0.1) 0%, transparent 70%)",
+            filter: "blur(80px)",
+          }}
+        />
+      </Box>
       {/* Error and Success Alerts */}
       {error && (
         <Alert
@@ -230,145 +302,100 @@ const Head = () => {
       )}
 
       {/* Header Section */}
-      <Box sx={{ mb: 6 }}>
-        <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}>
-          <Box
-            sx={{
-              width: { xs: 50, md: 70 },
-              height: { xs: 50, md: 70 },
-              borderRadius: "50%",
-              background: "linear-gradient(135deg, #00d4ff20, #00d4ff05)",
-              border: "3px solid #00d4ff40",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: { xs: "1.5rem", md: "2rem" },
-              color: "#00d4ff",
-              fontWeight: 700,
-            }}
-          >
-            H
-          </Box>
-          <Box>
-            <Typography
-              variant="h3"
+      <Fade in={true} timeout={800}>
+        <Box sx={{ mb: 6, position: "relative", zIndex: 1 }}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 3, mb: 2 }}>
+            <Box
               sx={{
-                color: "#e5e7eb",
-                fontWeight: 700,
-                fontSize: { xs: "1.8rem", sm: "2.5rem", md: "3rem" },
-                background: "linear-gradient(135deg, #00d4ff, #4ade80)",
-                backgroundClip: "text",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                letterSpacing: 1,
+                width: { xs: 50, md: 70 },
+                height: { xs: 50, md: 70 },
+                borderRadius: "20px",
+                background: "rgba(255, 255, 255, 0.8)",
+                backdropFilter: "blur(10px)",
+                border: `1px solid ${GLASS_BORDER}`,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: { xs: "1.5rem", md: "2rem" },
+                color: "#38bdf8",
+                fontWeight: 900,
+                boxShadow: "0 10px 20px rgba(10, 15, 25, 0.05)",
               }}
             >
-              Head Operations
-            </Typography>
-            <Typography
-              variant="body1"
-              sx={{ color: "#94a3b8", fontSize: { xs: "0.9rem", md: "1rem" } }}
-            >
-              Manage and track all team tasks and assignments
-            </Typography>
+              H
+            </Box>
+            <Box>
+              <Typography
+                variant="h2"
+                sx={{
+                  fontWeight: 900,
+                  fontSize: { xs: "1.8rem", sm: "2.5rem", md: "3rem" },
+                  background: "linear-gradient(135deg, #0f172a 0%, #475569 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  letterSpacing: -1,
+                }}
+              >
+                Head Operations
+              </Typography>
+              <Typography
+                variant="body1"
+                sx={{
+                  color: "#64748b",
+                  fontWeight: 500,
+                  fontSize: { xs: "0.9rem", md: "1.1rem" },
+                  letterSpacing: 0.5
+                }}
+              >
+                Enterprise Management Command Console
+              </Typography>
+            </Box>
           </Box>
         </Box>
-      </Box>
+      </Fade>
 
       {/* Stats Cards */}
-      <Grid container spacing={{ xs: 2, sm: 3, md: 4 }} sx={{ mb: 6 }}>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card
-            sx={{
-              background: "linear-gradient(135deg, #020617, #1a1f3a)",
-              border: "2px solid #1e293b",
-              borderRadius: { xs: 2, md: 3 },
-            }}
-          >
-            <CardContent sx={{ textAlign: "center" }}>
-              <Typography sx={{ color: "#94a3b8", mb: 1 }}>
-                Total Tasks
-              </Typography>
-              <Typography
-                variant="h4"
-                sx={{ color: "#4ade80", fontWeight: 700 }}
-              >
-                {tasks.length}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card
-            sx={{
-              background: "linear-gradient(135deg, #020617, #1a1f3a)",
-              border: "2px solid #1e293b",
-              borderRadius: { xs: 2, md: 3 },
-            }}
-          >
-            <CardContent sx={{ textAlign: "center" }}>
-              <Typography sx={{ color: "#94a3b8", mb: 1 }}>
-                In Progress
-              </Typography>
-              <Typography
-                variant="h4"
-                sx={{ color: "#00d4ff", fontWeight: 700 }}
-              >
-                {tasks.filter((t) => t.status === "in_progress").length}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card
-            sx={{
-              background: "linear-gradient(135deg, #020617, #1a1f3a)",
-              border: "2px solid #1e293b",
-              borderRadius: { xs: 2, md: 3 },
-            }}
-          >
-            <CardContent sx={{ textAlign: "center" }}>
-              <Typography sx={{ color: "#94a3b8", mb: 1 }}>
-                Completed
-              </Typography>
-              <Typography
-                variant="h4"
-                sx={{ color: "#4ade80", fontWeight: 700 }}
-              >
-                {tasks.filter((t) => t.status === "completed").length}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card
-            sx={{
-              background: "linear-gradient(135deg, #020617, #1a1f3a)",
-              border: "2px solid #1e293b",
-              borderRadius: { xs: 2, md: 3 },
-            }}
-          >
-            <CardContent sx={{ textAlign: "center" }}>
-              <Typography sx={{ color: "#94a3b8", mb: 1 }}>Pending</Typography>
-              <Typography
-                variant="h4"
-                sx={{ color: "#ff9c6e", fontWeight: 700 }}
-              >
-                {tasks.filter((t) => t.status === "pending").length}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
+      <Grid container spacing={{ xs: 2, sm: 3, md: 4 }} sx={{ mb: 6, position: "relative", zIndex: 1 }}>
+        {[
+          { title: "Total Tasks", value: tasks.length, color: "#4ade80" },
+          { title: "In Progress", value: tasks.filter((t) => t.status === "in_progress").length, color: "#38bdf8" },
+          { title: "Completed", value: tasks.filter((t) => t.status === "completed").length, color: "#4ade80" },
+          { title: "Pending", value: tasks.filter((t) => t.status === "pending").length, color: "#f59e0b" },
+        ].map((stat, idx) => (
+          <Grid item xs={12} sm={6} md={3} key={idx}>
+            <GlassCard sx={{ py: 3, px: 2 }}>
+              <Box sx={{ textAlign: "center" }}>
+                <Typography sx={{ color: "#64748b", fontWeight: 600, mb: 1, fontSize: "0.85rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                  {stat.title}
+                </Typography>
+                <Typography
+                  variant="h3"
+                  sx={{
+                    fontWeight: 900,
+                    background: `linear-gradient(135deg, #0f172a 0%, ${alpha(stat.color, 0.7)} 100%)`,
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                  }}
+                >
+                  {stat.value}
+                </Typography>
+                <Box sx={{ mt: 2, height: "4px", width: "40px", bgcolor: stat.color, borderRadius: "2px", mx: "auto", boxShadow: `0 0 10px ${stat.color}` }} />
+              </Box>
+            </GlassCard>
+          </Grid>
+        ))}
       </Grid>
 
       {/* Add Task and Create Project Buttons */}
       <Box
         sx={{
-          mb: 4,
+          mb: 6,
           display: "flex",
           gap: 2,
           justifyContent: { xs: "center", md: "flex-start" },
           flexWrap: "wrap",
+          position: "relative",
+          zIndex: 1,
         }}
       >
         <Button
@@ -376,21 +403,19 @@ const Head = () => {
           startIcon={<AddIcon />}
           onClick={() => setOpenDialog(true)}
           sx={{
-            background: "linear-gradient(135deg, #4ade80, #4ade80cc)",
-            color: "#020617",
-            fontWeight: 700,
-            fontSize: { xs: "0.9rem", md: "1rem" },
-            textTransform: "uppercase",
-            letterSpacing: 1,
-            py: { xs: 1.2, md: 1.5 },
-            px: { xs: 2, md: 3 },
-            borderRadius: 2,
-            transition: "all 0.3s ease",
+            background: "linear-gradient(135deg, #0f172a 0%, #334155 100%)",
+            color: "#fff",
+            fontWeight: 800,
+            textTransform: "none",
+            px: 4,
+            py: 1.5,
+            borderRadius: "14px",
+            boxShadow: "0 10px 20px -5px rgba(15, 23, 42, 0.3)",
+            transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
             "&:hover": {
-              background: "linear-gradient(135deg, #4ade80dd, #4ade80)",
               transform: "translateY(-2px)",
-              boxShadow: "0 8px 25px #4ade8040",
-            },
+              boxShadow: "0 15px 30px -5px rgba(15, 23, 42, 0.4)",
+            }
           }}
         >
           Add New Task
@@ -400,21 +425,19 @@ const Head = () => {
           startIcon={<FolderIcon />}
           onClick={() => setOpenProjectDialog(true)}
           sx={{
-            background: "linear-gradient(135deg, #00d4ff, #0099cc)",
+            background: "linear-gradient(135deg, #38bdf8 0%, #2563eb 100%)",
             color: "#fff",
-            fontWeight: 700,
-            fontSize: { xs: "0.9rem", md: "1rem" },
-            textTransform: "uppercase",
-            letterSpacing: 1,
-            py: { xs: 1.2, md: 1.5 },
-            px: { xs: 2, md: 3 },
-            borderRadius: 2,
-            transition: "all 0.3s ease",
+            fontWeight: 800,
+            textTransform: "none",
+            px: 4,
+            py: 1.5,
+            borderRadius: "14px",
+            boxShadow: "0 10px 20px -5px rgba(56, 189, 248, 0.3)",
+            transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
             "&:hover": {
-              background: "linear-gradient(135deg, #00bbee, #0088bb)",
               transform: "translateY(-2px)",
-              boxShadow: "0 8px 25px #00d4ff40",
-            },
+              boxShadow: "0 15px 30px -5px rgba(56, 189, 248, 0.4)",
+            }
           }}
         >
           Create Project
@@ -424,21 +447,22 @@ const Head = () => {
           startIcon={<AssessmentIcon />}
           onClick={() => navigate("/head/projects")}
           sx={{
-            background: "linear-gradient(135deg, #b721ff, #7f00ff)",
-            color: "#fff",
-            fontWeight: 700,
-            fontSize: { xs: "0.9rem", md: "1rem" },
-            textTransform: "uppercase",
-            letterSpacing: 1,
-            py: { xs: 1.2, md: 1.5 },
-            px: { xs: 2, md: 3 },
-            borderRadius: 2,
-            transition: "all 0.3s ease",
+            background: "rgba(255, 255, 255, 0.8)",
+            color: "#0f172a",
+            fontWeight: 800,
+            textTransform: "none",
+            px: 4,
+            py: 1.5,
+            borderRadius: "14px",
+            border: `1px solid ${GLASS_BORDER}`,
+            boxShadow: "0 4px 12px rgba(10, 15, 25, 0.05)",
+            backdropFilter: "blur(10px)",
+            transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
             "&:hover": {
-              background: "linear-gradient(135deg, #a61ef0, #6e00f0)",
+              background: "#fff",
               transform: "translateY(-2px)",
-              boxShadow: "0 8px 25px #b721ff40",
-            },
+              boxShadow: "0 8px 20px rgba(10, 15, 25, 0.08)",
+            }
           }}
         >
           View Projects
@@ -448,21 +472,19 @@ const Head = () => {
           startIcon={<DashboardCustomizeIcon />}
           onClick={() => navigate("/head/project-overview")}
           sx={{
-            background: "linear-gradient(135deg, #f59e0b, #f97316)",
-            color: "#020617",
-            fontWeight: 700,
-            fontSize: { xs: "0.9rem", md: "1rem" },
-            textTransform: "uppercase",
-            letterSpacing: 1,
-            py: { xs: 1.2, md: 1.5 },
-            px: { xs: 2, md: 3 },
-            borderRadius: 2,
-            transition: "all 0.3s ease",
+            background: "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)",
+            color: "#fff",
+            fontWeight: 800,
+            textTransform: "none",
+            px: 4,
+            py: 1.5,
+            borderRadius: "14px",
+            boxShadow: "0 10px 20px -5px rgba(245, 158, 11, 0.3)",
+            transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
             "&:hover": {
-              background: "linear-gradient(135deg, #f59e0bdd, #f97316dd)",
               transform: "translateY(-2px)",
-              boxShadow: "0 8px 25px #f59e0b40",
-            },
+              boxShadow: "0 15px 30px -5px rgba(245, 158, 11, 0.4)",
+            }
           }}
         >
           Project Overview
@@ -470,184 +492,178 @@ const Head = () => {
       </Box>
 
       {/* Tasks Table - Desktop View */}
-      <Box sx={{ display: { xs: "none", md: "block" } }}>
-        <TableContainer
-          component={Paper}
-          sx={{
-            background: "linear-gradient(135deg, #020617, #1a1f3a)",
-            border: "2px solid #1e293b",
-            borderRadius: 3,
-          }}
-        >
-          <Table>
-            <TableHead>
-              <TableRow sx={{ background: "#1e293b" }}>
-                <TableCell sx={{ color: "#94a3b8", fontWeight: 700 }}>
-                  ID
-                </TableCell>
-                <TableCell sx={{ color: "#94a3b8", fontWeight: 700 }}>
-                  Title
-                </TableCell>
-                <TableCell sx={{ color: "#94a3b8", fontWeight: 700 }}>
-                  Description
-                </TableCell>
-                <TableCell sx={{ color: "#94a3b8", fontWeight: 700 }}>
-                  Priority
-                </TableCell>
-                <TableCell sx={{ color: "#94a3b8", fontWeight: 700 }}>
-                  Status
-                </TableCell>
-                <TableCell sx={{ color: "#94a3b8", fontWeight: 700 }}>
-                  Deadline
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {tasks.map((task) => (
-                <TableRow
-                  key={task.id}
-                  sx={{
-                    borderBottom: "1px solid #1e293b",
-                    "&:hover": {
-                      background: "#1a1f3a",
-                    },
-                  }}
-                >
-                  <TableCell sx={{ color: "#e5e7eb" }}>
-                    <Chip label={task.id} size="small" variant="outlined" />
-                  </TableCell>
-                  <TableCell sx={{ color: "#e5e7eb", fontWeight: 600 }}>
-                    {task.title}
-                  </TableCell>
-                  <TableCell sx={{ color: "#94a3b8", maxWidth: 300 }}>
-                    {task.desc.substring(0, 50)}...
-                  </TableCell>
-                  <TableCell>
-                    <Chip
-                      label={task.priority}
-                      size="small"
-                      sx={{
-                        backgroundColor: `${priorityColors[task.priority]}20`,
-                        color: priorityColors[task.priority],
-                        fontWeight: 600,
-                      }}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Chip
-                      label={task.status.replace("_", " ")}
-                      size="small"
-                      sx={{
-                        backgroundColor: `${statusColors[task.status]}20`,
-                        color: statusColors[task.status],
-                        fontWeight: 600,
-                      }}
-                    />
-                  </TableCell>
-                  <TableCell sx={{ color: "#94a3b8" }}>
-                    {task.deadline}
-                  </TableCell>
+      <Box sx={{ display: { xs: "none", md: "block" }, position: "relative", zIndex: 1 }}>
+        <GlassCard sx={{ p: 0, borderRadius: "24px" }}>
+          <TableContainer component={Box}>
+            <Table>
+              <TableHead>
+                <TableRow sx={{ background: "rgba(15, 23, 42, 0.03)" }}>
+                  {["ID", "Title", "Description", "Priority", "Status", "Deadline"].map((head) => (
+                    <TableCell key={head} sx={{ color: "#475569", fontWeight: 800, textTransform: "uppercase", fontSize: "0.75rem", letterSpacing: "0.05em", py: 2.5 }}>
+                      {head}
+                    </TableCell>
+                  ))}
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+              </TableHead>
+              <TableBody>
+                {tasks.map((task) => (
+                  <TableRow
+                    key={task.id}
+                    component={motion.tr}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    sx={{
+                      borderBottom: `1px solid ${GLASS_BORDER}`,
+                      "&:hover": { background: "rgba(0, 0, 0, 0.02)" },
+                      transition: "background 0.3s ease",
+                    }}
+                  >
+                    <TableCell>
+                      <Chip
+                        label={task.id}
+                        size="small"
+                        sx={{
+                          fontWeight: 700,
+                          background: "rgba(15, 23, 42, 0.05)",
+                          color: "#475569",
+                          borderRadius: "8px"
+                        }}
+                      />
+                    </TableCell>
+                    <TableCell sx={{ color: "#0f172a", fontWeight: 700 }}>
+                      {task.title}
+                    </TableCell>
+                    <TableCell sx={{ color: "#64748b", maxWidth: 300 }}>
+                      {task.desc.substring(0, 60)}...
+                    </TableCell>
+                    <TableCell>
+                      <Chip
+                        label={task.priority}
+                        size="small"
+                        sx={{
+                          backgroundColor: alpha(priorityColors[task.priority], 0.1),
+                          color: priorityColors[task.priority],
+                          fontWeight: 800,
+                          borderRadius: "8px",
+                          textTransform: "uppercase",
+                          fontSize: "0.7rem"
+                        }}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Chip
+                        label={task.status.replace("_", " ")}
+                        size="small"
+                        sx={{
+                          backgroundColor: alpha(statusColors[task.status], 0.1),
+                          color: statusColors[task.status],
+                          fontWeight: 800,
+                          borderRadius: "8px",
+                          textTransform: "uppercase",
+                          fontSize: "0.7rem"
+                        }}
+                      />
+                    </TableCell>
+                    <TableCell sx={{ color: "#64748b", fontWeight: 600 }}>
+                      {task.deadline}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </GlassCard>
       </Box>
 
       {/* Tasks Cards - Mobile View */}
-      <Box sx={{ display: { xs: "block", md: "none" } }}>
+      <Box sx={{ display: { xs: "block", md: "none" }, position: "relative", zIndex: 1 }}>
         <Grid container spacing={2}>
           {tasks.map((task) => (
             <Grid item xs={12} key={task.id}>
-              <Card
-                sx={{
-                  background: "linear-gradient(135deg, #020617, #1a1f3a)",
-                  border: "2px solid #1e293b",
-                  borderRadius: 2,
-                  p: 2,
-                }}
-              >
-                <Box sx={{ mb: 2 }}>
+              <GlassCard sx={{ p: 2.5 }}>
+                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 2 }}>
                   <Chip
                     label={`ID: ${task.id}`}
                     size="small"
-                    variant="outlined"
+                    sx={{ background: "rgba(15, 23, 42, 0.05)", color: "#475569", fontWeight: 700, borderRadius: "8px" }}
                   />
+                  <Typography sx={{ color: "#64748b", fontSize: "0.85rem", fontWeight: 600 }}>
+                    {task.deadline}
+                  </Typography>
                 </Box>
 
                 <Typography
                   sx={{
-                    color: "#e5e7eb",
-                    fontWeight: 700,
+                    color: "#0f172a",
+                    fontWeight: 800,
                     mb: 1,
                     fontSize: "1.1rem",
+                    letterSpacing: "-0.01em"
                   }}
                 >
                   {task.title}
                 </Typography>
 
                 <Typography
-                  sx={{ color: "#94a3b8", mb: 2, fontSize: "0.9rem" }}
+                  sx={{ color: "#64748b", mb: 2.5, fontSize: "0.9rem", lineHeight: 1.6 }}
                 >
                   {task.desc}
                 </Typography>
 
-                <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", mb: 2 }}>
+                <Box sx={{ display: "flex", gap: 1.5, flexWrap: "wrap" }}>
                   <Chip
                     label={task.priority}
                     size="small"
                     sx={{
-                      backgroundColor: `${priorityColors[task.priority]}20`,
+                      background: alpha(priorityColors[task.priority], 0.1),
                       color: priorityColors[task.priority],
-                      fontWeight: 600,
+                      fontWeight: 800,
+                      borderRadius: "8px",
+                      textTransform: "uppercase",
+                      fontSize: "0.7rem"
                     }}
                   />
                   <Chip
                     label={task.status.replace("_", " ")}
                     size="small"
                     sx={{
-                      backgroundColor: `${statusColors[task.status]}20`,
+                      background: alpha(statusColors[task.status], 0.1),
                       color: statusColors[task.status],
-                      fontWeight: 600,
+                      fontWeight: 800,
+                      borderRadius: "8px",
+                      textTransform: "uppercase",
+                      fontSize: "0.7rem"
                     }}
                   />
                 </Box>
-
-                <Typography sx={{ color: "#94a3b8", fontSize: "0.85rem" }}>
-                  Deadline: {task.deadline}
-                </Typography>
-              </Card>
+              </GlassCard>
             </Grid>
           ))}
         </Grid>
       </Box>
 
-      {/* Add/Edit Task Dialog */}
       <Dialog
         open={openDialog}
         onClose={handleCloseDialog}
-        maxWidth="sm"
-        fullWidth
+        TransitionComponent={Fade}
+        transitionDuration={400}
         PaperProps={{
           sx: {
-            background: "linear-gradient(135deg, #020617, #1a1f3a)",
-            borderRadius: { xs: 2, md: 3 },
-            border: "2px solid #4ade8040",
-            boxShadow: "0 12px 50px #4ade8030",
+            background: "rgba(255, 255, 255, 0.9)",
+            backdropFilter: "blur(40px) saturate(180%)",
+            WebkitBackdropFilter: "blur(40px) saturate(180%)",
+            border: `1px solid ${GLASS_BORDER}`,
+            borderRadius: "32px",
+            boxShadow: "0 25px 50px -12px rgba(10, 15, 25, 0.1)",
+            color: "#0f172a",
+            overflow: "hidden"
           },
         }}
+        fullWidth
+        maxWidth="sm"
       >
-        <DialogTitle
-          sx={{
-            color: "#e5e7eb",
-            fontSize: { xs: "1.25rem", md: "1.5rem" },
-            fontWeight: 700,
-            textAlign: "center",
-            background: "linear-gradient(135deg, #4ade8020, transparent)",
-            paddingY: 3,
-          }}
-        >
-          Create New Task
+        <DialogTitle sx={{ borderBottom: `1px solid ${GLASS_BORDER}`, p: 4, fontWeight: 900, fontSize: "1.5rem" }}>
+          {editingId ? "Edit Enterprise Task" : "Initialize Strategic Task"}
         </DialogTitle>
 
         <DialogContent sx={{ py: 4, px: { xs: 2, md: 3 } }}>
@@ -658,22 +674,15 @@ const Head = () => {
               value={formData.title}
               onChange={handleInputChange}
               fullWidth
-              placeholder="Enter task title"
-              InputLabelProps={{ sx: { color: "#94a3b8" } }}
+              variant="outlined"
               sx={{
-                input: {
-                  color: "#e5e7eb",
-                  fontSize: { xs: "0.95rem", md: "1rem" },
-                },
                 "& .MuiOutlinedInput-root": {
-                  borderColor: "#1e293b",
-                  "& fieldset": {
-                    borderColor: "#1e293b",
-                  },
-                  "&:hover fieldset": {
-                    borderColor: "#4ade80",
-                  },
+                  borderRadius: "14px",
+                  color: "#0f172a",
+                  "& fieldset": { borderColor: "rgba(10, 15, 25, 0.1)" },
+                  "&.Mui-focused fieldset": { borderColor: "#38bdf8" },
                 },
+                "& .MuiInputLabel-root": { color: "#475569" },
               }}
             />
 
@@ -685,19 +694,14 @@ const Head = () => {
               fullWidth
               multiline
               rows={3}
-              placeholder="Enter task description"
-              InputLabelProps={{ sx: { color: "#94a3b8" } }}
               sx={{
-                input: { color: "#e5e7eb" },
                 "& .MuiOutlinedInput-root": {
-                  borderColor: "#1e293b",
-                  "& fieldset": {
-                    borderColor: "#1e293b",
-                  },
-                  "&:hover fieldset": {
-                    borderColor: "#4ade80",
-                  },
+                  borderRadius: "14px",
+                  color: "#0f172a",
+                  "& fieldset": { borderColor: "rgba(10, 15, 25, 0.1)" },
+                  "&.Mui-focused fieldset": { borderColor: "#38bdf8" },
                 },
+                "& .MuiInputLabel-root": { color: "#475569" },
               }}
             />
 
@@ -708,18 +712,13 @@ const Head = () => {
               value={formData.priority}
               onChange={handleInputChange}
               fullWidth
-              InputLabelProps={{ sx: { color: "#94a3b8" } }}
               sx={{
                 "& .MuiOutlinedInput-root": {
-                  borderColor: "#1e293b",
-                  color: "#e5e7eb",
-                  "& fieldset": {
-                    borderColor: "#1e293b",
-                  },
-                  "&:hover fieldset": {
-                    borderColor: "#4ade80",
-                  },
+                  borderRadius: "14px",
+                  color: "#0f172a",
+                  "& fieldset": { borderColor: "rgba(10, 15, 25, 0.1)" },
                 },
+                "& .MuiInputLabel-root": { color: "#475569" },
               }}
             >
               <MenuItem value="Low">Low</MenuItem>
@@ -735,18 +734,13 @@ const Head = () => {
               value={formData.status}
               onChange={handleInputChange}
               fullWidth
-              InputLabelProps={{ sx: { color: "#94a3b8" } }}
               sx={{
                 "& .MuiOutlinedInput-root": {
-                  borderColor: "#1e293b",
-                  color: "#e5e7eb",
-                  "& fieldset": {
-                    borderColor: "#1e293b",
-                  },
-                  "&:hover fieldset": {
-                    borderColor: "#4ade80",
-                  },
+                  borderRadius: "14px",
+                  color: "#0f172a",
+                  "& fieldset": { borderColor: "rgba(10, 15, 25, 0.1)" },
                 },
+                "& .MuiInputLabel-root": { color: "#475569" },
               }}
             >
               <MenuItem value="pending">Pending</MenuItem>
@@ -760,78 +754,40 @@ const Head = () => {
               value={formData.deadline}
               onChange={handleInputChange}
               fullWidth
-              placeholder="e.g., Today, Tomorrow, 2025-01-20"
-              InputLabelProps={{ sx: { color: "#94a3b8" } }}
               sx={{
-                input: {
-                  color: "#e5e7eb",
-                  fontSize: { xs: "0.95rem", md: "1rem" },
-                },
                 "& .MuiOutlinedInput-root": {
-                  borderColor: "#1e293b",
-                  "& fieldset": {
-                    borderColor: "#1e293b",
-                  },
-                  "&:hover fieldset": {
-                    borderColor: "#4ade80",
-                  },
+                  borderRadius: "14px",
+                  color: "#0f172a",
+                  "& fieldset": { borderColor: "rgba(10, 15, 25, 0.1)" },
+                  "&.Mui-focused fieldset": { borderColor: "#38bdf8" },
                 },
+                "& .MuiInputLabel-root": { color: "#475569" },
               }}
             />
 
-            <Stack direction="row" spacing={2} sx={{ mt: 3 }}>
-              <Button
-                onClick={handleAddOrUpdateTask}
-                disabled={loading}
-                fullWidth
-                sx={{
-                  py: { xs: 1.5, md: 2 },
-                  background: "linear-gradient(135deg, #4ade80, #4ade80cc)",
-                  color: "#020617",
-                  fontWeight: 700,
-                  fontSize: { xs: "0.95rem", md: "1rem" },
-                  textTransform: "uppercase",
-                  letterSpacing: 1,
-                  borderRadius: 2,
-                  transition: "all 0.3s ease",
-                  "&:hover": {
-                    background: "linear-gradient(135deg, #4ade80dd, #4ade80)",
-                    transform: "translateY(-2px)",
-                    boxShadow: "0 8px 25px #4ade8040",
-                  },
-                  "&:disabled": {
-                    opacity: 0.6,
-                    cursor: "not-allowed",
-                  },
-                }}
-              >
-                {loading ? "Creating..." : "Create Task"}
-              </Button>
-
-              <Button
-                onClick={handleCloseDialog}
-                disabled={loading}
-                fullWidth
-                sx={{
-                  py: { xs: 1.5, md: 2 },
-                  background: "#1e293b",
-                  color: "#e5e7eb",
-                  fontWeight: 700,
-                  fontSize: { xs: "0.95rem", md: "1rem" },
-                  borderRadius: 2,
-                  transition: "all 0.3s ease",
-                  "&:hover": {
-                    background: "#334155",
-                  },
-                  "&:disabled": {
-                    opacity: 0.6,
-                    cursor: "not-allowed",
-                  },
-                }}
-              >
-                Cancel
-              </Button>
-            </Stack>
+            <Button
+              onClick={handleAddOrUpdateTask}
+              disabled={loading}
+              fullWidth
+              sx={{
+                mt: 1,
+                py: 2,
+                background: "linear-gradient(135deg, #0f172a 0%, #334155 100%)",
+                color: "#fff",
+                fontWeight: 800,
+                fontSize: "1rem",
+                textTransform: "none",
+                borderRadius: "16px",
+                boxShadow: "0 10px 20px -5px rgba(15, 23, 42, 0.3)",
+                transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                "&:hover": {
+                  transform: "translateY(-2px)",
+                  boxShadow: "0 15px 30px -5px rgba(15, 23, 42, 0.4)",
+                }
+              }}
+            >
+              {loading ? "Processing..." : (editingId ? "Update Intelligence Task" : "Onboard Control Task")}
+            </Button>
           </Stack>
         </DialogContent>
       </Dialog>

@@ -1,3 +1,7 @@
+/**
+ * AntyGravity Instruction:
+ * Apply rules from /docs/component_analysis_prompt.md
+ */
 import React from "react";
 import { Box, Typography, Paper, Chip } from "@mui/material";
 import { DataGrid, gridClasses } from "@mui/x-data-grid";
@@ -78,47 +82,47 @@ const TaskHistory = ({ tasks = [] }) => {
     tasks.length > 0
       ? tasks
       : [
-          {
-            id: 1,
-            title: "Database Schema Update",
-            project: "E-Commerce",
-            completedDate: "2024-01-15",
-            status: "Done",
-            timeSpent: 4,
-          },
-          {
-            id: 2,
-            title: "Login API Integration",
-            project: "E-Commerce",
-            completedDate: "2024-01-14",
-            status: "Done",
-            timeSpent: 3,
-          },
-          {
-            id: 3,
-            title: "Unit Tests for Auth",
-            project: "Auth Service",
-            completedDate: "2024-01-13",
-            status: "Done",
-            timeSpent: 2,
-          },
-          {
-            id: 4,
-            title: "Fix Header Alignment",
-            project: "Landing Page",
-            completedDate: "2024-01-12",
-            status: "Done",
-            timeSpent: 1,
-          },
-          {
-            id: 5,
-            title: "Deploy to Staging",
-            project: "DevOps",
-            completedDate: "2024-01-11",
-            status: "Done",
-            timeSpent: 5,
-          },
-        ];
+        {
+          id: 1,
+          title: "Database Schema Update",
+          project: "E-Commerce",
+          completedDate: "2024-01-15",
+          status: "Done",
+          timeSpent: 4,
+        },
+        {
+          id: 2,
+          title: "Login API Integration",
+          project: "E-Commerce",
+          completedDate: "2024-01-14",
+          status: "Done",
+          timeSpent: 3,
+        },
+        {
+          id: 3,
+          title: "Unit Tests for Auth",
+          project: "Auth Service",
+          completedDate: "2024-01-13",
+          status: "Done",
+          timeSpent: 2,
+        },
+        {
+          id: 4,
+          title: "Fix Header Alignment",
+          project: "Landing Page",
+          completedDate: "2024-01-12",
+          status: "Done",
+          timeSpent: 1,
+        },
+        {
+          id: 5,
+          title: "Deploy to Staging",
+          project: "DevOps",
+          completedDate: "2024-01-11",
+          status: "Done",
+          timeSpent: 5,
+        },
+      ];
 
   return (
     <Paper

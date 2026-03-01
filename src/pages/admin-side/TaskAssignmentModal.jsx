@@ -1,3 +1,7 @@
+/**
+ * AntyGravity Instruction:
+ * Apply rules from /docs/component_analysis_prompt.md
+ */
 import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom";
 import {
@@ -12,6 +16,7 @@ import {
   Chip,
   Button,
   Tooltip,
+  alpha,
 } from "@mui/material";
 import { motion, AnimatePresence } from "framer-motion";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
@@ -21,6 +26,12 @@ import PersonIcon from "@mui/icons-material/Person";
 import ChecklistIcon from "@mui/icons-material/Checklist";
 import SendIcon from "@mui/icons-material/Send";
 import axios from "axios";
+
+// --- Theme Constants ---
+const GLASS_BG = "rgba(255, 255, 255, 0.75)";
+const GLASS_BORDER = "rgba(10, 15, 25, 0.08)";
+const PRIMARY_SLATE = "#0f172a";
+const SECONDARY_SLATE = "#475569";
 
 const TaskAssignmentModal = ({ open, onClose, projectData, onSave }) => {
   const [unassignedTasks, setUnassignedTasks] = useState([]);
@@ -272,12 +283,14 @@ const TaskAssignmentModal = ({ open, onClose, projectData, onSave }) => {
       fullWidth
       PaperProps={{
         sx: {
-          background: "linear-gradient(135deg, #020617 0%, #0f172a 100%)",
-          borderRadius: 6,
-          border: "1px solid rgba(56, 189, 248, 0.2)",
-          boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.5)",
-          minHeight: "80vh",
-          overflow: "hidden", // Ensure the main container doesn't have double scroll
+          background: GLASS_BG,
+          backdropFilter: "blur(48px) saturate(160%)",
+          WebkitBackdropFilter: "blur(48px) saturate(160%)",
+          borderRadius: "32px",
+          border: `1px solid ${GLASS_BORDER}`,
+          boxShadow: "0 40px 80px -20px rgba(10, 15, 25, 0.12)",
+          minHeight: "85vh",
+          overflow: "hidden",
         },
       }}
     >
@@ -289,37 +302,43 @@ const TaskAssignmentModal = ({ open, onClose, projectData, onSave }) => {
           alignItems: "center",
         }}
       >
-        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 3 }}>
           <Avatar
             variant="rounded"
             sx={{
-              bgcolor: "rgba(56, 189, 248, 0.1)",
-              color: "#38bdf8",
-              width: 50,
-              height: 50,
+              background: "linear-gradient(135deg, #0f172a 0%, #334155 100%)",
+              color: "#fff",
+              width: 56,
+              height: 56,
+              borderRadius: "16px",
+              boxShadow: "0 8px 16px rgba(10, 15, 25, 0.08)"
             }}
           >
-            <AssignmentIndIcon fontSize="large" />
+            <AssignmentIndIcon sx={{ fontSize: 32 }} />
           </Avatar>
           <Box>
-            <Typography variant="h5" sx={{ color: "#f8fafc", fontWeight: 800 }}>
-              Orchestrate Assignments
+            <Typography variant="h4" sx={{ color: PRIMARY_SLATE, fontWeight: 900, mb: 0.5 }}>
+              Orchestrate Intelligence
             </Typography>
             <Typography
               variant="caption"
               sx={{
-                color: "#64748b",
+                color: SECONDARY_SLATE,
                 textTransform: "uppercase",
-                letterSpacing: 1,
+                letterSpacing: 1.5,
+                fontWeight: 800
               }}
             >
-              Project: {projectData.title}
+              Stream: {projectData.title}
             </Typography>
           </Box>
         </Box>
         <IconButton
           onClick={onClose}
-          sx={{ color: "rgba(255,255,255,0.2)", "&:hover": { color: "#fff" } }}
+          sx={{
+            color: alpha(PRIMARY_SLATE, 0.2),
+            "&:hover": { color: PRIMARY_SLATE, background: "rgba(15, 23, 42, 0.05)" }
+          }}
         >
           <CloseIcon />
         </IconButton>
@@ -343,9 +362,9 @@ const TaskAssignmentModal = ({ open, onClose, projectData, onSave }) => {
                 <ChecklistIcon sx={{ color: "#38bdf8" }} />
                 <Typography
                   variant="h6"
-                  sx={{ color: "#f8fafc", fontWeight: 700 }}
+                  sx={{ color: PRIMARY_SLATE, fontWeight: 900, letterSpacing: "-0.01em" }}
                 >
-                  Backlog Checklist
+                  Backlog Portfolio
                 </Typography>
               </Box>
 
@@ -356,14 +375,16 @@ const TaskAssignmentModal = ({ open, onClose, projectData, onSave }) => {
                     ref={provided.innerRef}
                     sx={{
                       bgcolor: snapshot.isDraggingOver
-                        ? "rgba(56, 189, 248, 0.05)"
-                        : "rgba(15, 23, 42, 0.4)",
-                      borderRadius: 4,
-                      p: 2,
+                        ? "rgba(15, 23, 42, 0.05)"
+                        : "rgba(15, 23, 42, 0.02)",
+                      borderRadius: "24px",
+                      p: 2.5,
                       minHeight: "60vh",
                       maxHeight: "65vh",
                       overflowY: "auto",
-                      border: "1px dashed rgba(56, 189, 248, 0.2)",
+                      border: "1px solid",
+                      borderColor: snapshot.isDraggingOver ? "rgba(15, 23, 42, 0.15)" : GLASS_BORDER,
+                      boxShadow: snapshot.isDraggingOver ? "0 8px 32px rgba(10, 15, 25, 0.05)" : "none",
                       transition: "all 0.3s ease",
                     }}
                   >
@@ -383,27 +404,34 @@ const TaskAssignmentModal = ({ open, onClose, projectData, onSave }) => {
                                 p: 2,
                                 mb: 2,
                                 background: snapshot.isDragging
-                                  ? "rgba(56, 189, 248, 0.3)"
-                                  : "rgba(30, 41, 59, 0.8)",
-                                backdropFilter: "blur(8px)",
-                                border: `1px solid ${snapshot.isDragging ? "#38bdf8" : "rgba(255, 255, 255, 0.05)"}`,
-                                borderRadius: 3,
+                                  ? "rgba(255, 255, 255, 0.9)"
+                                  : "rgba(255, 255, 255, 0.6)",
+                                backdropFilter: snapshot.isDragging
+                                  ? "blur(12px) saturate(180%)"
+                                  : "blur(20px) saturate(120%)",
+                                border: `1px solid ${snapshot.isDragging ? "rgba(15, 23, 42, 0.15)" : GLASS_BORDER}`,
+                                borderRadius: "16px",
                                 boxShadow: snapshot.isDragging
-                                  ? "0 15px 40px rgba(0, 0, 0, 0.4)"
-                                  : "none",
+                                  ? "0 20px 40px rgba(10, 15, 25, 0.15)"
+                                  : "0 4px 12px rgba(10, 15, 25, 0.03)",
                                 cursor: "grab",
-                                width: snapshot.isDragging ? "300px" : "auto", // Maintain width during drag
+                                width: snapshot.isDragging ? "300px" : "auto",
                                 zIndex: 9999,
+                                transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
                                 "&:hover": {
-                                  borderColor: "rgba(56, 189, 248, 0.4)",
+                                  background: "rgba(255, 255, 255, 0.8)",
+                                  borderColor: "rgba(15, 23, 42, 0.1)",
+                                  transform: "translateY(-2px)",
+                                  boxShadow: "0 8px 20px rgba(10, 15, 25, 0.05)"
                                 },
                               }}
                             >
                               <Typography
                                 sx={{
-                                  color: "#f1f5f9",
-                                  fontWeight: 600,
+                                  color: PRIMARY_SLATE,
+                                  fontWeight: 800,
                                   mb: 1,
+                                  letterSpacing: "-0.01em"
                                 }}
                               >
                                 {task.title}
@@ -414,26 +442,27 @@ const TaskAssignmentModal = ({ open, onClose, projectData, onSave }) => {
                                 sx={{
                                   height: 20,
                                   fontSize: "0.65rem",
-                                  fontWeight: 700,
+                                  fontWeight: 800,
                                   bgcolor:
                                     task.priority === "Critical"
-                                      ? "#f43f5e20"
-                                      : "rgba(255,255,255,0.05)",
+                                      ? "rgba(244, 63, 94, 0.1)"
+                                      : "rgba(15, 23, 42, 0.05)",
                                   color:
                                     task.priority === "Critical"
-                                      ? "#f43f5e"
-                                      : "#94a3b8",
+                                      ? "#e11d48"
+                                      : PRIMARY_SLATE,
+                                  borderRadius: "6px"
                                 }}
                               />
                               {(task.dueDate || task.duedate) && (
                                 <Typography
                                   variant="caption"
                                   sx={{
-                                    color: "#64748b",
+                                    color: SECONDARY_SLATE,
                                     display: "block",
                                     mt: 1.5,
                                     fontSize: "0.65rem",
-                                    fontWeight: 600,
+                                    fontWeight: 700,
                                   }}
                                 >
                                   Due:{" "}
@@ -454,8 +483,8 @@ const TaskAssignmentModal = ({ open, onClose, projectData, onSave }) => {
                     ))}
                     {provided.placeholder}
                     {unassignedTasks.length === 0 && (
-                      <Box sx={{ p: 4, textAlign: "center", color: "#64748b" }}>
-                        <Typography variant="body2">
+                      <Box sx={{ p: 4, textAlign: "center", color: SECONDARY_SLATE }}>
+                        <Typography variant="body2" sx={{ fontWeight: 600 }}>
                           No unassigned tasks remaining
                         </Typography>
                       </Box>
@@ -470,12 +499,12 @@ const TaskAssignmentModal = ({ open, onClose, projectData, onSave }) => {
               <Box
                 sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 3 }}
               >
-                <PersonIcon sx={{ color: "#4ade80" }} />
+                <PersonIcon sx={{ color: "#10b981" }} />
                 <Typography
                   variant="h6"
-                  sx={{ color: "#f8fafc", fontWeight: 700 }}
+                  sx={{ color: PRIMARY_SLATE, fontWeight: 900, letterSpacing: "-0.01em" }}
                 >
-                  Strategic Distribution
+                  Resource Deployment
                 </Typography>
               </Box>
 
@@ -514,12 +543,14 @@ const TaskAssignmentModal = ({ open, onClose, projectData, onSave }) => {
                             ref={provided.innerRef}
                             sx={{
                               bgcolor: snapshot.isDraggingOver
-                                ? "rgba(74, 222, 128, 0.05)"
-                                : "rgba(15, 23, 42, 0.4)",
-                              borderRadius: 4,
+                                ? "rgba(15, 23, 42, 0.05)"
+                                : "rgba(15, 23, 42, 0.02)",
+                              borderRadius: "24px",
                               p: 2,
                               minHeight: "50vh",
-                              border: `2px dashed ${snapshot.isDraggingOver ? "#4ade80" : "rgba(255, 255, 255, 0.05)"}`,
+                              border: "1px solid",
+                              borderColor: snapshot.isDraggingOver ? "rgba(15, 23, 42, 0.15)" : GLASS_BORDER,
+                              boxShadow: snapshot.isDraggingOver ? "0 8px 32px rgba(10, 15, 25, 0.05)" : "none",
                               transition: "all 0.3s ease",
                             }}
                           >
@@ -534,11 +565,12 @@ const TaskAssignmentModal = ({ open, onClose, projectData, onSave }) => {
                             >
                               <Avatar
                                 sx={{
-                                  width: 32,
-                                  height: 32,
-                                  bgcolor: "#1e293b",
-                                  color: "#4ade80",
-                                  border: "1px solid rgba(74, 222, 128, 0.3)",
+                                  width: 36,
+                                  height: 36,
+                                  background: "linear-gradient(135deg, #0f172a 0%, #334155 100%)",
+                                  color: "#fff",
+                                  borderRadius: "10px",
+                                  boxShadow: "0 4px 8px rgba(10, 15, 25, 0.1)"
                                 }}
                               >
                                 {specialist.name?.charAt(0)}
@@ -546,13 +578,13 @@ const TaskAssignmentModal = ({ open, onClose, projectData, onSave }) => {
                               <Box>
                                 <Typography
                                   variant="subtitle2"
-                                  sx={{ color: "#f1f5f9", fontWeight: 700 }}
+                                  sx={{ color: PRIMARY_SLATE, fontWeight: 800 }}
                                 >
                                   {specialist.name}
                                 </Typography>
                                 <Typography
                                   variant="caption"
-                                  sx={{ color: "#64748b" }}
+                                  sx={{ color: SECONDARY_SLATE, fontWeight: 600, textTransform: "uppercase", fontSize: "0.65rem" }}
                                 >
                                   {specialist.role || "Specialist"}
                                 </Typography>
@@ -576,24 +608,33 @@ const TaskAssignmentModal = ({ open, onClose, projectData, onSave }) => {
                                         p: 1.5,
                                         mb: 1.5,
                                         background: snapshot.isDragging
-                                          ? "rgba(74, 222, 128, 0.3)"
-                                          : "rgba(74, 222, 128, 0.03)",
-                                        border: `1px solid ${snapshot.isDragging ? "#4ade80" : "rgba(74, 222, 128, 0.2)"}`,
-                                        borderRadius: 3,
+                                          ? "rgba(255, 255, 255, 0.9)"
+                                          : "rgba(255, 255, 255, 0.6)",
+                                        backdropFilter: snapshot.isDragging
+                                          ? "blur(12px) saturate(180%)"
+                                          : "blur(20px) saturate(120%)",
+                                        border: `1px solid ${snapshot.isDragging ? "rgba(15, 23, 42, 0.15)" : GLASS_BORDER}`,
+                                        borderRadius: "12px",
                                         boxShadow: snapshot.isDragging
-                                          ? "0 10px 30px rgba(0, 0, 0, 0.4)"
-                                          : "none",
+                                          ? "0 20px 40px rgba(10, 15, 25, 0.15)"
+                                          : "0 4px 12px rgba(10, 15, 25, 0.03)",
                                         width: snapshot.isDragging
                                           ? "240px"
-                                          : "auto", // Stable width
+                                          : "auto",
                                         zIndex: 9999,
+                                        transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                                        "&:hover": {
+                                          background: "rgba(255, 255, 255, 0.8)",
+                                          borderColor: "rgba(15, 23, 42, 0.1)",
+                                          transform: "translateY(-1px)",
+                                        },
                                       }}
                                     >
                                       <Typography
                                         variant="body2"
                                         sx={{
-                                          color: "#f1f5f9",
-                                          fontWeight: 600,
+                                          color: PRIMARY_SLATE,
+                                          fontWeight: 700,
                                         }}
                                       >
                                         {task.title}
@@ -602,11 +643,11 @@ const TaskAssignmentModal = ({ open, onClose, projectData, onSave }) => {
                                         <Typography
                                           variant="caption"
                                           sx={{
-                                            color: "rgba(74, 222, 128, 0.5)",
+                                            color: "#10b981",
                                             display: "block",
                                             mt: 1,
                                             fontSize: "0.6rem",
-                                            fontWeight: 600,
+                                            fontWeight: 800,
                                           }}
                                         >
                                           Due:{" "}
@@ -634,10 +675,11 @@ const TaskAssignmentModal = ({ open, onClose, projectData, onSave }) => {
                                 <Typography
                                   variant="caption"
                                   sx={{
-                                    color: "#64748b",
+                                    color: SECONDARY_SLATE,
                                     display: "block",
                                     textAlign: "center",
                                     mt: 4,
+                                    fontWeight: 600
                                   }}
                                 >
                                   Drop tasks here
@@ -658,7 +700,16 @@ const TaskAssignmentModal = ({ open, onClose, projectData, onSave }) => {
         <Box
           sx={{ mt: 6, display: "flex", justifyContent: "flex-end", gap: 2 }}
         >
-          <Button onClick={onClose} sx={{ color: "#64748b", fontWeight: 600 }}>
+          <Button
+            onClick={onClose}
+            sx={{
+              color: SECONDARY_SLATE,
+              fontWeight: 800,
+              textTransform: "uppercase",
+              letterSpacing: 1,
+              "&:hover": { background: "rgba(15, 23, 42, 0.05)" }
+            }}
+          >
             Cancel
           </Button>
           <Button
@@ -667,18 +718,28 @@ const TaskAssignmentModal = ({ open, onClose, projectData, onSave }) => {
             onClick={handleSave}
             disabled={specialists.every((s) => s.assignedTasks.length === 0)}
             sx={{
-              background: "linear-gradient(135deg, #4ade80, #22c55e)",
-              color: "#020617",
-              fontWeight: 800,
+              background: "linear-gradient(135deg, #0f172a 0%, #334155 100%)",
+              color: "#fff",
+              fontWeight: 900,
               px: 4,
-              borderRadius: 3,
+              py: 1.5,
+              borderRadius: "14px",
+              boxShadow: "0 10px 20px -5px rgba(10, 15, 25, 0.25)",
+              textTransform: "none",
+              fontSize: "1rem",
+              transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
               "&:hover": {
-                background: "linear-gradient(135deg, #22c55e, #16a34a)",
+                transform: "translateY(-2px)",
+                boxShadow: "0 15px 30px -5px rgba(10, 15, 25, 0.35)",
               },
-              "&:disabled": { opacity: 0.3 },
+              "&:disabled": {
+                opacity: 0.2,
+                background: "#94a3b8",
+                color: "#fff"
+              },
             }}
           >
-            Deploy Assignments
+            Deploy Intelligence
           </Button>
         </Box>
       </DialogContent>

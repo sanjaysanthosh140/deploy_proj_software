@@ -1,4 +1,7 @@
-import React, { useState, useEffect } from "react";
+/**
+ * AntyGravity Instruction:
+ * Apply rules from /docs/component_analysis_prompt.md
+ */import React, { useState, useEffect } from "react";
 import {
   Box,
   Typography,
@@ -7,6 +10,7 @@ import {
   IconButton,
   Collapse,
   Alert,
+  alpha,
 } from "@mui/material";
 import { motion, AnimatePresence } from "framer-motion";
 import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
@@ -16,6 +20,12 @@ import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+
+const PRIMARY_SLATE = "#0f172a";
+const SECONDARY_SLATE = "#475569";
+const INDIGO_ACCENT = "#4f46e5";
+const GLASS_BG = "rgba(255, 255, 255, 0.75)";
+const GLASS_BORDER = "rgba(10, 15, 25, 0.08)";
 
 const DeadlineNotifications = ({ userId }) => {
   const [deadlines, setDeadlines] = useState([]);
@@ -79,15 +89,15 @@ const DeadlineNotifications = ({ userId }) => {
   return (
     <Paper
       component={motion.div}
-      initial={{ opacity: 0, y: -20 }}
+      initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
       sx={{
-        mb: 3,
-        background: "rgba(20, 25, 40, 0.6)",
-        backdropFilter: "blur(16px)",
-        borderRadius: "16px",
-        border: "1px solid rgba(255, 171, 0, 0.2)",
+        mb: 4,
+        background: GLASS_BG,
+        backdropFilter: "blur(48px) saturate(180%)",
+        borderRadius: "24px",
+        border: `1px solid ${GLASS_BORDER}`,
+        boxShadow: "0 12px 32px -4px rgba(10, 15, 25, 0.04)",
         overflow: "hidden",
         position: "relative",
       }}
@@ -100,9 +110,8 @@ const DeadlineNotifications = ({ userId }) => {
           left: 0,
           right: 0,
           height: "2px",
-          background:
-            "linear-gradient(90deg, transparent, #ffab00, transparent)",
-          animation: "shimmer 3s infinite",
+          background: `linear-gradient(90deg, transparent, ${alpha(INDIGO_ACCENT, 0.3)}, transparent)`,
+          animation: "shimmer 4s infinite",
           "@keyframes shimmer": {
             "0%": { transform: "translateX(-100%)" },
             "100%": { transform: "translateX(100%)" },
@@ -113,7 +122,7 @@ const DeadlineNotifications = ({ userId }) => {
       {/* Header */}
       <Box
         sx={{
-          p: 2,
+          p: 2.5,
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
@@ -121,40 +130,34 @@ const DeadlineNotifications = ({ userId }) => {
         }}
         onClick={() => setExpanded(!expanded)}
       >
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
           <Box
             sx={{
-              width: 40,
-              height: 40,
-              borderRadius: "10px",
-              background:
-                "linear-gradient(135deg, rgba(255, 171, 0, 0.2), rgba(255, 91, 91, 0.2))",
+              width: 44,
+              height: 44,
+              borderRadius: "14px",
+              background: `linear-gradient(135deg, ${alpha(INDIGO_ACCENT, 0.1)}, ${alpha(INDIGO_ACCENT, 0.05)})`,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              animation: "pulse 2s infinite",
-              "@keyframes pulse": {
-                "0%, 100%": { transform: "scale(1)", opacity: 1 },
-                "50%": { transform: "scale(1.05)", opacity: 0.8 },
-              },
+              border: `1px solid ${alpha(INDIGO_ACCENT, 0.15)}`,
             }}
           >
-            <NotificationsActiveIcon sx={{ color: "#ffab00", fontSize: 20 }} />
+            <NotificationsActiveIcon sx={{ color: INDIGO_ACCENT, fontSize: 22 }} />
           </Box>
           <Box>
             <Typography
               variant="subtitle1"
-              sx={{ fontWeight: 700, color: "#fff" }}
+              sx={{ fontWeight: 800, color: PRIMARY_SLATE, lineHeight: 1.2, letterSpacing: "-0.01em" }}
             >
               Upcoming Deadlines
             </Typography>
-            <Typography variant="caption" sx={{ color: "#a0aec0" }}>
-              {urgentDeadlines.length} project
-              {urgentDeadlines.length !== 1 ? "s" : ""} need attention
+            <Typography variant="caption" sx={{ color: SECONDARY_SLATE, fontWeight: 500 }}>
+              {urgentDeadlines.length} protocol{urgentDeadlines.length !== 1 ? "s" : ""} requiring attention
             </Typography>
           </Box>
         </Box>
-        <IconButton size="small" sx={{ color: "#a0aec0" }}>
+        <IconButton size="small" sx={{ color: alpha(SECONDARY_SLATE, 0.4) }}>
           {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
         </IconButton>
       </Box>
@@ -179,16 +182,17 @@ const DeadlineNotifications = ({ userId }) => {
                     sx={{
                       mb: 1.5,
                       p: 2,
-                      borderRadius: "12px",
-                      background: "rgba(255, 255, 255, 0.02)",
-                      border: `1px solid ${urgency.color}30`,
+                      borderRadius: "16px",
+                      background: "rgba(255, 255, 255, 0.4)",
+                      border: `1px solid ${alpha(urgency.color, 0.15)}`,
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "space-between",
-                      transition: "all 0.3s ease",
+                      transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
                       "&:hover": {
-                        background: "rgba(255, 255, 255, 0.04)",
+                        background: alpha(urgency.color, 0.05),
                         transform: "translateX(4px)",
+                        borderColor: alpha(urgency.color, 0.3),
                       },
                     }}
                   >
@@ -200,13 +204,25 @@ const DeadlineNotifications = ({ userId }) => {
                         flex: 1,
                       }}
                     >
-                      <UrgencyIcon
-                        sx={{ color: urgency.color, fontSize: 24 }}
-                      />
+                      <Box
+                        sx={{
+                          width: 32,
+                          height: 32,
+                          borderRadius: "8px",
+                          background: alpha(urgency.color, 0.1),
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <UrgencyIcon
+                          sx={{ color: urgency.color, fontSize: 18 }}
+                        />
+                      </Box>
                       <Box sx={{ flex: 1 }}>
                         <Typography
                           variant="body2"
-                          sx={{ fontWeight: 600, color: "#fff", mb: 0.5 }}
+                          sx={{ fontWeight: 700, color: PRIMARY_SLATE, mb: 0.2 }}
                         >
                           {deadline.title}
                         </Typography>
@@ -214,11 +230,11 @@ const DeadlineNotifications = ({ userId }) => {
                           sx={{ display: "flex", alignItems: "center", gap: 1 }}
                         >
                           <AccessTimeIcon
-                            sx={{ fontSize: 14, color: "#a0aec0" }}
+                            sx={{ fontSize: 13, color: alpha(SECONDARY_SLATE, 0.5) }}
                           />
                           <Typography
                             variant="caption"
-                            sx={{ color: "#a0aec0" }}
+                            sx={{ color: SECONDARY_SLATE, fontWeight: 500 }}
                           >
                             Due:{" "}
                             {new Date(deadline.deadline).toLocaleDateString(
@@ -226,7 +242,6 @@ const DeadlineNotifications = ({ userId }) => {
                               {
                                 month: "short",
                                 day: "numeric",
-                                year: "numeric",
                               },
                             )}
                           </Typography>
@@ -234,14 +249,15 @@ const DeadlineNotifications = ({ userId }) => {
                       </Box>
                     </Box>
                     <Chip
-                      label={`${deadline.daysRemaining} day${deadline.daysRemaining !== 1 ? "s" : ""}`}
+                      label={`${deadline.daysRemaining}d`}
                       size="small"
                       sx={{
-                        bgcolor: `${urgency.color}20`,
+                        bgcolor: alpha(urgency.color, 0.1),
                         color: urgency.color,
-                        fontWeight: 700,
-                        border: `1px solid ${urgency.color}40`,
-                        fontSize: "0.75rem",
+                        fontWeight: 800,
+                        border: `1px solid ${alpha(urgency.color, 0.2)}`,
+                        fontSize: "0.7rem",
+                        height: "22px"
                       }}
                     />
                   </Box>

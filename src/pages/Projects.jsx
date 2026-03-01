@@ -1,3 +1,7 @@
+/**
+ * AntyGravity Instruction:
+ * Apply rules from /docs/component_analysis_prompt.md
+ */
 import React, { useState } from "react";
 import {
   Box,
@@ -179,8 +183,8 @@ const Projects = () => {
           <AnimatePresence>
             {filteredProjects.map((project) => (
               <Grid item xs={12} md={6} lg={4} key={project.id}>
-                <motion.div 
-                  variants={itemVariants} 
+                <motion.div
+                  variants={itemVariants}
                   layout
                   whileHover={{ scale: 1.05 }}
                   transition={{ type: "spring", stiffness: 300, damping: 20 }}

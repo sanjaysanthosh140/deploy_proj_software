@@ -1,3 +1,8 @@
+/**
+ * AntyGravity Instruction:
+ * Apply rules from /docs/component_analysis_prompt.md
+ */
+
 import React, { useState } from "react";
 import {
   Box,

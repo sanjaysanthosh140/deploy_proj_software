@@ -1,3 +1,7 @@
+/**
+ * AntyGravity Instruction:
+ * Apply rules from /docs/component_analysis_prompt.md
+ */
 import React from "react";
 import { Box, Typography, Avatar, Chip, IconButton } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";

@@ -1,3 +1,7 @@
+/**
+ * AntyGravity Instruction:
+ * Apply rules from /docs/component_analysis_prompt.md
+ */
 import React from "react";
 import { Box, Typography, LinearProgress, Paper, Chip } from "@mui/material";
 import { motion } from "framer-motion";

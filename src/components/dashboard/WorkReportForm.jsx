@@ -1,3 +1,7 @@
+/**
+ * AntyGravity Instruction:
+ * Apply rules from /docs/component_analysis_prompt.md
+ */
 import React, { useState } from "react";
 import {
   Box,
@@ -6,10 +10,17 @@ import {
   Button,
   Paper,
   CircularProgress,
+  alpha,
 } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import axios from "axios";
-import { useToast } from "../../context/ToastContext"; // Assuming this context exists from previous files or needed
+import { useToast } from "../../context/ToastContext";
+
+const PRIMARY_SLATE = "#0f172a";
+const SECONDARY_SLATE = "#475569";
+const INDIGO_ACCENT = "#4f46e5";
+const GLASS_BG = "rgba(255, 255, 255, 0.75)";
+const GLASS_BORDER = "rgba(10, 15, 25, 0.08)";
 
 const WorkReportForm = ({ deptId }) => {
   const [report, setReport] = useState("");
@@ -61,33 +72,40 @@ const WorkReportForm = ({ deptId }) => {
       component="form"
       onSubmit={handleSubmit}
       sx={{
-        p: 3,
-        background: "rgba(20, 25, 40, 0.6)",
-        backdropFilter: "blur(12px)",
-        border: "1px solid rgba(255, 255, 255, 0.08)",
-        borderRadius: "16px",
+        p: { xs: 3, md: 5 },
+        background: GLASS_BG,
+        backdropFilter: "blur(48px) saturate(180%)",
+        border: `1px solid ${GLASS_BORDER}`,
+        borderRadius: "24px",
+        boxShadow: "0 12px 32px -4px rgba(10, 15, 25, 0.04)",
       }}
     >
-      <Typography variant="h6" sx={{ mb: 2, fontWeight: 700, color: "#fff" }}>
-        Daily Work Report
+      <Typography variant="h5" sx={{ mb: 3, fontWeight: 900, color: PRIMARY_SLATE, letterSpacing: "-0.02em" }}>
+        Mission Logs & Protocol Reporting
       </Typography>
       <TextField
         fullWidth
         multiline
-        rows={4}
+        rows={8}
         variant="outlined"
-        placeholder="What did you accomplish today?"
+        placeholder="Log your active accomplishments..."
         value={report}
         onChange={(e) => setReport(e.target.value)}
         sx={{
-          mb: 2,
+          mb: 3,
           "& .MuiOutlinedInput-root": {
-            color: "#fff",
-            bgcolor: "rgba(255,255,255,0.02)",
-            "& fieldset": { borderColor: "rgba(255,255,255,0.1)" },
-            "&:hover fieldset": { borderColor: "rgba(255,255,255,0.2)" },
-            "&.Mui-focused fieldset": { borderColor: "#00d4ff" },
+            color: PRIMARY_SLATE,
+            fontWeight: 500,
+            bgcolor: "rgba(255,255,255,0.4)",
+            borderRadius: "16px",
+            "& fieldset": { borderColor: GLASS_BORDER },
+            "&:hover fieldset": { borderColor: alpha(INDIGO_ACCENT, 0.2) },
+            "&.Mui-focused fieldset": { borderColor: INDIGO_ACCENT },
           },
+          "& .MuiInputBase-input::placeholder": {
+            color: alpha(SECONDARY_SLATE, 0.5),
+            opacity: 1,
+          }
         }}
       />
       <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
@@ -95,19 +113,23 @@ const WorkReportForm = ({ deptId }) => {
           type="submit"
           variant="contained"
           disabled={loading}
-          endIcon={loading ? <CircularProgress size={20} /> : <SendIcon />}
+          endIcon={loading ? <CircularProgress size={20} color="inherit" /> : <SendIcon />}
           sx={{
-            background: "linear-gradient(135deg, #00d4ff 0%, #009bb3 100%)",
+            background: INDIGO_ACCENT,
             color: "#fff",
-            fontWeight: 600,
+            fontWeight: 700,
+            borderRadius: "12px",
             px: 4,
+            py: 1.2,
+            textTransform: "none",
+            boxShadow: `0 4px 14px ${alpha(INDIGO_ACCENT, 0.3)}`,
             "&.Mui-disabled": {
-              background: "rgba(255,255,255,0.1)",
-              color: "rgba(255,255,255,0.3)",
+              background: alpha(SECONDARY_SLATE, 0.1),
+              color: alpha(SECONDARY_SLATE, 0.3),
             },
           }}
         >
-          {loading ? "Submitting..." : "Submit Report"}
+          {loading ? "Transmitting..." : "Log Activity"}
         </Button>
       </Box>
     </Paper>

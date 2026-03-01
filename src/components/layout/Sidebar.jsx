@@ -1,4 +1,7 @@
-import React from "react";
+/**
+ * AntyGravity Instruction:
+ * Apply rules from /docs/component_analysis_prompt.md
+ */import React from "react";
 import {
   Drawer,
   List,
@@ -10,6 +13,7 @@ import {
   Avatar,
   Divider,
   IconButton,
+  alpha,
 } from "@mui/material";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import FolderIcon from "@mui/icons-material/Folder";
@@ -19,6 +23,7 @@ import GroupsIcon from "@mui/icons-material/Groups";
 import SettingsIcon from "@mui/icons-material/Settings";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useToast } from "../../context/ToastContext";
 
 const menuItems = [
   { text: "Dashboard", icon: <DashboardIcon />, path: "/app/gateway" },
@@ -29,9 +34,16 @@ const menuItems = [
   { text: "Settings", icon: <SettingsIcon />, path: "/app/settings" },
 ];
 
+const PRIMARY_SLATE = "#0f172a";
+const SECONDARY_SLATE = "#475569";
+const INDIGO_ACCENT = "#4f46e5";
+const GLASS_BG = "rgba(255, 255, 255, 0.75)";
+const GLASS_BORDER = "rgba(10, 15, 25, 0.08)";
+
 const Sidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { showToast } = useToast();
 
   return (
     <Drawer
@@ -42,10 +54,11 @@ const Sidebar = () => {
         "& .MuiDrawer-paper": {
           width: 260,
           boxSizing: "border-box",
-          background: "rgba(13, 17, 28, 0.85)",
-          backdropFilter: "blur(12px)",
-          borderRight: "1px solid rgba(255, 255, 255, 0.08)",
-          boxShadow: "4px 0 30px rgba(0,0,0,0.3)",
+          background: GLASS_BG,
+          backdropFilter: "blur(48px) saturate(180%)",
+          borderRight: `1px solid ${GLASS_BORDER}`,
+          boxShadow: "10px 0 40px rgba(10, 15, 25, 0.04)",
+          transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
         },
       }}
     >
@@ -58,18 +71,30 @@ const Sidebar = () => {
       <List sx={{ px: 2, mt: 2 }}>
         {menuItems.map((item) => {
           const isActive = location.pathname === item.path;
+          const isImplemented = ["Dashboard", "Projects"].includes(item.text);
+
           return (
             <ListItem
-              button
               key={item.text}
-              onClick={() => navigate(item.path)}
+              onClick={() => {
+                if (isImplemented) {
+                  navigate(item.path);
+                } else {
+                  showToast(`${item.text} protocol is being finalized. Access restricted to Level 2 Specialists.`, "info");
+                }
+              }}
               sx={{
                 mb: 1,
+                gap: 1.5,
                 borderRadius: "12px",
                 position: "relative",
+                cursor: "pointer",
                 transition: "all 0.3s ease",
+                px: 2,
+                py: 1.5,
+                opacity: isImplemented ? 1 : 0.6,
                 background: isActive
-                  ? "linear-gradient(90deg, rgba(0, 212, 255, 0.1) 0%, rgba(0, 0, 0, 0) 100%)"
+                  ? `linear-gradient(90deg, ${alpha(INDIGO_ACCENT, 0.08)} 0%, transparent 100%)`
                   : "transparent",
                 "&::before": {
                   content: '""',
@@ -79,20 +104,20 @@ const Sidebar = () => {
                   transform: "translateY(-50%)",
                   width: "4px",
                   height: isActive ? "24px" : "0px",
-                  backgroundColor: "#00d4ff",
+                  backgroundColor: INDIGO_ACCENT,
                   borderRadius: "0 4px 4px 0",
                   transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-                  boxShadow: isActive ? "0 0 10px #00d4ff" : "none",
+                  boxShadow: isActive ? `0 0 12px ${alpha(INDIGO_ACCENT, 0.4)}` : "none",
                 },
                 "&:hover": {
-                  background: "rgba(255, 255, 255, 0.03)",
-                  transform: "translateX(4px)",
+                  background: isImplemented ? alpha(INDIGO_ACCENT, 0.04) : "transparent",
+                  transform: isImplemented ? "translateX(4px)" : "none",
                 },
               }}
             >
               <ListItemIcon
                 sx={{
-                  color: isActive ? "#00d4ff" : "#94a3b8",
+                  color: isActive ? INDIGO_ACCENT : alpha(SECONDARY_SLATE, 0.6),
                   minWidth: 42,
                   display: "flex",
                   justifyContent: "center",
@@ -105,9 +130,9 @@ const Sidebar = () => {
                 primary={item.text}
                 primaryTypographyProps={{
                   fontSize: "0.95rem",
-                  fontWeight: isActive ? 600 : 500,
-                  color: isActive ? "#fff" : "#94a3b8",
-                  letterSpacing: "0.02em",
+                  fontWeight: isActive ? 800 : 500,
+                  color: isActive ? PRIMARY_SLATE : alpha(SECONDARY_SLATE, 0.7),
+                  letterSpacing: "0.01em",
                   transition: "color 0.3s ease",
                 }}
                 sx={{ m: 0 }}
@@ -123,25 +148,30 @@ const Sidebar = () => {
         <Box
           sx={{
             p: 2,
-            borderRadius: "16px",
-            background:
-              "linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%)",
-            border: "1px solid rgba(255,255,255,0.05)",
+            borderRadius: "20px",
+            background: "rgba(255,255,255,0.4)",
+            border: `1px solid ${GLASS_BORDER}`,
+            boxShadow: "0 4px 12px rgba(15, 23, 42, 0.04)",
           }}
         >
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 1 }}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 1.5 }}>
             <Avatar
               src="/broken-image.jpg"
-              sx={{ width: 36, height: 36, border: "2px solid #00d4ff" }}
+              sx={{
+                width: 36,
+                height: 36,
+                border: `2px solid ${alpha(INDIGO_ACCENT, 0.2)}`,
+                bgcolor: alpha(INDIGO_ACCENT, 0.1)
+              }}
             />
             <Box>
               <Typography
                 variant="subtitle2"
-                sx={{ color: "#fff", fontWeight: 600 }}
+                sx={{ color: PRIMARY_SLATE, fontWeight: 800, lineHeight: 1.2 }}
               >
                 Alkor User
               </Typography>
-              <Typography variant="caption" sx={{ color: "#a0aec0" }}>
+              <Typography variant="caption" sx={{ color: SECONDARY_SLATE, fontWeight: 500 }}>
                 Product Owner
               </Typography>
             </Box>
@@ -150,16 +180,21 @@ const Sidebar = () => {
             size="small"
             sx={{
               width: "100%",
-              borderRadius: "8px",
-              mt: 1,
-              color: "#a0aec0",
+              borderRadius: "10px",
+              py: 0.8,
+              color: alpha(SECONDARY_SLATE, 0.6),
+              fontSize: "0.8rem",
+              fontWeight: 700,
+              textTransform: "none",
+              border: `1px solid ${alpha(SECONDARY_SLATE, 0.1)}`,
               "&:hover": {
-                color: "#ff5b5b",
-                background: "rgba(255, 91, 91, 0.1)",
+                color: "#ef4444",
+                background: alpha("#ef4444", 0.08),
+                borderColor: alpha("#ef4444", 0.2),
               },
             }}
           >
-            <LogoutIcon fontSize="small" sx={{ mr: 1 }} /> Logout
+            <LogoutIcon sx={{ fontSize: 16, mr: 1 }} /> Logout
           </IconButton>
         </Box>
       </Box>

@@ -1,3 +1,7 @@
+/**
+ * AntyGravity Instruction:
+ * Apply rules from /docs/component_analysis_prompt.md
+ */
 import React, { useState, useEffect } from "react";
 import { Box, Typography, Grid, Container, alpha, Avatar } from "@mui/material";
 import { GlassContainer } from "../../components/common/GlassComp";
@@ -13,47 +17,53 @@ import {
   ArrowForward as ArrowIcon,
 } from "@mui/icons-material";
 
+const PRIMARY_SLATE = "#0f172a";
+const SECONDARY_SLATE = "#475569";
+const INDIGO_ACCENT = "#4f46e5";
+const GLASS_BG = "rgba(255, 255, 255, 0.75)";
+const GLASS_BORDER = "rgba(10, 15, 25, 0.08)";
+
 // Helper to get consistent styling based on department ID
 const getDepartmentStyle = (deptId) => {
   const styles = {
     it: {
-      color: "#00d4ff",
-      gradient: "linear-gradient(135deg, #00d4ff 0%, #0056b3 100%)",
-      icon: <CodeIcon sx={{ fontSize: 40 }} />,
-      glow: "0 0 30px rgba(0, 212, 255, 0.3)",
+      color: "#6366f1", // Indigo
+      gradient: "linear-gradient(135deg, #6366f1 0%, #4338ca 100%)",
+      icon: <CodeIcon sx={{ fontSize: 32 }} />,
+      glow: "0 8px 20px rgba(99, 102, 241, 0.15)",
     },
     marketing: {
-      color: "#ff4081",
-      gradient: "linear-gradient(135deg, #ff4081 0%, #c60055 100%)",
-      icon: <MarketingIcon sx={{ fontSize: 40 }} />,
-      glow: "0 0 30px rgba(255, 64, 129, 0.3)",
+      color: "#ec4899", // Pink
+      gradient: "linear-gradient(135deg, #ec4899 0%, #be185d 100%)",
+      icon: <MarketingIcon sx={{ fontSize: 32 }} />,
+      glow: "0 8px 20px rgba(236, 72, 153, 0.15)",
     },
     hr: {
-      color: "#7c4dff",
-      gradient: "linear-gradient(135deg, #7c4dff 0%, #3f1dcb 100%)",
-      icon: <HRIcon sx={{ fontSize: 40 }} />,
-      glow: "0 0 30px rgba(124, 77, 255, 0.3)",
+      color: "#8b5cf6", // Violet
+      gradient: "linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%)",
+      icon: <HRIcon sx={{ fontSize: 32 }} />,
+      glow: "0 8px 20px rgba(139, 92, 246, 0.15)",
     },
     finance: {
-      color: "#00e676",
-      gradient: "linear-gradient(135deg, #00e676 0%, #00a152 100%)",
-      icon: <FinanceIcon sx={{ fontSize: 40 }} />,
-      glow: "0 0 30px rgba(0, 230, 118, 0.3)",
+      color: "#10b981", // Emerald
+      gradient: "linear-gradient(135deg, #10b981 0%, #047857 100%)",
+      icon: <FinanceIcon sx={{ fontSize: 32 }} />,
+      glow: "0 8px 20px rgba(16, 185, 129, 0.15)",
     },
     design: {
-      color: "#ff9100",
-      gradient: "linear-gradient(135deg, #ff9100 0%, #c66900 100%)",
-      icon: <DesignIcon sx={{ fontSize: 40 }} />,
-      glow: "0 0 30px rgba(255, 145, 0, 0.3)",
+      color: "#f59e0b", // Amber
+      gradient: "linear-gradient(135deg, #f59e0b 0%, #b45309 100%)",
+      icon: <DesignIcon sx={{ fontSize: 32 }} />,
+      glow: "0 8px 20px rgba(245, 158, 11, 0.15)",
     },
   };
 
   return (
     styles[deptId.toLowerCase()] || {
-      color: "#a0aec0",
-      gradient: "linear-gradient(135deg, #a0aec0 0%, #4a5568 100%)",
-      icon: <GeneralIcon sx={{ fontSize: 40 }} />,
-      glow: "0 0 30px rgba(160, 174, 192, 0.3)",
+      color: "#64748b",
+      gradient: "linear-gradient(135deg, #64748b 0%, #334155 100%)",
+      icon: <GeneralIcon sx={{ fontSize: 32 }} />,
+      glow: "0 8px 20px rgba(100, 116, 139, 0.15)",
     }
   );
 };
@@ -86,13 +96,12 @@ const DepartmentGateway = () => {
     <Box
       sx={{
         minHeight: "100vh",
-        background:
-          "radial-gradient(circle at 50% 0%, #2a3555 0%, #0a0e17 80%)",
+        background: "#f8fafc",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        pt: 10,
-        pb: 6,
+        pt: 12,
+        pb: 8,
         px: 2,
         position: "relative",
         overflow: "hidden",
@@ -102,44 +111,43 @@ const DepartmentGateway = () => {
       <Box
         sx={{
           position: "absolute",
-          top: "-20%",
-          left: "20%",
-          width: "600px",
-          height: "600px",
-          background:
-            "radial-gradient(circle, rgba(0,212,255,0.05) 0%, transparent 70%)",
+          top: "-10%",
+          left: "10%",
+          width: "800px",
+          height: "800px",
+          background: "radial-gradient(circle, rgba(79, 70, 229, 0.03) 0%, transparent 70%)",
           zIndex: 0,
           pointerEvents: "none",
+          filter: "blur(60px)",
         }}
       />
 
       <Container maxWidth="xl" sx={{ position: "relative", zIndex: 1 }}>
-        <Box sx={{ mb: 8, textAlign: "center" }}>
+        <Box sx={{ mb: 10, textAlign: "center" }}>
           <Typography
             variant="h2"
             sx={{
-              fontWeight: 800,
-              background: "linear-gradient(45deg, #fff 30%, #a0aec0 90%)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              mb: 2,
-              letterSpacing: "-2px",
-              textShadow: "0 10px 30px rgba(0,0,0,0.5)",
+              fontWeight: 900,
+              color: PRIMARY_SLATE,
+              mb: 2.5,
+              letterSpacing: "-0.04em",
+              lineHeight: 1.1,
             }}
           >
-            Select Your Workspace
+            Mission Selection
           </Typography>
           <Typography
             variant="h6"
             sx={{
-              color: "#a0aec0",
-              fontWeight: 400,
+              color: SECONDARY_SLATE,
+              fontWeight: 500,
               maxWidth: "600px",
               mx: "auto",
+              opacity: 0.8,
+              lineHeight: 1.6,
             }}
           >
-            Choose your department to access your personalized dashboard and
-            team resources.
+            Choose your specialized division to initialize your workspace protocols and team synchrony.
           </Typography>
         </Box>
 
@@ -152,36 +160,43 @@ const DepartmentGateway = () => {
           {departments.map((dept) => {
             const style = getDepartmentStyle(dept.id);
             return (
-              <Grid item xs={12} sm={6} md={4} lg={3} key={dept.id}>
+              <Grid item xs={12} md={6} lg={6} key={dept.id}>
                 <GlassContainer
                   onClick={() => handleEnter(dept.id)}
                   sx={{
                     height: "100%",
-                    p: 4,
+                    p: 6,
                     display: "flex",
                     flexDirection: "column",
                     alignItems: "flex-start",
                     justifyContent: "space-between",
                     cursor: "pointer",
                     transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
-                    border: "1px solid rgba(255,255,255,0.05)",
-                    background: `linear-gradient(135deg, ${alpha("#ffffff", 0.03)} 0%, ${alpha("#ffffff", 0.01)} 100%)`,
-                    backdropFilter: "blur(20px)",
+                    border: `1px solid ${GLASS_BORDER}`,
+                    background: GLASS_BG,
+                    backdropFilter: "blur(48px) saturate(180%)",
                     position: "relative",
                     overflow: "hidden",
+                    borderRadius: "32px",
+                    boxShadow: "0 10px 30px -10px rgba(10, 15, 25, 0.05)",
                     "&:hover": {
-                      transform: "translateY(-10px)",
-                      boxShadow: `0 20px 40px ${alpha(style.color, 0.15)}, inset 0 0 0 1px ${alpha(style.color, 0.3)}`,
+                      transform: "translateY(-12px)",
+                      boxShadow: `0 20px 40px -10px ${alpha(style.color, 0.15)}`,
+                      border: `1px solid ${alpha(style.color, 0.2)}`,
                       "& .icon-wrapper": {
-                        transform: "scale(1.1) rotate(5deg)",
+                        transform: "scale(1.15) rotate(5deg)",
                         background: style.gradient,
-                        boxShadow: style.glow,
+                        boxShadow: `0 8px 24px ${alpha(style.color, 0.25)}`,
                         color: "#fff",
                       },
-                      "& .arrow-icon": {
-                        transform: "translateX(5px)",
-                        opacity: 1,
-                      },
+                      "& .action-btn": {
+                        color: style.color,
+                        transform: "translateY(-4px)",
+                        "& .arrow-icon": {
+                          transform: "translateX(8px)",
+                          opacity: 1,
+                        },
+                      }
                     },
                   }}
                 >
@@ -189,28 +204,29 @@ const DepartmentGateway = () => {
                     <Box
                       className="icon-wrapper"
                       sx={{
-                        width: 70,
-                        height: 70,
-                        borderRadius: "20px",
-                        background: alpha(style.color, 0.1),
+                        width: 88,
+                        height: 88,
+                        borderRadius: "28px",
+                        background: alpha(style.color, 0.08),
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
                         color: style.color,
-                        mb: 3,
-                        transition: "all 0.4s ease",
+                        mb: 5,
+                        transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
+                        border: `1px solid ${alpha(style.color, 0.1)}`,
                       }}
                     >
                       {style.icon}
                     </Box>
 
                     <Typography
-                      variant="h5"
+                      variant="h4"
                       sx={{
-                        fontWeight: 700,
-                        color: "#fff",
-                        mb: 1.5,
-                        letterSpacing: 0.5,
+                        fontWeight: 900,
+                        color: PRIMARY_SLATE,
+                        mb: 2,
+                        letterSpacing: "-0.04em",
                       }}
                     >
                       {dept.title}
@@ -219,45 +235,51 @@ const DepartmentGateway = () => {
                     <Typography
                       variant="body2"
                       sx={{
-                        color: "#a0aec0",
-                        lineHeight: 1.6,
-                        mb: 3,
-                        minHeight: "3em",
+                        color: SECONDARY_SLATE,
+                        lineHeight: 1.7,
+                        mb: 4,
+                        minHeight: "3.4em",
+                        fontWeight: 500,
+                        opacity: 0.8,
                       }}
                     >
                       {dept.description ||
-                        "Access departmental tools, track progress, and manage team workflows."}
+                        "Access departmental tools, track progress, and manage team workflows through our secure workspace protocols."}
                     </Typography>
                   </Box>
 
                   <Box
+                    className="action-btn"
                     sx={{
                       display: "flex",
                       alignItems: "center",
                       width: "100%",
                       mt: "auto",
-                      pt: 2,
-                      borderTop: "1px solid rgba(255,255,255,0.05)",
+                      pt: 2.5,
+                      borderTop: `1px solid ${alpha(PRIMARY_SLATE, 0.04)}`,
+                      transition: "all 0.3s ease",
                     }}
                   >
                     <Typography
                       variant="button"
                       sx={{
-                        color: style.color,
-                        fontWeight: 600,
+                        color: alpha(SECONDARY_SLATE, 0.6),
+                        fontWeight: 800,
                         flexGrow: 1,
-                        letterSpacing: 1,
+                        letterSpacing: "0.05em",
+                        fontSize: "0.75rem",
+                        transition: "all 0.3s ease",
                       }}
                     >
-                      ENTER
+                      INITIALIZE
                     </Typography>
                     <ArrowIcon
                       className="arrow-icon"
                       sx={{
-                        color: style.color,
-                        opacity: 0.5,
+                        color: alpha(SECONDARY_SLATE, 0.4),
+                        opacity: 0.6,
                         transition: "all 0.3s ease",
-                        fontSize: 20,
+                        fontSize: 18,
                       }}
                     />
                   </Box>

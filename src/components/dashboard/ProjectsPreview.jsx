@@ -1,5 +1,9 @@
-import React, { useState, useEffect } from "react";
-import { Box, Typography, Grid, Button, Chip, Paper } from "@mui/material";
+
+/**
+ * AntyGravity Instruction:
+ * Apply rules from /docs/component_analysis_prompt.md
+ */import React, { useState, useEffect } from "react";
+import { Box, Typography, Grid, Button, Chip, Paper, alpha } from "@mui/material";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import VisibilityIcon from "@mui/icons-material/Visibility";
@@ -8,6 +12,12 @@ import FolderIcon from "@mui/icons-material/Folder";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import axios from "axios";
+
+const PRIMARY_SLATE = "#0f172a";
+const SECONDARY_SLATE = "#475569";
+const INDIGO_ACCENT = "#4f46e5";
+const GLASS_BG = "rgba(255, 255, 255, 0.75)";
+const GLASS_BORDER = "rgba(10, 15, 25, 0.08)";
 
 const ProjectsPreview = ({ userId }) => {
   const [projects, setProjects] = useState([]);
@@ -84,13 +94,13 @@ const ProjectsPreview = ({ userId }) => {
   const getPriorityColor = (priority) => {
     switch (priority) {
       case "Critical":
-        return "#ff5b5b";
+        return "#ef4444"; // Red
       case "High":
-        return "#ffab00";
+        return "#f59e0b"; // Amber
       case "Medium":
-        return "#00d4ff";
+        return "#6366f1"; // Indigo
       default:
-        return "#00e676";
+        return "#10b981"; // Emerald
     }
   };
 
@@ -116,24 +126,32 @@ const ProjectsPreview = ({ userId }) => {
         }}
       >
         <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-          <FolderIcon sx={{ color: "#00d4ff", fontSize: 28 }} />
-          <Typography variant="h5" sx={{ fontWeight: 700, color: "#fff" }}>
-            My Projects
+          <FolderIcon sx={{ color: INDIGO_ACCENT, fontSize: 24 }} />
+          <Typography
+            variant="h5"
+            sx={{
+              fontWeight: 800,
+              color: PRIMARY_SLATE,
+              letterSpacing: "-0.01em"
+            }}
+          >
+            Assigned Protocols
           </Typography>
         </Box>
         <Button
           variant="text"
           onClick={() => navigate("/app/projects")}
           sx={{
-            color: "#00d4ff",
+            color: INDIGO_ACCENT,
             textTransform: "none",
-            fontWeight: 600,
+            fontWeight: 800,
+            fontSize: "0.85rem",
             "&:hover": {
-              bgcolor: "rgba(0, 212, 255, 0.1)",
+              bgcolor: alpha(INDIGO_ACCENT, 0.05),
             },
           }}
         >
-          View All →
+          View Portfolio →
         </Button>
       </Box>
 
@@ -144,29 +162,30 @@ const ProjectsPreview = ({ userId }) => {
           const isUrgent = daysRemaining <= 7;
 
           return (
-            <Grid item xs={12} md={4} key={project._id}>
+            <Grid size={{ xs: 12, md: 4 }} key={project._id}>
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1, duration: 0.5 }}
+                transition={{ delay: index * 0.1 }}
               >
                 <Paper
                   sx={{
                     p: 2.5,
-                    borderRadius: "16px",
-                    background: "rgba(20, 25, 40, 0.6)",
-                    backdropFilter: "blur(12px)",
-                    border: `1px solid ${isUrgent ? "rgba(255, 171, 0, 0.3)" : "rgba(255, 255, 255, 0.08)"}`,
+                    borderRadius: "24px",
+                    background: GLASS_BG,
+                    backdropFilter: "blur(48px) saturate(180%)",
+                    border: `1px solid ${isUrgent ? alpha(getPriorityColor(project.priority), 0.3) : GLASS_BORDER}`,
                     position: "relative",
                     overflow: "hidden",
-                    transition: "all 0.3s ease",
+                    transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
                     height: "100%",
                     display: "flex",
                     flexDirection: "column",
+                    boxShadow: "0 8px 32px -4px rgba(10, 15, 25, 0.04)",
                     "&:hover": {
-                      transform: "translateY(-2px)",
-                      border: `1px solid ${getPriorityColor(project.priority)}40`,
-                      boxShadow: `0 4px 20px ${getPriorityColor(project.priority)}15`,
+                      transform: "translateY(-4px)",
+                      borderColor: alpha(getPriorityColor(project.priority), 0.4),
+                      boxShadow: `0 12px 40px ${alpha(getPriorityColor(project.priority), 0.1)}`,
                     },
                   }}
                 >
@@ -212,8 +231,8 @@ const ProjectsPreview = ({ userId }) => {
                     <Typography
                       variant="subtitle1"
                       sx={{
-                        fontWeight: 700,
-                        color: "#fff",
+                        fontWeight: 800,
+                        color: PRIMARY_SLATE,
                         mb: 2,
                         lineHeight: 1.3,
                         display: "-webkit-box",
@@ -221,6 +240,7 @@ const ProjectsPreview = ({ userId }) => {
                         WebkitBoxOrient: "vertical",
                         overflow: "hidden",
                         minHeight: "2.6em",
+                        letterSpacing: "-0.01em"
                       }}
                     >
                       {project.title}
@@ -243,18 +263,18 @@ const ProjectsPreview = ({ userId }) => {
                           }}
                         >
                           <TrendingUpIcon
-                            sx={{ fontSize: 14, color: "#a0aec0" }}
+                            sx={{ fontSize: 13, color: alpha(SECONDARY_SLATE, 0.6) }}
                           />
                           <Typography
                             variant="caption"
-                            sx={{ color: "#a0aec0", fontWeight: 600 }}
+                            sx={{ color: SECONDARY_SLATE, fontWeight: 600 }}
                           >
                             Progress
                           </Typography>
                         </Box>
                         <Typography
                           variant="caption"
-                          sx={{ color: "#00d4ff", fontWeight: 700 }}
+                          sx={{ color: INDIGO_ACCENT, fontWeight: 800 }}
                         >
                           {project.progress}%
                         </Typography>
@@ -328,29 +348,27 @@ const ProjectsPreview = ({ userId }) => {
                     </Box>
 
                     {/* Action Buttons */}
-                    <Box sx={{ display: "flex", gap: 1, mt: "auto" }}>
+                    <Box sx={{ display: "flex", gap: 1.5, mt: "auto" }}>
                       <Button
                         variant="contained"
                         size="small"
+                        disableElevation
                         startIcon={<VisibilityIcon sx={{ fontSize: 16 }} />}
                         onClick={() => navigate(`/app/projects/${project._id}`)}
                         sx={{
                           flex: 1,
-                          borderRadius: "10px",
+                          borderRadius: "12px",
                           textTransform: "none",
-                          fontWeight: 600,
+                          fontWeight: 800,
                           fontSize: "0.8rem",
-                          py: 0.75,
-                          background:
-                            "linear-gradient(135deg, #00d4ff 0%, #0099cc 100%)",
-                          boxShadow: "0 2px 8px rgba(0, 212, 255, 0.3)",
+                          py: 1,
+                          background: INDIGO_ACCENT,
                           "&:hover": {
-                            background:
-                              "linear-gradient(135deg, #00bbee 0%, #0088bb 100%)",
+                            background: "#3730a3",
                           },
                         }}
                       >
-                        View
+                        Details
                       </Button>
                       {!project.isEnrolled && (
                         <Button

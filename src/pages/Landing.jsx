@@ -1,3 +1,7 @@
+/**
+ * AntyGravity Instruction:
+ * Apply rules from /docs/component_analysis_prompt.md
+ */
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -6,6 +10,7 @@ import {
   Button,
   Grid,
   Container,
+  alpha,
   Stack,
   useTheme,
   useMediaQuery,
@@ -26,15 +31,23 @@ import {
   Menu as MenuIcon,
   CheckCircle as CheckCircleIcon,
 } from "@mui/icons-material";
-import { GlassContainer, GlowText } from "../components/common/GlassComp";
+const PRIMARY_SLATE = "#0f172a";
+const SECONDARY_SLATE = "#475569";
+const INDIGO_ACCENT = "#4f46e5";
+const GLASS_BG = "rgba(255, 255, 255, 0.75)";
+const GLASS_BORDER = "rgba(10, 15, 25, 0.08)";
 
-/* ─── Shared Animation/Layout Components ─── */
 const FadeIn = ({ children, delay = 0, y = 20 }) => (
   <motion.div
-    initial={{ opacity: 0, y }}
-    whileInView={{ opacity: 1, y: 0 }}
+    initial={{ opacity: 0, y, scale: 0.96 }}
+    whileInView={{ opacity: 1, y: 0, scale: 1 }}
     viewport={{ once: true, margin: "-50px" }}
-    transition={{ duration: 0.6, delay, ease: "easeOut" }}
+    transition={{
+      type: "spring",
+      stiffness: 150,
+      damping: 20,
+      delay
+    }}
   >
     {children}
   </motion.div>
@@ -86,11 +99,12 @@ const Navbar = () => {
         left: 0,
         right: 0,
         zIndex: 1000,
-        transition: "all 0.3s ease",
-        bgcolor: scrolled ? "rgba(10, 14, 23, 0.85)" : "transparent",
-        backdropFilter: scrolled ? "blur(20px)" : "none",
-        borderBottom: scrolled ? "1px solid rgba(255,255,255,0.05)" : "none",
-        py: 2,
+        transition: "all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1)",
+        bgcolor: scrolled ? "rgba(255, 255, 255, 0.8)" : "transparent",
+        backdropFilter: scrolled ? "blur(40px) saturate(180%)" : "none",
+        WebkitBackdropFilter: scrolled ? "blur(40px) saturate(180%)" : "none",
+        borderBottom: scrolled ? `1px solid ${GLASS_BORDER}` : "none",
+        py: scrolled ? 1.5 : 2.5,
       }}
     >
       <Container maxWidth="xl">
@@ -111,21 +125,21 @@ const Navbar = () => {
               sx={{
                 width: 32,
                 height: 32,
-                borderRadius: "8px",
-                background: "linear-gradient(135deg, #00d4ff 0%, #005bea 100%)",
+                borderRadius: "10px",
+                background: "linear-gradient(135deg, #0f172a 0%, #334155 100%)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                boxShadow: "0 0 15px rgba(0, 212, 255, 0.5)",
+                boxShadow: "0 4px 12px rgba(15, 23, 42, 0.15)",
               }}
             >
               <BoltIcon sx={{ color: "#fff", fontSize: 20 }} />
             </Box>
             <Typography
               variant="h6"
-              sx={{ fontWeight: 800, letterSpacing: -0.5, color: "#fff" }}
+              sx={{ fontWeight: 900, letterSpacing: -0.5, color: PRIMARY_SLATE }}
             >
-              Tasks.
+              Antigravity.
             </Typography>
           </Stack>
 
@@ -135,16 +149,21 @@ const Navbar = () => {
             spacing={4}
             sx={{ display: { xs: "none", md: "flex" } }}
           >
-            {["Features", "Solutions", "Enterprise", "Pricing"].map((item) => (
+            {["Ecosystem", "Protocols", "Infrastructure", "Intel"].map((item) => (
               <Typography
                 key={item}
                 sx={{
-                  color: "#a0aec0",
-                  fontSize: "0.95rem",
-                  fontWeight: 500,
+                  color: SECONDARY_SLATE,
+                  fontSize: "0.9rem",
+                  fontWeight: 700,
+                  textTransform: "uppercase",
+                  letterSpacing: 1,
                   cursor: "pointer",
-                  transition: "color 0.2s",
-                  "&:hover": { color: "#fff" },
+                  transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                  "&:hover": {
+                    color: PRIMARY_SLATE,
+                    transform: "translateY(-1px)",
+                  },
                 }}
               >
                 {item}
@@ -153,34 +172,44 @@ const Navbar = () => {
           </Stack>
 
           {/* Actions */}
-          <Stack direction="row" spacing={2}>
+          <Stack direction="row" spacing={2} alignItems="center">
             <Button
               variant="text"
               sx={{
-                color: "#fff",
-                fontWeight: 600,
+                color: PRIMARY_SLATE,
+                fontWeight: 800,
+                fontSize: "0.85rem",
+                textTransform: "uppercase",
+                letterSpacing: 1,
                 display: { xs: "none", sm: "block" },
               }}
               onClick={() => navigate("/login")}
             >
-              Log In
+              Terminal
             </Button>
             <Button
               variant="contained"
               onClick={() => navigate("/signup")}
               sx={{
-                background: "#fff",
-                color: "#000",
-                fontWeight: 700,
-                borderRadius: "8px",
-                px: 2.5,
-                "&:hover": { background: "#e2e8f0" },
+                background: "linear-gradient(135deg, #0f172a 0%, #334155 100%)",
+                color: "#fff",
+                fontWeight: 900,
+                borderRadius: "12px",
+                textTransform: "none",
+                fontSize: "0.95rem",
+                px: 3,
+                boxShadow: "0 8px 20px rgba(15, 23, 42, 0.15)",
+                "&:hover": {
+                  background: "linear-gradient(135deg, #1e293b 0%, #0f172a 100%)",
+                  transform: "translateY(-1px)",
+                  boxShadow: "0 12px 24px rgba(15, 23, 42, 0.2)",
+                },
               }}
             >
-              Get Started
+              Initialize Node
             </Button>
             <IconButton
-              sx={{ display: { xs: "block", md: "none" }, color: "#fff" }}
+              sx={{ display: { xs: "block", md: "none" }, color: PRIMARY_SLATE }}
             >
               <MenuIcon />
             </IconButton>
@@ -191,214 +220,7 @@ const Navbar = () => {
   );
 };
 
-/* ─── Hero Visual (3D Dashboard) ─── */
-const HeroVisual = () => {
-  const { scrollY } = useScroll();
-  const y = useTransform(scrollY, [0, 500], [0, 100]);
-  const rotateX = useTransform(scrollY, [0, 500], [20, 0]);
 
-  return (
-    <Box
-      sx={{
-        perspective: "1000px",
-        mt: { xs: 8, md: 10 },
-        mb: { xs: 10, md: 15 },
-      }}
-    >
-      <motion.div
-        style={{ y, rotateX, rotateY: -12, scale: 0.95 }}
-        initial={{ opacity: 0, rotateX: 45, y: 100 }}
-        animate={{ opacity: 1, rotateX: 20, y: 0 }}
-        transition={{ duration: 1.2, ease: "easeOut" }}
-      >
-        <GlassContainer
-          sx={{
-            width: "100%",
-            maxWidth: 1100,
-            mx: "auto",
-            height: { xs: 300, md: 600 },
-            border: "1px solid rgba(255,255,255,0.1)",
-            background: "rgba(13, 17, 23, 0.6)",
-            backdropFilter: "blur(20px)",
-            boxShadow:
-              "0 50px 100px -20px rgba(0,0,0,0.5), 0 0 80px -10px rgba(0, 212, 255, 0.15)",
-            overflow: "hidden",
-            position: "relative",
-          }}
-        >
-          {/* App Header Mockup */}
-          <Box
-            sx={{
-              p: 2,
-              borderBottom: "1px solid rgba(255,255,255,0.05)",
-              display: "flex",
-              alignItems: "center",
-              gap: 2,
-            }}
-          >
-            <Stack direction="row" spacing={1}>
-              <Box
-                sx={{
-                  width: 10,
-                  height: 10,
-                  borderRadius: "50%",
-                  bgcolor: "#ff5f56",
-                }}
-              />
-              <Box
-                sx={{
-                  width: 10,
-                  height: 10,
-                  borderRadius: "50%",
-                  bgcolor: "#ffbd2e",
-                }}
-              />
-              <Box
-                sx={{
-                  width: 10,
-                  height: 10,
-                  borderRadius: "50%",
-                  bgcolor: "#27c93f",
-                }}
-              />
-            </Stack>
-            <Box
-              sx={{
-                flex: 1,
-                height: 24,
-                bgcolor: "rgba(255,255,255,0.05)",
-                borderRadius: 1,
-              }}
-            />
-          </Box>
-
-          {/* Dashboard Content Mockup */}
-          <Grid container sx={{ height: "100%" }}>
-            {/* Sidebar */}
-            <Grid
-              item
-              xs={2}
-              sx={{
-                borderRight: "1px solid rgba(255,255,255,0.05)",
-                p: 2,
-                display: { xs: "none", md: "block" },
-              }}
-            >
-              {[1, 2, 3, 4, 5].map((i) => (
-                <Box
-                  key={i}
-                  sx={{
-                    height: 20,
-                    width: "80%",
-                    bgcolor: "rgba(255,255,255,0.03)",
-                    mb: 2,
-                    borderRadius: 1,
-                  }}
-                />
-              ))}
-            </Grid>
-            {/* Main Area */}
-            <Grid item xs={12} md={10} sx={{ p: 3 }}>
-              <Box
-                sx={{ display: "flex", justifyContent: "space-between", mb: 4 }}
-              >
-                <Box
-                  sx={{
-                    width: 150,
-                    height: 30,
-                    bgcolor: "rgba(255,255,255,0.1)",
-                    borderRadius: 1,
-                  }}
-                />
-                <Box
-                  sx={{
-                    width: 100,
-                    height: 30,
-                    bgcolor: "#00d4ff",
-                    borderRadius: 1,
-                  }}
-                />
-              </Box>
-              <Grid container spacing={2}>
-                {/* Simulated Kanban Columns */}
-                {[0, 1, 2].map((col) => (
-                  <Grid item xs={4} key={col}>
-                    <Box
-                      sx={{
-                        height: 400,
-                        bgcolor: "rgba(255,255,255,0.02)",
-                        borderRadius: 2,
-                        p: 1.5,
-                      }}
-                    >
-                      <Box
-                        sx={{
-                          width: 80,
-                          height: 15,
-                          bgcolor: "rgba(255,255,255,0.1)",
-                          mb: 2,
-                          borderRadius: 1,
-                        }}
-                      />
-                      {[1, 2, 3].map((card) => (
-                        <motion.div
-                          key={card}
-                          initial={{ y: 20, opacity: 0 }}
-                          animate={{ y: 0, opacity: 1 }}
-                          transition={{ delay: 1 + col * 0.2 + card * 0.1 }}
-                        >
-                          <Box
-                            sx={{
-                              height: 80,
-                              bgcolor: "rgba(255,255,255,0.05)",
-                              mb: 1,
-                              borderRadius: 2,
-                              border: "1px solid rgba(255,255,255,0.05)",
-                            }}
-                          />
-                        </motion.div>
-                      ))}
-                    </Box>
-                  </Grid>
-                ))}
-              </Grid>
-            </Grid>
-          </Grid>
-
-          {/* Floating Elements for 3D effect */}
-          <motion.div
-            style={{
-              position: "absolute",
-              bottom: "10%",
-              right: "5%",
-              zIndex: 10,
-            }}
-            animate={{ y: [-10, 10, -10] }}
-            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-          >
-            <GlassContainer
-              sx={{
-                p: 2,
-                border: "1px solid rgba(0,212,255,0.3)",
-                bgcolor: "rgba(0,0,0,0.6)",
-              }}
-            >
-              <Stack direction="row" alignItems="center" spacing={1}>
-                <CheckCircleIcon sx={{ color: "#27c93f" }} />
-                <Typography
-                  variant="body2"
-                  sx={{ color: "#fff", fontWeight: 600 }}
-                >
-                  Deployment Successful
-                </Typography>
-              </Stack>
-            </GlassContainer>
-          </motion.div>
-        </GlassContainer>
-      </motion.div>
-    </Box>
-  );
-};
 
 /* ─── Main Landing Component ─── */
 const Landing = () => {
@@ -407,18 +229,80 @@ const Landing = () => {
   return (
     <Box
       sx={{
-        bgcolor: "#0a0e17",
+        bgcolor: "#f8fafc",
         minHeight: "100vh",
-        color: "#fff",
+        color: PRIMARY_SLATE,
         overflowX: "hidden",
+        position: "relative",
       }}
     >
+      {/* Background Mesh Gradients */}
+      <Box
+        sx={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          zIndex: 0,
+          overflow: "hidden",
+          pointerEvents: "none",
+        }}
+      >
+        <motion.div
+          animate={{
+            scale: [1, 1.2, 1],
+            x: [0, 50, 0],
+            y: [0, 30, 0]
+          }}
+          transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+          style={{
+            position: "absolute",
+            top: "-10%",
+            left: "10%",
+            width: "60vw",
+            height: "60vw",
+            background: "radial-gradient(circle, rgba(79, 70, 229, 0.05) 0%, rgba(255,255,255,0) 70%)",
+            filter: "blur(80px)",
+          }}
+        />
+        <motion.div
+          animate={{
+            scale: [1.2, 1, 1.2],
+            x: [0, -50, 0],
+            y: [0, -30, 0]
+          }}
+          transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
+          style={{
+            position: "absolute",
+            bottom: "0%",
+            right: "5%",
+            width: "50vw",
+            height: "50vw",
+            background: "radial-gradient(circle, rgba(15, 23, 42, 0.03) 0%, rgba(255,255,255,0) 70%)",
+            filter: "blur(100px)",
+          }}
+        />
+        <Box
+          sx={{
+            position: "absolute",
+            top: "40%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: "80vw",
+            height: "80vh",
+            background: "radial-gradient(circle, rgba(248, 250, 252, 0) 0%, #f8fafc 80%)",
+            zIndex: 1,
+          }}
+        />
+      </Box>
+
       <Navbar />
 
       {/* Hero Section */}
       <Container
         maxWidth="lg"
-        sx={{ pt: { xs: 15, md: 22 }, position: "relative", zIndex: 2 }}
+        sx={{ pt: { xs: 15, md: 25 }, pb: { xs: 10, md: 20 }, position: "relative", zIndex: 2 }}
       >
         <Box
           sx={{
@@ -437,12 +321,16 @@ const Landing = () => {
         <Stack alignItems="center" spacing={3} textAlign="center">
           <FadeIn>
             <Chip
-              label="New: AI-Powered Workflows ⚡"
+              label="v2.0: Neural Orchestration Engine 🧠"
               sx={{
-                bgcolor: "rgba(0, 212, 255, 0.1)",
-                color: "#00d4ff",
-                border: "1px solid rgba(0, 212, 255, 0.2)",
-                fontWeight: 600,
+                background: "rgba(79, 70, 229, 0.06)",
+                color: INDIGO_ACCENT,
+                border: `1px solid ${alpha(INDIGO_ACCENT, 0.1)}`,
+                fontWeight: 800,
+                textTransform: "uppercase",
+                letterSpacing: 2,
+                fontSize: "0.7rem",
+                py: 2,
                 mb: 2,
               }}
             />
@@ -452,22 +340,33 @@ const Landing = () => {
             <Typography
               variant="h1"
               sx={{
-                fontSize: { xs: "2.5rem", md: "5rem" },
-                fontWeight: 800,
-                lineHeight: 1.1,
-                letterSpacing: -1,
+                fontSize: { xs: "2.8rem", md: "5.5rem" },
+                fontWeight: 900,
+                lineHeight: 1.05,
+                letterSpacing: "-0.04em",
+                color: PRIMARY_SLATE,
               }}
             >
-              Manage projects with <br />
-              <span
+              Master Your Projects with <br />
+              <motion.span
                 style={{
-                  background: "linear-gradient(to right, #00d4ff, #005bea)",
+                  display: "inline-block",
+                  background: "linear-gradient(135deg, #0f172a 0%, #4f46e5 50%, #0f172a 100%)",
+                  backgroundSize: "200% auto",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
                 }}
+                animate={{
+                  backgroundPosition: ["0% center", "200% center"]
+                }}
+                transition={{
+                  duration: 8,
+                  repeat: Infinity,
+                  ease: "linear"
+                }}
               >
-                Supernatural Speed
-              </span>
+                Infinite Precision
+              </motion.span>
             </Typography>
           </FadeIn>
 
@@ -475,72 +374,82 @@ const Landing = () => {
             <Typography
               variant="h5"
               sx={{
-                color: "#a0aec0",
-                maxWidth: 660,
+                color: SECONDARY_SLATE,
+                maxWidth: 720,
                 lineHeight: 1.6,
-                fontSize: { xs: "1rem", md: "1.25rem" },
+                fontSize: { xs: "1.1rem", md: "1.4rem" },
+                fontWeight: 500,
+                letterSpacing: "-0.01em",
               }}
             >
-              The all-in-one workspace for high-performance teams. Plan, track,
-              and ship world-class software without the chaos.
+              The definitive operating system for high-output engineering teams.
+              Orchestrate complex protocols, automate friction, and achieve pure velocity.
             </Typography>
           </FadeIn>
 
           <FadeIn delay={0.3}>
             <Stack
               direction={{ xs: "column", sm: "row" }}
-              spacing={2}
-              sx={{ mt: 2 }}
+              spacing={2.5}
+              sx={{ mt: 3 }}
             >
               <Button
                 variant="contained"
                 size="large"
                 sx={{
-                  bgcolor: "#fff",
-                  color: "#000",
+                  background: "linear-gradient(135deg, #0f172a 0%, #334155 100%)",
+                  color: "#fff",
                   fontSize: "1rem",
-                  fontWeight: 700,
-                  px: 4,
-                  py: 1.5,
-                  borderRadius: "10px",
-                  "&:hover": { bgcolor: "#e2e8f0" },
+                  fontWeight: 900,
+                  px: 5,
+                  py: 1.8,
+                  borderRadius: "16px",
+                  boxShadow: "0 12px 32px rgba(15, 23, 42, 0.15)",
+                  transition: "all 0.3s ease",
+                  "&:hover": {
+                    transform: "translateY(-1px)",
+                    boxShadow: "0 16px 40px rgba(15, 23, 42, 0.25)",
+                    background: "linear-gradient(135deg, #1e293b 0%, #0f172a 100%)",
+                  },
                 }}
               >
-                Start Free Trial
+                Access Terminal
               </Button>
               <Button
                 variant="outlined"
                 size="large"
                 endIcon={<ArrowForwardIcon />}
                 sx={{
-                  borderColor: "rgba(255,255,255,0.2)",
-                  color: "#fff",
+                  borderColor: GLASS_BORDER,
+                  color: PRIMARY_SLATE,
                   fontSize: "1rem",
-                  px: 4,
-                  py: 1.5,
-                  borderRadius: "10px",
+                  fontWeight: 800,
+                  px: 5,
+                  py: 1.8,
+                  borderRadius: "16px",
+                  borderWidth: "2px",
+                  transition: "all 0.3s ease",
                   "&:hover": {
-                    borderColor: "#fff",
-                    bgcolor: "rgba(255,255,255,0.05)",
+                    borderColor: PRIMARY_SLATE,
+                    bgcolor: "rgba(15, 23, 42, 0.04)",
+                    borderWidth: "2px",
+                    transform: "translateY(-1px)",
                   },
                 }}
               >
-                View Demo
+                Protocol Audit
               </Button>
             </Stack>
           </FadeIn>
         </Stack>
-
-        <HeroVisual />
       </Container>
 
-      {/* Logos Marquee */}
       <Box
         sx={{
-          borderTop: "1px solid rgba(255,255,255,0.05)",
-          borderBottom: "1px solid rgba(255,255,255,0.05)",
-          py: 4,
-          bgcolor: "rgba(255,255,255,0.01)",
+          borderTop: `1px solid ${GLASS_BORDER}`,
+          borderBottom: `1px solid ${GLASS_BORDER}`,
+          py: 6,
+          bgcolor: "rgba(15, 23, 42, 0.01)",
         }}
       >
         <Container maxWidth="xl">
@@ -548,28 +457,42 @@ const Landing = () => {
             variant="overline"
             display="block"
             align="center"
-            sx={{ color: "#4a5568", mb: 3, letterSpacing: 2 }}
+            sx={{ color: SECONDARY_SLATE, mb: 6, letterSpacing: 6, fontWeight: 900, fontSize: "0.75rem" }}
           >
-            TRUSTED BY INDUSTRY LEADERS
+            Powering Next-Generation Protocols
           </Typography>
           <Stack
             direction="row"
             justifyContent="center"
+            alignItems="center"
             flexWrap="wrap"
-            spacing={{ xs: 3, md: 8 }}
+            spacing={{ xs: 6, md: 12 }}
+            sx={{ px: 2 }}
           >
             {[
-              "Acme Corp",
-              "Linear",
-              "Vercel",
-              "Stripe",
-              "Raycast",
-              "Shopify",
+              "NEURAL",
+              "AXON",
+              "VECTOR",
+              "NEXUS",
+              "SYNAPSE",
+              "CORE",
             ].map((name) => (
               <Typography
                 key={name}
-                variant="h6"
-                sx={{ color: "#4a5568", fontWeight: 700, opacity: 0.6 }}
+                sx={{
+                  color: PRIMARY_SLATE,
+                  fontWeight: 900,
+                  fontSize: "1.4rem",
+                  letterSpacing: 6,
+                  opacity: 0.15,
+                  cursor: "default",
+                  transition: "all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+                  "&:hover": {
+                    opacity: 0.8,
+                    color: INDIGO_ACCENT,
+                    transform: "scale(1.05)",
+                  }
+                }}
               >
                 {name}
               </Typography>
@@ -578,266 +501,264 @@ const Landing = () => {
         </Container>
       </Box>
 
-      {/* Benefits Grid */}
-      <Container maxWidth="lg" sx={{ py: 15 }}>
-        <FadeIn>
-          <Typography
-            variant="h2"
-            align="center"
-            sx={{ fontWeight: 800, mb: 2 }}
-          >
-            Built for modern workflows
-          </Typography>
-          <Typography
-            variant="h6"
-            align="center"
-            sx={{ color: "#a0aec0", mb: 10, maxWidth: 600, mx: "auto" }}
-          >
-            Everything you need to manage complex projects without the
-            complexity.
-          </Typography>
-        </FadeIn>
 
-        <Grid container spacing={4}>
-          {[
-            {
-              icon: <SpeedIcon sx={{ fontSize: 40, color: "#00d4ff" }} />,
-              title: "Real-time Sync",
-              desc: "Updates happen instantly across all devices. No refresh needed.",
-            },
-            {
-              icon: <BoltIcon sx={{ fontSize: 40, color: "#f4bf50" }} />,
-              title: "Automated Actions",
-              desc: "Create custom rules to automate repetitive tasks and save time.",
-            },
-            {
-              icon: <SecurityIcon sx={{ fontSize: 40, color: "#27c93f" }} />,
-              title: "Enterprise Security",
-              desc: "Bank-grade encryption and SSO support for your peace of mind.",
-            },
-            {
-              icon: <RocketIcon sx={{ fontSize: 40, color: "#ff5f56" }} />,
-              title: "Fast Deployment",
-              desc: "Set up in minutes, not days. Import from Jira or Trello instantly.",
-            },
-            {
-              icon: <TeamIcon sx={{ fontSize: 40, color: "#a78bfa" }} />,
-              title: "Team Velocity",
-              desc: "Track sprint progress and team performance with beautiful charts.",
-            },
-            {
-              icon: <MagicIcon sx={{ fontSize: 40, color: "#ec4899" }} />,
-              title: "AI Assistant",
-              desc: "Let AI write your release notes and summarize daily standups.",
-            },
-          ].map((item, i) => (
-            <Grid item xs={12} md={4} key={i}>
-              <FadeIn delay={i * 0.1}>
-                <GlassContainer
-                  sx={{
-                    height: "100%",
-                    p: 4,
-                    transition: "transform 0.2s",
-                    "&:hover": { transform: "translateY(-5px)" },
-                  }}
-                >
-                  <Box sx={{ mb: 2 }}>{item.icon}</Box>
-                  <Typography variant="h5" sx={{ fontWeight: 700, mb: 1 }}>
-                    {item.title}
-                  </Typography>
-                  <Typography
-                    variant="body1"
-                    sx={{ color: "#a0aec0", lineHeight: 1.6 }}
-                  >
-                    {item.desc}
-                  </Typography>
-                </GlassContainer>
-              </FadeIn>
-            </Grid>
-          ))}
-        </Grid>
-      </Container>
 
       {/* Stats Section */}
       <Box
         sx={{
-          py: 15,
-          bgcolor: "rgba(0, 212, 255, 0.02)",
-          borderTop: "1px solid rgba(255,255,255,0.05)",
+          py: { xs: 8, md: 15 },
+          bgcolor: "rgba(15, 23, 42, 0.01)",
+          borderTop: `1px solid ${GLASS_BORDER}`,
+          borderBottom: `1px solid ${GLASS_BORDER}`,
         }}
       >
         <Container maxWidth="lg">
-          <Grid container spacing={4} justifyContent="center">
+          <Stack
+            direction={{ xs: "column", md: "row" }}
+            justifyContent="space-around"
+            alignItems="center"
+            spacing={6}
+          >
             {[
-              { val: 10000, label: "Active Users", suffix: "+" },
-              { val: 500, label: "Companies", suffix: "+" },
-              { val: 99, label: "Uptime", suffix: ".9%" },
+              { val: 12500, label: "Neural Nodes", suffix: "+" },
+              { val: 640, label: "Elite Consortiums", suffix: "" },
+              { val: 99, label: "Core Availability", suffix: ".99%" },
             ].map((stat, i) => (
-              <Grid item xs={12} md={4} key={i} sx={{ textAlign: "center" }}>
+              <Box key={i} sx={{ textAlign: "center" }}>
                 <FadeIn delay={i * 0.2}>
                   <Typography
                     variant="h2"
-                    sx={{ fontWeight: 800, color: "#fff", mb: 1 }}
+                    sx={{
+                      fontWeight: 900,
+                      mb: 1,
+                      background: "linear-gradient(135deg, #0f172a 0%, #4f46e5 100%)",
+                      WebkitBackgroundClip: "text",
+                      WebkitTextFillColor: "transparent",
+                      letterSpacing: "-0.04em",
+                    }}
                   >
                     <AnimatedCounter target={stat.val} suffix={stat.suffix} />
                   </Typography>
-                  <Typography variant="h6" sx={{ color: "#a0aec0" }}>
+                  <Typography
+                    variant="subtitle1"
+                    sx={{
+                      color: SECONDARY_SLATE,
+                      fontWeight: 800,
+                      letterSpacing: 2,
+                      textTransform: "uppercase",
+                      fontSize: "0.75rem"
+                    }}
+                  >
                     {stat.label}
                   </Typography>
                 </FadeIn>
-              </Grid>
+              </Box>
             ))}
-          </Grid>
+          </Stack>
         </Container>
       </Box>
 
       {/* CTA */}
-      <Container maxWidth="md" sx={{ py: 15, textAlign: "center" }}>
+      <Container maxWidth="md" sx={{ py: 20, textAlign: "center" }}>
         <FadeIn>
           <Box
             sx={{
               position: "relative",
-              p: { xs: 4, md: 8 },
-              borderRadius: 4,
+              p: { xs: 6, md: 12 },
+              borderRadius: "48px",
               overflow: "hidden",
-              background:
-                "linear-gradient(135deg, rgba(0, 212, 255, 0.1) 0%, rgba(0,0,0,0) 100%)",
-              border: "1px solid rgba(0, 212, 255, 0.2)",
+              background: "linear-gradient(135deg, #0f172a 0%, #334155 100%)",
+              border: `1px solid ${alpha(PRIMARY_SLATE, 0.1)}`,
+              boxShadow: "0 64px 128px -32px rgba(15, 23, 42, 0.3)",
             }}
           >
-            <Typography variant="h2" sx={{ fontWeight: 800, mb: 3 }}>
-              Ready to ship faster?
-            </Typography>
-            <Typography
-              variant="h6"
-              sx={{ color: "#a0aec0", mb: 5, maxWidth: 500, mx: "auto" }}
-            >
-              Join thousands of developers using Tasks to build the future.
-            </Typography>
-            <Button
-              variant="contained"
-              size="large"
+            {/* Animated Canvas Elements */}
+            <Box
               sx={{
-                bgcolor: "#00d4ff",
-                color: "#000",
-                fontSize: "1.2rem",
-                fontWeight: 700,
-                px: 6,
-                py: 2,
-                borderRadius: "12px",
-                "&:hover": {
-                  bgcolor: "#33dcff",
-                  boxShadow: "0 0 30px rgba(0, 212, 255, 0.4)",
-                },
+                position: "absolute",
+                top: "-10%",
+                left: "-10%",
+                width: "50%",
+                height: "50%",
+                background: "radial-gradient(circle, rgba(79, 70, 229, 0.15) 0%, rgba(0,0,0,0) 70%)",
+                filter: "blur(60px)",
+                zIndex: 0,
               }}
-            >
-              Get Started for Free
-            </Button>
+            />
+            <Box
+              sx={{
+                position: "absolute",
+                bottom: "-10%",
+                right: "-10%",
+                width: "50%",
+                height: "50%",
+                background: "radial-gradient(circle, rgba(16, 185, 129, 0.1) 0%, rgba(0,0,0,0) 70%)",
+                filter: "blur(60px)",
+                zIndex: 0,
+              }}
+            />
+
+            <Box sx={{ position: "relative", zIndex: 1 }}>
+              <Typography variant="h2" sx={{ fontWeight: 900, mb: 3, letterSpacing: "-0.04em", color: "#fff" }}>
+                Ready to Accelerate?
+              </Typography>
+              <Typography
+                variant="h6"
+                sx={{ color: alpha("#fff", 0.7), mb: 8, maxWidth: 540, mx: "auto", lineHeight: 1.6, fontWeight: 500 }}
+              >
+                Join the global consortium of high-velocity engineering teams orchestrating the future with Antigravity.
+              </Typography>
+              <motion.div
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <Button
+                  variant="contained"
+                  size="large"
+                  onClick={() => navigate("/signup")}
+                  sx={{
+                    bgcolor: "#fff",
+                    color: PRIMARY_SLATE,
+                    fontSize: "1.1rem",
+                    fontWeight: 900,
+                    px: 8,
+                    py: 2.5,
+                    borderRadius: "20px",
+                    boxShadow: "0 20px 40px rgba(0,0,0,0.2)",
+                    "&:hover": {
+                      bgcolor: "#f8fafc",
+                      boxShadow: "0 24px 48px rgba(0,0,0,0.3)",
+                    },
+                  }}
+                >
+                  Request Access
+                </Button>
+              </motion.div>
+            </Box>
           </Box>
         </FadeIn>
       </Container>
 
-      {/* Footer */}
-      <Box sx={{ borderTop: "1px solid rgba(255,255,255,0.05)", py: 8 }}>
+      <Box
+        sx={{
+          borderTop: `1px solid ${GLASS_BORDER}`,
+          py: 10,
+          background: "rgba(15, 23, 42, 0.01)",
+        }}
+      >
         <Container maxWidth="lg">
-          <Stack
-            direction={{ xs: "column", md: "row" }}
-            justifyContent="space-between"
-            spacing={4}
-          >
-            <Box>
+          <Grid container spacing={8} justifyContent="space-between">
+            <Grid item xs={12} md={4}>
               <Stack
                 direction="row"
                 alignItems="center"
-                spacing={1}
-                sx={{ mb: 2 }}
+                spacing={1.5}
+                sx={{ mb: 3 }}
               >
                 <Box
                   sx={{
-                    width: 24,
-                    height: 24,
-                    borderRadius: "6px",
-                    background: "#00d4ff",
+                    width: 32,
+                    height: 32,
+                    borderRadius: "10px",
+                    background: "linear-gradient(135deg, #0f172a 0%, #334155 100%)",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
+                    boxShadow: "0 8px 16px rgba(15, 23, 42, 0.15)",
                   }}
                 >
-                  <BoltIcon sx={{ color: "#fff", fontSize: 16 }} />
+                  <BoltIcon sx={{ color: "#fff", fontSize: 20 }} />
                 </Box>
-                <Typography variant="h6" sx={{ fontWeight: 800 }}>
-                  Tasks.
+                <Typography variant="h6" sx={{ fontWeight: 900, color: PRIMARY_SLATE, letterSpacing: -0.5 }}>
+                  Antigravity.
                 </Typography>
               </Stack>
               <Typography
                 variant="body2"
-                sx={{ color: "#a0aec0", maxWidth: 300 }}
+                sx={{ color: SECONDARY_SLATE, maxWidth: 300, lineHeight: 1.8, fontWeight: 500 }}
               >
-                The modern project management platform for software teams.
+                The definitive operating system for high-output engineering teams.
+                Orchestrate your future with cinematic precision.
               </Typography>
-            </Box>
-            <Stack direction="row" spacing={8}>
-              <Stack spacing={2}>
+            </Grid>
+
+            {[
+              {
+                title: "Protocols",
+                links: ["Ecosystem", "Neural Engine", "Security Hub", "Infrastructure"]
+              },
+              {
+                title: "Organization",
+                links: ["Consortium", "Careers", "Documentation", "Contact"]
+              },
+              {
+                title: "Intelligence",
+                links: ["Blog", "Analytics", "Performance", "Release Notes"]
+              }
+            ].map((col, i) => (
+              <Grid item xs={6} md={2} key={i}>
                 <Typography
                   variant="subtitle2"
-                  sx={{ color: "#fff", fontWeight: 700 }}
+                  sx={{ color: PRIMARY_SLATE, fontWeight: 900, mb: 3, textTransform: "uppercase", letterSpacing: 1 }}
                 >
-                  Product
+                  {col.title}
                 </Typography>
-                <Typography
-                  variant="body2"
-                  sx={{ color: "#a0aec0", cursor: "pointer" }}
-                >
-                  Features
-                </Typography>
-                <Typography
-                  variant="body2"
-                  sx={{ color: "#a0aec0", cursor: "pointer" }}
-                >
-                  Ingetrations
-                </Typography>
-                <Typography
-                  variant="body2"
-                  sx={{ color: "#a0aec0", cursor: "pointer" }}
-                >
-                  Changelog
-                </Typography>
-              </Stack>
-              <Stack spacing={2}>
-                <Typography
-                  variant="subtitle2"
-                  sx={{ color: "#fff", fontWeight: 700 }}
-                >
-                  Company
-                </Typography>
-                <Typography
-                  variant="body2"
-                  sx={{ color: "#a0aec0", cursor: "pointer" }}
-                >
-                  About
-                </Typography>
-                <Typography
-                  variant="body2"
-                  sx={{ color: "#a0aec0", cursor: "pointer" }}
-                >
-                  Careers
-                </Typography>
-                <Typography
-                  variant="body2"
-                  sx={{ color: "#a0aec0", cursor: "pointer" }}
-                >
-                  Blog
-                </Typography>
-              </Stack>
-            </Stack>
-          </Stack>
-          <Typography
-            variant="body2"
-            align="center"
-            sx={{ color: "#4a5568", mt: 8 }}
+                <Stack spacing={2}>
+                  {col.links.map((link) => (
+                    <Typography
+                      key={link}
+                      variant="body2"
+                      sx={{
+                        color: SECONDARY_SLATE,
+                        fontWeight: 600,
+                        cursor: "pointer",
+                        transition: "color 0.2s ease",
+                        "&:hover": { color: INDIGO_ACCENT }
+                      }}
+                    >
+                      {link}
+                    </Typography>
+                  ))}
+                </Stack>
+              </Grid>
+            ))}
+          </Grid>
+
+          <Box
+            sx={{
+              mt: 10,
+              pt: 4,
+              borderTop: `1px solid ${GLASS_BORDER}`,
+              display: "flex",
+              flexDirection: { xs: "column", md: "row" },
+              justifyContent: "space-between",
+              alignItems: "center",
+              gap: 2
+            }}
           >
-            © 2026 Tasks Inc. All rights reserved.
-          </Typography>
+            <Typography
+              variant="caption"
+              sx={{ color: alpha(SECONDARY_SLATE, 0.6), fontWeight: 600 }}
+            >
+              © 2026 Antigravity Systems. Industrial grade orchestration.
+            </Typography>
+            <Stack direction="row" spacing={4}>
+              {["Privacy", "Terms", "Security", "Status"].map((link) => (
+                <Typography
+                  key={link}
+                  variant="caption"
+                  sx={{
+                    color: alpha(SECONDARY_SLATE, 0.6),
+                    fontWeight: 700,
+                    cursor: "pointer",
+                    "&:hover": { color: PRIMARY_SLATE }
+                  }}
+                >
+                  {link}
+                </Typography>
+              ))}
+            </Stack>
+          </Box>
         </Container>
       </Box>
     </Box>
