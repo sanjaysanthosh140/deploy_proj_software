@@ -33,6 +33,7 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import axios from "axios";
 import TaskAssignmentModal from "./TaskAssignmentModal";
+import CreateProjectDialog from "../../components/CreateProjectDialog";
 
 // --- Styled Components & Theme Constants ---
 const GLASS_BG = "rgba(255, 255, 255, 0.75)";
@@ -75,6 +76,10 @@ const HeadProjectView = () => {
   const [selectedProject, setSelectedProject] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  // Creation/Edit Dialog State
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [editingProjectData, setEditingProjectData] = useState(null);
+
   const token = localStorage.getItem("token");
 
   useEffect(() => {
@@ -103,6 +108,32 @@ const HeadProjectView = () => {
     }
   }, [token]);
 
+  const handleDelete = (e, id) => {
+    if (e) e.stopPropagation();
+    try {
+      console.log(id);
+    } catch (error) {
+      console.log(error);
+    }
+
+  }
+  const handleEdit = async (e, id) => {
+    if (e) e.stopPropagation();
+    try {
+      // The user specified using .delete for fetching edit data
+      let res = await axios.delete(`http://localhost:8080/admin/edit_project/${id}`, {
+        headers: {
+          Authorization: `${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+      console.log("from edit", res.data);
+      setEditingProjectData(res.data);
+      setIsCreateDialogOpen(true);
+    } catch (error) {
+      console.error("Error fetching project for edit:", error);
+    }
+  };
   const getStatusColor = (status) => {
     switch (status) {
       case "Active":
@@ -231,7 +262,7 @@ const HeadProjectView = () => {
                 lineHeight: 1.1,
               }}
             >
-              Enterprise Portfolios
+              Projects
             </Typography>
             <Typography
               variant="h6"
@@ -579,6 +610,7 @@ const HeadProjectView = () => {
                               bgcolor: "rgba(15, 23, 42, 0.06)",
                             },
                           }}
+                          onClick={(e) => { handleEdit(e, project._id) }}
                         >
                           <EditIcon sx={{ fontSize: 20 }} />
                         </IconButton>
@@ -593,6 +625,7 @@ const HeadProjectView = () => {
                               bgcolor: alpha("#f43f5e", 0.1),
                             },
                           }}
+                          onClick={(e) => { handleDelete(e, project._id) }}
                         >
                           <DeleteIcon sx={{ fontSize: 20 }} />
                         </IconButton>
@@ -647,6 +680,42 @@ const HeadProjectView = () => {
         onSave={(data) => {
           console.log("Saving Assignments in HeadProjectView:", data);
           // Here the user will integrate with backend
+        }}
+      />
+
+      <CreateProjectDialog
+        open={isCreateDialogOpen}
+        onClose={() => {
+          setIsCreateDialogOpen(false);
+          setEditingProjectData(null);
+        }}
+        initialData={editingProjectData}
+        onSubmit={async (finalData) => {
+          try {
+            if (editingProjectData?._id) {
+              // Update existing
+              let id = editingProjectData._id;
+              await axios.put(
+                `http://localhost:8080/admin/updateProj/${id}`,
+                finalData,
+                { headers: { Authorization: `${token}` } }
+              );
+            } else {
+              // Create new
+              await axios.post(
+                "http://localhost:8080/admin/createProj",
+                finalData,
+                { headers: { Authorization: `${token}` } }
+              );
+            }
+            // Refresh
+            const response = await axios.get("http://localhost:8080/admin/headProj", {
+              headers: { Authorization: `${token}` }
+            });
+            setProjectsList(response.data);
+          } catch (error) {
+            console.error("Submission error:", error);
+          }
         }}
       />
     </Box>

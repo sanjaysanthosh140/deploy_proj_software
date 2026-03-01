@@ -24,6 +24,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import CloseIcon from "@mui/icons-material/Close";
 import AddIcon from "@mui/icons-material/Add";
+import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import GroupsIcon from "@mui/icons-material/Groups";
@@ -37,7 +38,7 @@ const PRIMARY_SLATE = "#0f172a";
 const SECONDARY_SLATE = "#475569";
 const INDIGO_ACCENT = "#4f46e5";
 
-const CreateProjectDialog = ({ open, onClose, onSubmit }) => {
+const CreateProjectDialog = ({ open, onClose, onSubmit, initialData }) => {
   const [activeStep, setActiveStep] = useState(0);
   const [projectData, setProjectData] = useState({
     title: "",
@@ -58,6 +59,41 @@ const CreateProjectDialog = ({ open, onClose, onSubmit }) => {
 
   const steps = ["Project Details", "Add Tasks", "Assign Team"];
 
+  // Reset or Popoulate state based on initialData
+  useEffect(() => {
+    if (open) {
+      if (initialData) {
+        // Edit mode
+        setProjectData({
+          title: initialData.projectName || initialData.title || "",
+          description: initialData.projectDesc || initialData.description || "",
+          deadline: initialData.projectDeadline ? initialData.projectDeadline.split("T")[0] : (initialData.deadline ? initialData.deadline.split("T")[0] : ""),
+          priority: initialData.priority || "Medium",
+        });
+        setTodos(initialData.tasks || initialData.todos || []);
+
+        // Map existing team members
+        const team = (initialData.specialists || initialData.teamMembers || []).map(member => {
+          const id = member.userId || member._id;
+          const idStr = typeof id === 'object' ? id.$oid || id.toString() : String(id);
+          return {
+            ...member,
+            userId: idStr,
+            _id: idStr,
+            avatar: member.name ? member.name.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2) : "S"
+          };
+        });
+        setSelectedTeam(team);
+      } else {
+        // Create mode - reset everything
+        setProjectData({ title: "", description: "", deadline: "", priority: "Medium" });
+        setTodos([]);
+        setSelectedTeam([]);
+        setActiveStep(0);
+      }
+    }
+  }, [open, initialData]);
+
   useEffect(() => {
     if (open && activeStep == 2) {
       fetchEmployees();
@@ -67,9 +103,6 @@ const CreateProjectDialog = ({ open, onClose, onSubmit }) => {
   const fetchEmployees = async () => {
     try {
       let token = localStorage.getItem("token");
-      // TODO: Replace with actual API call
-      // const res = await axios.get('/api/employees/department');
-      // setAvailableEmployees(res.data);
       axios
         .get("http://localhost:8080/admin/employes", {
           headers: {
@@ -82,10 +115,10 @@ const CreateProjectDialog = ({ open, onClose, onSubmit }) => {
           const mappedEmployees = data.data.map((emp) => {
             const empIdStr = typeof emp._id === 'object' ? emp._id.$oid || emp._id.toString() : String(emp._id);
             return {
-              userId: empIdStr, // Map _id to userId
-              _id: empIdStr, // Keep _id for draggable key
+              userId: empIdStr,
+              _id: empIdStr,
               name: emp.name,
-              role: emp.department, // Map department to role
+              role: emp.department,
               department: emp.department,
               email: emp.email,
               avatar: emp.name
@@ -93,47 +126,16 @@ const CreateProjectDialog = ({ open, onClose, onSubmit }) => {
                 .map((n) => n[0])
                 .join("")
                 .toUpperCase()
-                .slice(0, 2), // Generate avatar initials
+                .slice(0, 2),
             };
           });
-          setAvailableEmployees(mappedEmployees);
-        });
 
-      // Mock data
-      // const mockEmployees = [
-      //   { userId: "u1", name: "John Doe", role: "ML Engineer", avatar: "JD" },
-      //   {
-      //     userId: "u2",
-      //     name: "Jane Smith",
-      //     role: "Data Scientist",
-      //     avatar: "JS",
-      //   },
-      //   {
-      //     userId: "u3",
-      //     name: "Mike Johnson",
-      //     role: "DevOps Engineer",
-      //     avatar: "MJ",
-      //   },
-      //   {
-      //     userId: "u4",
-      //     name: "Sarah Williams",
-      //     role: "QA Engineer",
-      //     avatar: "SW",
-      //   },
-      //   {
-      //     userId: "u5",
-      //     name: "Alex Brown",
-      //     role: "Backend Developer",
-      //     avatar: "AB",
-      //   },
-      //   {
-      //     userId: "u6",
-      //     name: "Emily Davis",
-      //     role: "Frontend Developer",
-      //     avatar: "ED",
-      //   },
-      // ];
-      // setAvailableEmployees(mockEmployees);
+          // Filter out employees already in the team
+          const filteredEmployees = mappedEmployees.filter(
+            (emp) => !selectedTeam.some((member) => member.userId === emp.userId)
+          );
+          setAvailableEmployees(filteredEmployees);
+        });
     } catch (error) {
       console.error("Error fetching employees:", error);
       setError("Failed to load employees");
@@ -370,9 +372,13 @@ const CreateProjectDialog = ({ open, onClose, onSubmit }) => {
               boxShadow: "0 8px 16px rgba(10, 15, 25, 0.08)"
             }}
           >
-            <AddIcon sx={{ color: "#fff", fontSize: 28 }} />
+            {initialData ? (
+              <EditIcon sx={{ color: "#fff", fontSize: 24 }} />
+            ) : (
+              <AddIcon sx={{ color: "#fff", fontSize: 28 }} />
+            )}
           </Box>
-          Create New Project
+          {initialData ? "Update Project System" : "Create New Project"}
         </Typography>
         <IconButton
           onClick={handleClose}
@@ -1112,7 +1118,7 @@ const CreateProjectDialog = ({ open, onClose, onSubmit }) => {
                   "&:disabled": { opacity: 0.6 },
                 }}
               >
-                {loading ? "Initializing..." : "Protocol Deployment"}
+                {loading ? "Initializing..." : (initialData ? "Commit Changes" : "Protocol Deployment")}
               </Button>
             )}
           </Box>
