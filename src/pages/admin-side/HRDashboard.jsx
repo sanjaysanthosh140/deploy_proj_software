@@ -3,6 +3,7 @@
  * Apply rules from /docs/component_analysis_prompt.md
  */
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Box,
   Card,
@@ -88,6 +89,7 @@ const GlassCard = ({ children, sx = {}, hoverEffect = true }) => (
 );
 
 const HRDashboard = () => {
+  const navigate = useNavigate();
   const theme = useTheme();
   const [tabValue, setTabValue] = useState(0);
   const [users, setUsers] = useState([]);
@@ -174,6 +176,10 @@ const HRDashboard = () => {
   };
 
   const handleTabChange = (event, newValue) => {
+    if (newValue === 4) {
+      navigate("/hr/project-progress");
+      return;
+    }
     setTabValue(newValue);
   };
 
@@ -490,6 +496,7 @@ const HRDashboard = () => {
               { icon: BusinessIcon, label: "Departments" },
               { icon: ReportIcon, label: "Work Reports" },
               { icon: AccessTimeIcon, label: "Attendance Logs" },
+              { icon: AssessmentIcon, label: "Project Progress" },
             ].map((tab, idx) => (
               <Tab
                 key={idx}

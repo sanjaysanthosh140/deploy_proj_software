@@ -29,6 +29,7 @@ import AssignedProjectsList from "./pages/Employee/AssignedProjectsList";
 import ProjectDetailView from "./pages/Employee/ProjectDetailView";
 import Projects from "./pages/Projects";
 import HRDashboard from "./pages/admin-side/HRDashboard";
+import HRProjectProgress from "./pages/admin-side/HRProjectProgress";
 
 // Placeholder for other role pages (to be created)
 const SuperAdminPage = () => (
@@ -102,6 +103,7 @@ function App() {
             />
 
             <Route path="/hr-dashboard" element={<HRDashboard />} />
+            <Route path="/hr/project-progress" element={<HRProjectProgress />} />
             <Route path="/super-admin" element={<SuperAdminPage />} />
             <Route path="/admin-dashboard" element={<AdminDashboardPage />} />
             <Route path="/developer" element={<DeveloperPage />} />
