@@ -44,73 +44,120 @@ const ProjectDetailView = () => {
   const [loading, setLoading] = useState(true);
   const [expandedTasks, setExpandedTasks] = useState({});
   const [newSubTaskInputs, setNewSubTaskInputs] = useState({});
-  console.log(projectId);
-  let token = localStorage.getItem("token");
-  useEffect(() => {
-    const fetchProjectDetails = async () => {
-      try {
-        setLoading(true);
-        const headers = {
-          Authorization: `${token}`,
-          "Content-Type": "application/json",
-        };
+  const [modifiedTasks, setModifiedTasks] = useState({}); // Track which tasks have unsaved changes
+  const token = localStorage.getItem("token");
 
-        // Fetch both project details and specific tasks for this employee
-        const [projectsRes, tasksRes] = await Promise.all([
-          axios.get("http://localhost:8080/employee_included_proj", {
-            headers,
-          }),
-          axios.get(`http://localhost:8080/emp_proj-tasks/${projectId}`, {
-            headers,
-          }),
-        ]);
-        console.log("fetch takss", tasksRes);
-        // Find the specific project this page is for
-        const projectMetadata = projectsRes.data.find(
-          (p) => p._id === projectId,
-        );
+  const fetchProjectDetails = async () => {
+    try {
+      setLoading(true);
+      const headers = {
+        Authorization: `${token}`,
+        "Content-Type": "application/json",
+      };
 
-        if (projectMetadata) {
-          // Flatten the aggregated tasks from backend
-          // Structure: [{ employeeTasks: { tasks: { ... }, _id: "..." } }, ...]
-          const normalizedTasks = tasksRes.data.map((item, index) => {
-            const rawId = item.employeeTasks._id || item._id;
-            const backendTaskId =
-              typeof rawId === "object"
-                ? rawId.$oid || rawId.toString()
-                : rawId;
-            const backendTodoList =
-              item.employeeTasks.todolist ||
-              item.employeeTasks.tasks?.todolist ||
-              item.employeeTasks.tasks?.subTasks ||
-              [];
+      // Fetch project details, tasks for this employee, and any previously created todos
+      const [projectsRes, tasksRes, todosRes] = await Promise.all([
+        axios.get("http://localhost:8080/employee_included_proj", {
+          headers,
+        }),
+        axios.get(`http://localhost:8080/emp_proj-tasks/${projectId}`, {
+          headers,
+        }),
+        axios.get("http://localhost:8080/achive_created_todo_list", {
+          headers,
+        }),
+      ]);
 
-            return {
-              ...item.employeeTasks.tasks,
-              _id: backendTaskId || `task-${index}-${Date.now()}`,
-              originalTaskId:
-                backendTaskId || item.employeeTasks.tasks?.task_id,
-              subTasks: backendTodoList, // map the db todolist to our local subTasks array
-            };
-          });
+      console.log("fetch tasks", tasksRes);
+      console.log("fetch todos", todosRes);
 
-          setProject({
-            ...projectMetadata,
-            todos: normalizedTasks,
-          });
-        } else {
-          setProject(null);
-        }
+      // Find the specific project this page is for
+      const projectMetadata = projectsRes.data.find(
+        (p) => p._id === projectId,
+      );
 
-        setTimeout(() => {
-          setLoading(false);
-        }, 600);
-      } catch (error) {
-        console.error("Error fetching project details:", error);
-        setLoading(false);
+      // Extract a universal user_id from any existing todo if possible
+      // This helps when creating the FIRST todo for a task
+      const universalUserId = Array.isArray(todosRes.data)
+        ? todosRes.data.find((t) => t.user_id)?.user_id
+        : null;
+
+      if (projectMetadata) {
+        // Flatten the aggregated tasks from backend
+        const normalizedTasks = tasksRes.data.map((item, index) => {
+          const rawId = item.employeeTasks._id || item._id;
+          const backendTaskId =
+            typeof rawId === "object"
+              ? rawId.$oid || rawId.toString()
+              : rawId;
+
+          // Get the static todolist from the task definition if any
+          const staticTodoList =
+            item.employeeTasks.todolist ||
+            item.employeeTasks.tasks?.todolist ||
+            item.employeeTasks.tasks?.subTasks ||
+            [];
+
+          // Extract the task_id to match with fetched todos
+          const currentTaskId = item.employeeTasks.tasks?.task_id;
+
+          // Filter todos from /achive_created_todo_list that match this task and project
+          // Note: backend uses 'project_id' and 'user_subTaks'
+          let fetchedTodos = [];
+          let todoMetadata = {};
+          let hasMatchedTodo = false;
+          if (Array.isArray(todosRes.data)) {
+            const matchedTodoEntry = todosRes.data.find(
+              (todo) => todo.task_id === currentTaskId && todo.project_id === projectId
+            );
+
+            if (matchedTodoEntry) {
+              hasMatchedTodo = true;
+              todoMetadata = {
+                group_id: matchedTodoEntry._id,
+                user_id: matchedTodoEntry.user_id,
+              };
+              if (Array.isArray(matchedTodoEntry.user_subTaks)) {
+                fetchedTodos = matchedTodoEntry.user_subTaks.map((st) => ({
+                  todo_id: st.todo_id,
+                  title: st.title,
+                  status: st.status || "pending",
+                  createdAt: st.createdAt,
+                }));
+              }
+            }
+          }
+
+          // Source of truth: Use fetched todos if a match exists, otherwise fallback to static definition
+          const combinedSubTasks = hasMatchedTodo ? fetchedTodos : staticTodoList;
+
+          return {
+            ...item.employeeTasks.tasks,
+            ...todoMetadata,
+            _id: todoMetadata.group_id || backendTaskId || `task-${index}-${Date.now()}`,
+            originalTaskId: currentTaskId,
+            subTasks: combinedSubTasks,
+          };
+        });
+
+        setProject({
+          ...projectMetadata,
+          todos: normalizedTasks,
+        });
+      } else {
+        setProject(null);
       }
-    };
 
+      setTimeout(() => {
+        setLoading(false);
+      }, 600);
+    } catch (error) {
+      console.error("Error fetching project details:", error);
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     if (token && projectId) {
       fetchProjectDetails();
     }
@@ -196,8 +243,9 @@ const ProjectDetailView = () => {
     if (!content || !content.trim()) return;
 
     // Optimistic update local
+    const subId = `sub-${Date.now()}`;
     const newSubTask = {
-      _id: `sub-${Date.now()}`,
+      todo_id: subId, // Backend expects this as the identifier
       title: content,
       status: "pending",
       createdAt: new Date().toISOString(),
@@ -217,14 +265,17 @@ const ProjectDetailView = () => {
       }),
     }));
 
+    setModifiedTasks((prev) => ({ ...prev, [taskId]: true }));
     setNewSubTaskInputs((prev) => ({ ...prev, [taskId]: "" }));
   };
 
   const handleSaveAllSubTasks = async (taskId) => {
     const todo = project.todos.find((t) => t._id === taskId);
     if (!todo) return;
-    const newSubTasks = todo.subTasks.filter((st) => st.isNew);
-    if (newSubTasks.length === 0) return;
+
+    // Send ENTIRE current list to prevent overwriting existing ones
+    const currentSubTasks = todo.subTasks || [];
+    if (currentSubTasks.length === 0 && !modifiedTasks[taskId]) return;
 
     try {
       const headers = {
@@ -232,87 +283,66 @@ const ProjectDetailView = () => {
         "Content-Type": "application/json",
       };
 
+      const subTaskList = currentSubTasks.map((st) => ({
+        createdAt: st.createdAt.includes("T")
+          ? st.createdAt.split("T")[0]
+          : st.createdAt,
+        status: st.status,
+        title: st.title,
+        todo_id: st.todo_id,
+      }));
+
       const payload = {
+        user_id: todo.user_id,
         task_id: todo.task_id,
-        proj_id: projectId,
-        todolist: newSubTasks.map((st) => ({
-          todo_id: st._id,
-          title: st.title,
-          status: st.status,
-          createdAt: st.createdAt.split("T")[0],
-        })),
+        project_id: projectId,
+        user_subTaks: subTaskList,
+        todolist: subTaskList,
       };
-      console.log("payload", payload);
+
+      console.log("Saving all subtasks payload:", payload);
       await axios.post("http://localhost:8080/add_multiple_todos", payload, {
         headers,
       });
 
-      // remove isNew flag on success
-      setProject((prev) => ({
-        ...prev,
-        todos: prev.todos.map((t) => {
-          if (t._id === taskId) {
-            return {
-              ...t,
-              subTasks: t.subTasks.map((st) => {
-                if (st.isNew) {
-                  const { isNew, ...rest } = st;
-                  return rest;
-                }
-                return st;
-              }),
-            };
-          }
-          return t;
-        }),
-      }));
+      // Clear modified flag
+      setModifiedTasks((prev) => {
+        const next = { ...prev };
+        delete next[taskId];
+        return next;
+      });
+
+      // Re-fetch project details to get actual MongoDB IDs for new subtasks
+      await fetchProjectDetails();
     } catch (error) {
       console.error("Failed to save subtasks", error);
     }
   };
 
   const handleDeleteSubTask = async (taskId, subTaskId) => {
-    const todo = project.todos.find((t) => t._id === taskId);
-    const subTask = todo?.subTasks.find((st) => st._id === subTaskId);
-
     setProject((prev) => ({
       ...prev,
       todos: prev.todos.map((t) => {
         if (t._id === taskId) {
           return {
             ...t,
-            subTasks: t.subTasks.filter((st) => st._id !== subTaskId),
+            subTasks: t.subTasks.filter((st) => st.todo_id !== subTaskId),
           };
         }
         return t;
       }),
     }));
 
-    if (subTask && !subTask.isNew) {
-      try {
-        const headers = { Authorization: `${token}` };
-        const payload = {
-          _id: subTaskId,
-          task_id: todo.task_id,
-          proj_id: projectId,
-        };
-        console.log("delete payload", payload);
-        await axios.post(`http://localhost:8080/delete_todo`, payload, {
-          headers,
-        });
-      } catch (error) {
-        console.error("Failed to delete subtask from server", error);
-      }
-    }
+    // Mark task as modified so "Save" button appears for deletions too
+    setModifiedTasks((prev) => ({ ...prev, [taskId]: true }));
   };
 
-  const handleToggleSubTaskStatus = async (taskId, subTaskId) => {
+  const handleToggleSubTaskStatus = (taskId, subTaskId) => {
     const todo = project.todos.find((t) => t._id === taskId);
-    const subTask = todo?.subTasks.find((st) => st._id === subTaskId);
+    const subTask = todo?.subTasks.find((st) => st.todo_id === subTaskId);
     if (!subTask) return;
 
     const newStatus = subTask.status === "completed" ? "pending" : "completed";
-    const newChecked = newStatus === "completed";
 
     setProject((prev) => ({
       ...prev,
@@ -321,7 +351,7 @@ const ProjectDetailView = () => {
           return {
             ...t,
             subTasks: t.subTasks.map((st) =>
-              st._id === subTaskId
+              st.todo_id === subTaskId
                 ? {
                   ...st,
                   status: newStatus,
@@ -334,23 +364,8 @@ const ProjectDetailView = () => {
       }),
     }));
 
-    if (!subTask.isNew) {
-      try {
-        const headers = { Authorization: `${token}` };
-        const payload = {
-          _id: subTaskId,
-          status: newStatus,
-          task_id: todo.task_id,
-          proj_id: projectId,
-        };
-        console.log("update status payload", payload);
-        await axios.post(`http://localhost:8080/update_todo_status`, payload, {
-          headers,
-        });
-      } catch (error) {
-        console.error("Failed to update status on server", error);
-      }
-    }
+    // Mark task as modified so "Save Changes" button appears
+    setModifiedTasks((prev) => ({ ...prev, [taskId]: true }));
   };
 
   if (loading) {
@@ -976,7 +991,7 @@ const ProjectDetailView = () => {
                           </Box>
 
                           {todo.subTasks &&
-                            todo.subTasks.some((st) => st.isNew) && (
+                            (todo.subTasks.some((st) => st.isNew) || modifiedTasks[todo._id]) && (
                               <Button
                                 variant="contained"
                                 onClick={() => handleSaveAllSubTasks(todo._id)}
@@ -990,7 +1005,7 @@ const ProjectDetailView = () => {
                                   "&:hover": { bgcolor: "#00c853" },
                                 }}
                               >
-                                Save All New To-dos
+                                {modifiedTasks[todo._id] ? "Save Changes" : "Save All New To-dos"}
                               </Button>
                             )}
 
@@ -1005,7 +1020,7 @@ const ProjectDetailView = () => {
                             {todo.subTasks && todo.subTasks.length > 0 ? (
                               todo.subTasks.map((subTask) => (
                                 <Box
-                                  key={subTask._id}
+                                  key={subTask.todo_id}
                                   sx={{
                                     display: "flex",
                                     alignItems: "center",
@@ -1032,7 +1047,7 @@ const ProjectDetailView = () => {
                                       onChange={() =>
                                         handleToggleSubTaskStatus(
                                           todo._id,
-                                          subTask._id,
+                                          subTask.todo_id,
                                         )
                                       }
                                       sx={{
@@ -1073,7 +1088,7 @@ const ProjectDetailView = () => {
                                   <IconButton
                                     size="small"
                                     onClick={() =>
-                                      handleDeleteSubTask(todo._id, subTask._id)
+                                      handleDeleteSubTask(todo._id, subTask.todo_id)
                                     }
                                     sx={{
                                       color: "#a0aec0",

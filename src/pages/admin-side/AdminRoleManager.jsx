@@ -38,19 +38,17 @@ const AdminRoleManager = () => {
   const [selectedRole, setSelectedRole] = useState(null);
 
   const [formData, setFormData] = useState({
-    position: "",
-    name: "",
-    department: "",
+    email: "",
     password: "",
+    position: "", // Position is still needed for routing but derived from role card
   });
 
   const handleOpen = (role) => {
     setSelectedRole(role);
     setFormData({
-      position: role.title,
-      name: "",
-      department: "",
+      email: "",
       password: "",
+      position: role.title,
     });
     setOpen(true);
   };
@@ -113,37 +111,71 @@ const AdminRoleManager = () => {
       sx={{
         minHeight: "100vh",
         p: { xs: 2, sm: 3, md: 4 },
-        background: "radial-gradient(circle at top, #0f172a 0%, #020617 70%)",
+        background: "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "flex-start",
+        position: "relative",
+        overflow: "hidden",
       }}
     >
-      <Box sx={{ width: "100%", textAlign: "center", mb: 6 }}>
+      {/* Background Decorative Blobs */}
+      <Box
+        sx={{
+          position: "absolute",
+          top: "-10%",
+          right: "-10%",
+          width: "40vw",
+          height: "40vw",
+          background: "radial-gradient(circle, rgba(56, 189, 248, 0.08) 0%, transparent 70%)",
+          filter: "blur(60px)",
+          zIndex: 0,
+        }}
+      />
+      <Box
+        sx={{
+          position: "absolute",
+          bottom: "-10%",
+          left: "-10%",
+          width: "40vw",
+          height: "40vw",
+          background: "radial-gradient(circle, rgba(139, 92, 246, 0.08) 0%, transparent 70%)",
+          filter: "blur(80px)",
+          zIndex: 0,
+        }}
+      />
+      <Box sx={{ width: "100%", textAlign: "center", mb: 8, position: "relative", zIndex: 1 }}>
         <Typography
           variant="h3"
           sx={{
-            color: "#e5e7eb",
-            fontWeight: 700,
+            color: "#0f172a",
+            fontWeight: 800,
             mb: 2,
-            fontSize: { xs: "1.8rem", sm: "2.5rem", md: "3rem" },
-            background: "linear-gradient(135deg, #00d4ff, #4ade80, #a855f7)",
+            fontSize: { xs: "2rem", sm: "2.8rem", md: "3.5rem" },
+            background: "linear-gradient(135deg, #0f172a 0%, #334155 100%)",
             backgroundClip: "text",
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
-            letterSpacing: 1,
+            letterSpacing: -1,
           }}
         >
-          Admin Roles
+          Administrator Portal
+        </Typography>
+        <Typography
+          variant="body1"
+          sx={{ color: "#64748b", mb: 4, fontWeight: 500, letterSpacing: 1 }}
+        >
+          SELECT YOUR ADMINISTRATIVE ROLE TO ACCESS THE COMMAND CENTER
         </Typography>
         <Box
           sx={{
-            height: 3,
-            width: { xs: "60px", md: "100px" },
-            background: "linear-gradient(90deg, #00d4ff, #4ade80)",
+            height: 4,
+            width: "80px",
+            background: "linear-gradient(90deg, #38bdf8, #818cf8)",
             borderRadius: 2,
             mx: "auto",
+            boxShadow: "0 4px 12px rgba(56, 189, 248, 0.2)",
           }}
         />
       </Box>
@@ -163,47 +195,65 @@ const AdminRoleManager = () => {
               onClick={() => handleOpen(role)}
               sx={{
                 cursor: "pointer",
-                borderRadius: { xs: 2, md: 3 },
-                background: "linear-gradient(135deg, #020617, #1a1f3a)",
-                border: "2px solid #1e293b",
-                boxShadow: `0 0 25px ${role.color}20`,
-                transition: "all 0.4s ease-in-out",
+                borderRadius: "32px",
+                background: "rgba(255, 255, 255, 0.7)",
+                backdropFilter: "blur(20px) saturate(160%)",
+                border: "1px solid rgba(255, 255, 255, 0.4)",
+                boxShadow: "0 8px 32px rgba(0, 0, 0, 0.04)",
+                transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
                 height: "100%",
                 display: "flex",
                 flexDirection: "column",
-                justifyContent: "center",
-                alignItems: "center",
-                textAlign: "center",
-                py: { xs: 3, sm: 4, md: 5 },
-                px: { xs: 2, sm: 3, md: 4 },
+                position: "relative",
+                overflow: "hidden",
                 "&:hover": {
-                  transform: "translateY(-12px) scale(1.05)",
-                  boxShadow: `0 12px 40px ${role.color}50`,
-                  border: `2px solid ${role.color}60`,
-                  background: `linear-gradient(135deg, #020617, #1a1f3a${role.color}15)`,
+                  transform: "translateY(-12px)",
+                  boxShadow: `0 20px 40px ${role.color}15`,
+                  border: `1px solid ${role.color}40`,
+                  background: "rgba(255, 255, 255, 0.9)",
+                  "& .role-icon-bg": {
+                    transform: "scale(1.1) rotate(5deg)",
+                    background: `linear-gradient(135deg, ${role.color}15, ${role.color}05)`,
+                  }
                 },
               }}
             >
+              <Box
+                className="role-accent"
+                sx={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  width: "100%",
+                  height: "4px",
+                  background: role.color,
+                }}
+              />
               <CardContent
                 sx={{
                   width: "100%",
                   display: "flex",
                   flexDirection: "column",
                   alignItems: "center",
-                  gap: { xs: 2, md: 3 },
+                  gap: { xs: 2.5, md: 3.5 },
+                  py: { xs: 5, md: 7 },
+                  px: { xs: 3, md: 4 },
                 }}
               >
                 <Box
+                  className="role-icon-bg"
                   sx={{
-                    width: { xs: 60, md: 80 },
-                    height: { xs: 60, md: 80 },
-                    borderRadius: "50%",
-                    background: `linear-gradient(135deg, ${role.color}20, ${role.color}05)`,
-                    border: `3px solid ${role.color}40`,
+                    width: { xs: 70, md: 90 },
+                    height: { xs: 70, md: 90 },
+                    borderRadius: "24px",
+                    background: "rgba(0, 0, 0, 0.03)",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    fontSize: { xs: "1.5rem", md: "2rem" },
+                    fontSize: { xs: "1.8rem", md: "2.5rem" },
+                    color: role.color,
+                    transition: "all 0.4s ease",
+                    mb: 1,
                   }}
                 >
                   {role.title.charAt(0)}
@@ -211,24 +261,26 @@ const AdminRoleManager = () => {
 
                 <Chip
                   label={role.level}
-                  size="medium"
+                  size="small"
                   sx={{
-                    backgroundColor: `${role.color}20`,
+                    backgroundColor: `${role.color}15`,
                     color: role.color,
-                    fontWeight: 600,
-                    fontSize: { xs: "0.75rem", md: "0.875rem" },
-                    py: 2,
-                    px: 1,
+                    fontWeight: 700,
+                    fontSize: "0.75rem",
+                    textTransform: "uppercase",
+                    letterSpacing: 1,
+                    border: `1px solid ${role.color}30`,
+                    py: 1.5,
                   }}
                 />
 
                 <Typography
                   variant="h5"
                   sx={{
-                    color: "#e5e7eb",
-                    fontWeight: 700,
-                    fontSize: { xs: "1.1rem", md: "1.4rem" },
-                    letterSpacing: 0.5,
+                    color: "#0f172a",
+                    fontWeight: 800,
+                    fontSize: { xs: "1.2rem", md: "1.5rem" },
+                    letterSpacing: -0.5,
                   }}
                 >
                   {role.title}
@@ -237,11 +289,12 @@ const AdminRoleManager = () => {
                 <Typography
                   variant="body2"
                   sx={{
-                    color: "#94a3b8",
-                    fontSize: { xs: "0.8rem", md: "0.95rem" },
+                    color: "#64748b",
+                    fontSize: { xs: "0.85rem", md: "1rem" },
+                    lineHeight: 1.6,
                   }}
                 >
-                  Click to create new {role.title.toLowerCase()}
+                  Secure access for {role.title.toLowerCase()} accounts
                 </Typography>
               </CardContent>
             </Card>
@@ -258,95 +311,50 @@ const AdminRoleManager = () => {
         fullWidth
         PaperProps={{
           sx: {
-            background: "linear-gradient(135deg, #020617, #1a1f3a)",
-            borderRadius: { xs: 2, md: 3 },
-            border: `2px solid ${selectedRole?.color}40`,
-            boxShadow: `0 12px 50px ${selectedRole?.color}30`,
+            background: "rgba(255, 255, 255, 0.9)",
+            backdropFilter: "blur(40px) saturate(180%)",
+            borderRadius: "32px",
+            border: `1px solid rgba(255, 255, 255, 0.5)`,
+            boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.1)",
           },
         }}
       >
         <DialogTitle
           sx={{
-            color: "#e5e7eb",
-            fontSize: { xs: "1.25rem", md: "1.5rem" },
-            fontWeight: 700,
+            color: "#0f172a",
+            fontSize: { xs: "1.5rem", md: "1.8rem" },
+            fontWeight: 800,
             textAlign: "center",
-            background: `linear-gradient(135deg, ${selectedRole?.color}20, transparent)`,
-            paddingY: 3,
+            pt: 4,
+            pb: 1,
           }}
         >
-          Create {selectedRole?.title}
+          {selectedRole?.title} Login
         </DialogTitle>
 
         <DialogContent sx={{ py: 4, px: { xs: 2, md: 3 } }}>
-          <Stack spacing={3} mt={2}>
-            <TextField
-              label="Position"
-              name="position"
-              value={formData.position}
-              disabled
-              fullWidth
-              InputLabelProps={{ sx: { color: "#94a3b8" } }}
-              sx={{
-                input: {
-                  color: "#e5e7eb",
-                  fontSize: { xs: "0.95rem", md: "1rem" },
-                },
-                "& .MuiOutlinedInput-root": {
-                  borderColor: "#1e293b",
-                  "& fieldset": {
-                    borderColor: "#1e293b",
-                  },
-                  "&:hover fieldset": {
-                    borderColor: selectedRole?.color,
-                  },
-                },
-              }}
-            />
+          <Stack spacing={3} mt={1}>
+            {/* Position is hidden but preserved in formData for the API */}
 
             <TextField
-              label="Name"
-              name="name"
-              value={formData.name}
+              label="Email Address"
+              name="email"
+              value={formData.email}
               onChange={handleChange}
               fullWidth
-              placeholder="Enter full name"
-              InputLabelProps={{ sx: { color: "#94a3b8" } }}
+              placeholder="Enter your email"
+              InputLabelProps={{ sx: { color: "#64748b" } }}
               sx={{
-                input: {
-                  color: "#e5e7eb",
-                  fontSize: { xs: "0.95rem", md: "1rem" },
-                },
                 "& .MuiOutlinedInput-root": {
-                  borderColor: "#1e293b",
+                  borderRadius: "16px",
+                  color: "#0f172a",
                   "& fieldset": {
-                    borderColor: "#1e293b",
+                    borderColor: "rgba(0, 0, 0, 0.1)",
                   },
                   "&:hover fieldset": {
                     borderColor: selectedRole?.color,
                   },
-                },
-              }}
-            />
-            <TextField
-              label="department"
-              name="department"
-              value={formData.department}
-              onChange={handleChange}
-              fullWidth
-              placeholder="Enter department"
-              InputLabelProps={{ sx: { color: "#94a3b8" } }}
-              sx={{
-                input: {
-                  color: "#e5e7eb",
-                  fontSize: { xs: "0.95rem", md: "1rem" },
-                },
-                "& .MuiOutlinedInput-root": {
-                  borderColor: "#1e293b",
-                  "& fieldset": {
-                    borderColor: "#1e293b",
-                  },
-                  "&:hover fieldset": {
+                  "&.Mui-focused fieldset": {
                     borderColor: selectedRole?.color,
                   },
                 },
@@ -360,19 +368,19 @@ const AdminRoleManager = () => {
               value={formData.password}
               onChange={handleChange}
               fullWidth
-              placeholder="Enter secure password"
-              InputLabelProps={{ sx: { color: "#94a3b8" } }}
+              placeholder="Enter your password"
+              InputLabelProps={{ sx: { color: "#64748b" } }}
               sx={{
-                input: {
-                  color: "#e5e7eb",
-                  fontSize: { xs: "0.95rem", md: "1rem" },
-                },
                 "& .MuiOutlinedInput-root": {
-                  borderColor: "#1e293b",
+                  borderRadius: "16px",
+                  color: "#0f172a",
                   "& fieldset": {
-                    borderColor: "#1e293b",
+                    borderColor: "rgba(0, 0, 0, 0.1)",
                   },
                   "&:hover fieldset": {
+                    borderColor: selectedRole?.color,
+                  },
+                  "&.Mui-focused fieldset": {
                     borderColor: selectedRole?.color,
                   },
                 },
@@ -383,24 +391,24 @@ const AdminRoleManager = () => {
               onClick={handleSubmit}
               fullWidth
               sx={{
-                mt: 3,
-                py: { xs: 1.5, md: 2 },
-                background: `linear-gradient(135deg, ${selectedRole?.color}, ${selectedRole?.color}cc)`,
-                color: "#020617",
-                fontWeight: 700,
-                fontSize: { xs: "0.95rem", md: "1rem" },
-                textTransform: "uppercase",
-                letterSpacing: 1,
-                borderRadius: 2,
+                mt: 4,
+                py: 2,
+                background: `linear-gradient(135deg, ${selectedRole?.color} 0%, #000 100%)`,
+                color: "#fff",
+                fontWeight: 800,
+                fontSize: "1rem",
+                textTransform: "none",
+                borderRadius: "16px",
                 transition: "all 0.3s ease",
+                boxShadow: `0 10px 20px ${selectedRole?.color}20`,
                 "&:hover": {
-                  background: `linear-gradient(135deg, ${selectedRole?.color}dd, ${selectedRole?.color})`,
                   transform: "translateY(-2px)",
-                  boxShadow: `0 8px 25px ${selectedRole?.color}40`,
+                  boxShadow: `0 15px 30px ${selectedRole?.color}30`,
+                  filter: "brightness(1.1)",
                 },
               }}
             >
-              Create User
+              Sign In to Command Center
             </Button>
           </Stack>
         </DialogContent>

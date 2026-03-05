@@ -110,7 +110,7 @@ const glassBg = {
 // ─── sub-components ──────────────────────────────────────────────────────────
 
 const TodoItem = ({ todo }) => {
-  const checked = todo.status === "done" || todo.status === "completed";
+  const checked = todo.status === "completed";
   return (
     <Box
       sx={{
@@ -170,9 +170,9 @@ const TodoItem = ({ todo }) => {
 };
 
 const TaskCard = ({ task }) => {
-  const todos = task.todos ?? task.user_subTaks ?? [];
+  const todos = task.user_subTaks ?? [];
   const doneTodos = todos.filter(
-    (t) => t.status === "done" || t.status === "completed",
+    (t) => t.status === "completed",
   ).length;
   const todoProgress = todos.length
     ? Math.round((doneTodos / todos.length) * 100)
@@ -302,7 +302,7 @@ const TaskCard = ({ task }) => {
             </Box>
             <Divider sx={{ borderColor: "rgba(15, 23, 42, 0.05)", mb: 1 }} />
             {todos.map((todo, idx) => (
-              <TodoItem key={todo._id ?? todo.todo_id ?? idx} todo={todo} />
+              <TodoItem key={todo.todo_id ?? idx} todo={todo} />
             ))}
           </Box>
         )}
@@ -314,14 +314,14 @@ const TaskCard = ({ task }) => {
 const EmployeeCard = ({ entry, index }) => {
   const tasks = entry.tasks ?? [];
   const totalTodos = tasks.reduce(
-    (sum, t) => sum + (t.todos ?? t.user_subTaks ?? []).length,
+    (sum, t) => sum + (t.user_subTaks ?? []).length,
     0,
   );
   const doneTodos = tasks.reduce((sum, t) => {
-    const td = t.todos ?? t.user_subTaks ?? [];
+    const td = t.user_subTaks ?? [];
     return (
       sum +
-      td.filter((x) => x.status === "done" || x.status === "completed").length
+      td.filter((x) => x.status === "completed").length
     );
   }, 0);
   const overallProgress = totalTodos
@@ -678,77 +678,99 @@ const HeadProjectOverview = () => {
       const rawData = res.data;
       console.log("Raw Backend Data:", rawData);
 
-      // We need to group by employee and match sub_tasks to their corresponding tasks.
-      const grouped = {};
+      const employeeMap = new Map(); // empId -> { name, taskMap: Map(taskId -> task) }
 
+      // Pass 1: Build Employee and Task Structure
       rawData.forEach((item) => {
         const empId = item.emp_datas?._id ? String(item.emp_datas._id) : null;
-        const empName = item.emp_datas?.name || "Unknown Employee";
+        const empName = item.emp_datas?.name;
 
-        if (!empId) return;
-
-        if (!grouped[empId]) {
-          // Find tasks assigned to this specific employee
-          let empTasks = [];
-
-          if (Array.isArray(item.employeeTasks)) {
-            // employeeTasks is an array of objects like { employee: "id", tasks: { task_id, title... } }
-            item.employeeTasks.forEach((et) => {
-              if (String(et.employee) === empId || String(et.employee?._id) === empId) {
-                // If it's the current employee's task, push the inner `.tasks` object
-                if (et.tasks && typeof et.tasks === 'object' && !Array.isArray(et.tasks)) {
-                  empTasks.push({ ...et.tasks, user_subTaks: [] });
-                } else if (Array.isArray(et.tasks)) {
-                  empTasks.push(...et.tasks.map((t) => ({ ...t, user_subTaks: [] })));
-                }
-              }
-            });
-          } else if (Array.isArray(item.tasks)) {
-            empTasks = item.tasks.map((t) => ({ ...t, user_subTaks: [] }));
+        if (empId) {
+          if (!employeeMap.has(empId)) {
+            employeeMap.set(empId, { name: empName || "Unknown Employee", taskMap: new Map() });
+          } else if (empName && employeeMap.get(empId).name === "Unknown Employee") {
+            // Update name if we previously set it to "Unknown Employee" but now found a real name
+            employeeMap.get(empId).name = empName;
           }
-
-          grouped[empId] = {
-            employee: empName,
-            tasks: empTasks,
-          };
         }
 
-        // Sub_tasks can be an object (if unwound) or an array
-        const subTasks = Array.isArray(item.sub_tasks)
-          ? item.sub_tasks
-          : item.sub_tasks
-            ? [item.sub_tasks]
+        const taskSource = Array.isArray(item.employeeTasks)
+          ? item.employeeTasks
+          : Array.isArray(item.tasks)
+            ? item.tasks.map(t => ({ tasks: t, employee: empId }))
             : [];
 
-        // Match sub_tasks to their respective tasks
-        subTasks.forEach((st) => {
-          if (!st) return;
-          const stTaskId = st.task_id?._id ? String(st.task_id._id) : String(st.task_id);
+        taskSource.forEach((et) => {
+          const taskObj = et.tasks || et;
+          if (!taskObj || typeof taskObj !== "object") return;
 
-          const taskToUpdate = grouped[empId].tasks.find(
-            (t) => String(t.task_id) === stTaskId || String(t._id) === stTaskId
-          );
+          const currentEmpId = et.employee ? String(et.employee._id || et.employee) : empId;
+          const currentEmpName = et.employee?.name || (currentEmpId === empId ? empName : null);
 
-          if (taskToUpdate && Array.isArray(st.user_subTaks)) {
-            st.user_subTaks.forEach((actualTodo) => {
-              if (!actualTodo) return;
-              // Avoid duplicate subtasks if the same one appears multiple times
-              // Specifically check for _id OR todo_id to prevent "undefined === undefined" bug!
-              const actualId = actualTodo._id || actualTodo.todo_id || actualTodo.title;
-              const exists = taskToUpdate.user_subTaks.find((existing) => {
-                const existingId = existing._id || existing.todo_id || existing.title;
-                return String(existingId) === String(actualId);
-              });
+          if (!currentEmpId) return;
 
-              if (!exists) {
-                taskToUpdate.user_subTaks.push(actualTodo);
-              }
+          if (!employeeMap.has(currentEmpId)) {
+            employeeMap.set(currentEmpId, { name: currentEmpName || "Unknown Employee", taskMap: new Map() });
+          } else if (currentEmpName && employeeMap.get(currentEmpId).name === "Unknown Employee") {
+            employeeMap.get(currentEmpId).name = currentEmpName;
+          }
+
+          const taskId = String(taskObj.task_id || taskObj._id);
+          const empRecord = employeeMap.get(currentEmpId);
+
+          if (!empRecord.taskMap.has(taskId)) {
+            empRecord.taskMap.set(taskId, {
+              ...taskObj,
+              task_id: taskId,
+              user_subTaks: [],
+              subTaskMap: new Map()
             });
           }
         });
       });
 
-      const formattedData = Object.values(grouped);
+      // Pass 2: Link Subtasks Globably using user_id and task_id
+      rawData.forEach((item) => {
+        const subTasksContainer = Array.isArray(item.sub_tasks)
+          ? item.sub_tasks
+          : item.sub_tasks ? [item.sub_tasks] : [];
+
+        subTasksContainer.forEach((st) => {
+          if (!st) return;
+          const stUserId = st.user_id ? String(st.user_id) : null;
+          const stTaskId = st.task_id?._id ? String(st.task_id._id) : String(st.task_id);
+
+          if (stUserId && employeeMap.has(stUserId)) {
+            const empRecord = employeeMap.get(stUserId);
+            const taskToUpdate = empRecord.taskMap.get(stTaskId);
+
+            if (taskToUpdate && Array.isArray(st.user_subTaks)) {
+              st.user_subTaks.forEach((todo) => {
+                if (!todo || !todo.todo_id) return;
+                taskToUpdate.subTaskMap.set(todo.todo_id, {
+                  todo_id: todo.todo_id,
+                  title: todo.title,
+                  status: todo.status || "pending",
+                  createdAt: todo.createdAt,
+                });
+              });
+            }
+          }
+        });
+      });
+
+      // Convert to UI format
+      const formattedData = Array.from(employeeMap.values()).map(emp => ({
+        employee: emp.name,
+        tasks: Array.from(emp.taskMap.values()).map(task => {
+          const { subTaskMap, ...taskData } = task;
+          return {
+            ...taskData,
+            user_subTaks: Array.from(subTaskMap.values())
+          };
+        })
+      }))
+        .filter(emp => emp.tasks.length > 0); // Only show employees with tasks
 
       setOverviewData(formattedData);
       console.log("Formatted Overview Data:", formattedData);

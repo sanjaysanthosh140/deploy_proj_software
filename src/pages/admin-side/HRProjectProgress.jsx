@@ -630,7 +630,7 @@ const HRProjectProgress = () => {
     useEffect(() => {
         const fetchProjects = async () => {
             try {
-                const res = await axios.get("http://localhost:8080/admin/headProj", {
+                const res = await axios.get("http://localhost:8080/admin/hr_projects_progress", {
                     headers: { Authorization: token, "Content-Type": "application/json" },
                 });
                 setProjects(res.data);

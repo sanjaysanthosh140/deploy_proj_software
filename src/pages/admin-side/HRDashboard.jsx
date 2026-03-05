@@ -60,6 +60,18 @@ import axios from "axios";
 const GLASS_BG = "rgba(255, 255, 255, 0.75)";
 const GLASS_BORDER = "rgba(10, 15, 25, 0.08)";
 
+const POSTS = ["admin", "head", "superadmin"];
+const DEPARTMENTS = [
+  "IT",
+  "DM",
+  "Editing",
+  "Content-writer",
+  "Video-production",
+  "Graphic Design",
+  "Accounts",
+  "Sales"
+];
+
 const GlassCard = ({ children, sx = {}, hoverEffect = true }) => (
   <Card
     component={motion.div}
@@ -108,6 +120,14 @@ const HRDashboard = () => {
     department: "",
     password: "",
     active: true,
+  });
+  const [openResponsibleDialog, setOpenResponsibleDialog] = useState(false);
+  const [responsibleForm, setResponsibleForm] = useState({
+    name: "",
+    email: "",
+    post: "",
+    department: "",
+    password: "",
   });
   const [deptForm, setDeptForm] = useState({
     id: "",
@@ -183,6 +203,21 @@ const HRDashboard = () => {
     setTabValue(newValue);
   };
 
+  const handleResponsibleDialogOpen = () => {
+    setResponsibleForm({
+      name: "",
+      email: "",
+      post: "",
+      department: "",
+      password: "",
+    });
+    setOpenResponsibleDialog(true);
+  };
+
+  const handleResponsibleDialogClose = () => {
+    setOpenResponsibleDialog(false);
+  };
+
   const handleUserDialogOpen = (user = null) => {
     setEditingUser(user);
     setUserForm(
@@ -232,6 +267,29 @@ const HRDashboard = () => {
       handleUserDialogClose();
     } catch (error) {
       console.error("Error saving user:", error);
+    }
+  };
+
+  const handleResponsibleSubmit = async () => {
+    try {
+      const payload = {
+        name: responsibleForm.name,
+        email: responsibleForm.email,
+        department: responsibleForm.department,
+        password: responsibleForm.password,
+        role: responsibleForm.post,
+        active: true
+      };
+
+      await axios.post("http://localhost:8080/admin/add_admins", payload).then((res) => {
+        setAlertMessage(`Responsible User ${responsibleForm.name} added successfully as ${responsibleForm.post}`);
+        setAlertOpen(true);
+      });
+
+      fetchUsers();
+      handleResponsibleDialogClose();
+    } catch (error) {
+      console.error("Error saving responsible user:", error);
     }
   };
 
@@ -540,27 +598,50 @@ const HRDashboard = () => {
                   <Typography variant="h5" fontWeight="bold">
                     User Directory
                   </Typography>
-                  <Button
-                    variant="contained"
-                    startIcon={<AddIcon />}
-                    onClick={() => handleUserDialogOpen()}
-                    sx={{
-                      background: "linear-gradient(135deg, #38bdf8 0%, #2563eb 100%)",
-                      borderRadius: "14px",
-                      textTransform: "none",
-                      fontWeight: 800,
-                      px: 3,
-                      boxShadow: "0 8px 20px -5px rgba(56, 189, 248, 0.4)",
-                      transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-                      "&:hover": {
-                        background: "linear-gradient(135deg, #0ea5e9 0%, #1d4ed8 100%)",
-                        transform: "translateY(-2px)",
-                        boxShadow: "0 12px 25px -5px rgba(56, 189, 248, 0.5)",
-                      }
-                    }}
-                  >
-                    Add Employee
-                  </Button>
+                  <Stack direction="row" spacing={2}>
+                    <Button
+                      variant="contained"
+                      startIcon={<AddIcon />}
+                      onClick={() => handleUserDialogOpen()}
+                      sx={{
+                        background: "linear-gradient(135deg, #38bdf8 0%, #2563eb 100%)",
+                        borderRadius: "14px",
+                        textTransform: "none",
+                        fontWeight: 800,
+                        px: 3,
+                        boxShadow: "0 8px 20px -5px rgba(56, 189, 248, 0.4)",
+                        transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                        "&:hover": {
+                          background: "linear-gradient(135deg, #0ea5e9 0%, #1d4ed8 100%)",
+                          transform: "translateY(-2px)",
+                          boxShadow: "0 12px 25px -5px rgba(56, 189, 248, 0.5)",
+                        }
+                      }}
+                    >
+                      Add Employee
+                    </Button>
+                    <Button
+                      variant="contained"
+                      startIcon={<PersonAddIcon />}
+                      onClick={handleResponsibleDialogOpen}
+                      sx={{
+                        background: "linear-gradient(135deg, #818cf8 0%, #4f46e5 100%)",
+                        borderRadius: "14px",
+                        textTransform: "none",
+                        fontWeight: 800,
+                        px: 3,
+                        boxShadow: "0 8px 20px -5px rgba(129, 140, 248, 0.4)",
+                        transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                        "&:hover": {
+                          background: "linear-gradient(135deg, #6366f1 0%, #4338ca 100%)",
+                          transform: "translateY(-2px)",
+                          boxShadow: "0 12px 25px -5px rgba(129, 140, 248, 0.5)",
+                        }
+                      }}
+                    >
+                      Add Responsible
+                    </Button>
+                  </Stack>
                 </Box>
                 <TableContainer
                   component={Paper}
@@ -1310,11 +1391,11 @@ const HRDashboard = () => {
                     sx={{
                       "& .MuiOutlinedInput-root": {
                         borderRadius: "14px",
-                        color: "#f1f5f9",
-                        "& fieldset": { borderColor: "rgba(241, 245, 249, 0.1)" },
+                        color: "#0f172a",
+                        "& fieldset": { borderColor: "rgba(10, 15, 25, 0.1)" },
                         "&.Mui-focused fieldset": { borderColor: "#38bdf8" },
                       },
-                      "& .MuiInputLabel-root": { color: "#64748b" },
+                      "& .MuiInputLabel-root": { color: "#475569" },
                     }}
                   />
                 )}
@@ -1338,6 +1419,144 @@ const HRDashboard = () => {
                   }}
                 >
                   {editingUser ? "Update Information" : "Create Account"}
+                </Button>
+              </Stack>
+            </DialogContent>
+          </Dialog>
+        )}
+
+        {openResponsibleDialog && (
+          <Dialog
+            open={openResponsibleDialog}
+            onClose={handleResponsibleDialogClose}
+            TransitionComponent={Fade}
+            transitionDuration={400}
+            PaperProps={{
+              sx: {
+                background: "rgba(255, 255, 255, 0.9)",
+                backdropFilter: "blur(40px) saturate(180%)",
+                WebkitBackdropFilter: "blur(40px) saturate(180%)",
+                border: `1px solid ${GLASS_BORDER}`,
+                borderRadius: "32px",
+                boxShadow: "0 25px 50px -12px rgba(10, 15, 25, 0.1)",
+                color: "#0f172a",
+                overflow: "hidden"
+              },
+            }}
+            fullWidth
+            maxWidth="sm"
+          >
+            <DialogTitle sx={{ borderBottom: `1px solid ${GLASS_BORDER}`, p: 3, fontWeight: 800 }}>
+              Onboard Responsible Employee
+            </DialogTitle>
+            <DialogContent sx={{ p: 4 }}>
+              <Stack spacing={3} sx={{ mt: 2 }}>
+                <TextField
+                  label="Full Name"
+                  value={responsibleForm.name}
+                  onChange={(e) => setResponsibleForm({ ...responsibleForm, name: e.target.value })}
+                  fullWidth
+                  variant="outlined"
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "14px",
+                      color: "#0f172a",
+                      "& fieldset": { borderColor: "rgba(10, 15, 25, 0.1)" },
+                      "&.Mui-focused fieldset": { borderColor: "#38bdf8" },
+                    },
+                    "& .MuiInputLabel-root": { color: "#475569" },
+                  }}
+                />
+                <TextField
+                  label="Gmail Address"
+                  value={responsibleForm.email}
+                  onChange={(e) => setResponsibleForm({ ...responsibleForm, email: e.target.value })}
+                  fullWidth
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "14px",
+                      color: "#0f172a",
+                      "& fieldset": { borderColor: "rgba(10, 15, 25, 0.1)" },
+                      "&.Mui-focused fieldset": { borderColor: "#38bdf8" },
+                    },
+                    "& .MuiInputLabel-root": { color: "#475569" },
+                  }}
+                />
+                <FormControl fullWidth>
+                  <InputLabel sx={{ color: "#64748b" }}>Post / Role</InputLabel>
+                  <Select
+                    value={responsibleForm.post}
+                    onChange={(e) => setResponsibleForm({ ...responsibleForm, post: e.target.value })}
+                    label="Post / Role"
+                    sx={{
+                      borderRadius: "14px",
+                      color: "#0f172a",
+                      "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(10, 15, 25, 0.1)" },
+                    }}
+                  >
+                    {POSTS.map((post) => (
+                      <MenuItem key={post} value={post}>
+                        {post.charAt(0).toUpperCase() + post.slice(1)}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+                <FormControl fullWidth>
+                  <InputLabel sx={{ color: "#64748b" }}>Department</InputLabel>
+                  <Select
+                    value={responsibleForm.department}
+                    onChange={(e) => setResponsibleForm({ ...responsibleForm, department: e.target.value })}
+                    label="Department"
+                    sx={{
+                      borderRadius: "14px",
+                      color: "#0f172a",
+                      "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(10, 15, 25, 0.1)" },
+                    }}
+                  >
+                    {DEPARTMENTS.map((dept) => (
+                      <MenuItem key={dept} value={dept}>
+                        {dept}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+                <TextField
+                  label="Set Password"
+                  type="password"
+                  value={responsibleForm.password}
+                  onChange={(e) => setResponsibleForm({ ...responsibleForm, password: e.target.value })}
+                  fullWidth
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "14px",
+                      color: "#0f172a",
+                      "& fieldset": { borderColor: "rgba(10, 15, 25, 0.1)" },
+                      "&.Mui-focused fieldset": { borderColor: "#38bdf8" },
+                    },
+                    "& .MuiInputLabel-root": { color: "#475569" },
+                  }}
+                />
+                <Button
+                  variant="contained"
+                  onClick={handleResponsibleSubmit}
+                  size="large"
+                  sx={{
+                    background: "linear-gradient(135deg, #818cf8 0%, #4f46e5 100%)",
+                    height: 56,
+                    borderRadius: "16px",
+                    fontWeight: 800,
+                    fontSize: "1rem",
+                    boxShadow: "0 10px 20px -5px rgba(129, 140, 248, 0.4)",
+                    textTransform: "none",
+                    mt: 2,
+                    "&:hover": {
+                      background: "linear-gradient(135deg, #6366f1 0%, #4338ca 100%)",
+                      transform: "translateY(-2px)",
+                      boxShadow: "0 15px 30px -5px rgba(129, 140, 248, 0.5)",
+                    }
+                  }}
+                >
+                  Create Responsible Account
                 </Button>
               </Stack>
             </DialogContent>
