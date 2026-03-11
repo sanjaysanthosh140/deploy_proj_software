@@ -28,7 +28,7 @@ import SendIcon from "@mui/icons-material/Send";
 import axios from "axios";
 
 // --- Theme Constants ---
-const GLASS_BG = "rgba(255, 255, 255, 0.75)";
+const GLASS_BG = "rgb(255, 255, 255)";
 const GLASS_BORDER = "rgba(10, 15, 25, 0.08)";
 const PRIMARY_SLATE = "#0f172a";
 const SECONDARY_SLATE = "#475569";
@@ -296,28 +296,31 @@ const TaskAssignmentModal = ({ open, onClose, projectData, onSave }) => {
     >
       <DialogTitle
         sx={{
-          p: 4,
+          p: { xs: 2, sm: 3, md: 4 },
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
+          flexWrap: "wrap",
+          gap: 2,
         }}
       >
-        <Box sx={{ display: "flex", alignItems: "center", gap: 3 }}>
+        <Box sx={{ display: "flex", alignItems: "center", gap: { xs: 2, md: 3 }, minWidth: 0 }}>
           <Avatar
             variant="rounded"
             sx={{
               background: "linear-gradient(135deg, #0f172a 0%, #334155 100%)",
               color: "#fff",
-              width: 56,
-              height: 56,
+              width: { xs: 40, md: 56 },
+              height: { xs: 40, md: 56 },
               borderRadius: "16px",
-              boxShadow: "0 8px 16px rgba(10, 15, 25, 0.08)"
+              boxShadow: "0 8px 16px rgba(10, 15, 25, 0.08)",
+              flexShrink: 0,
             }}
           >
-            <AssignmentIndIcon sx={{ fontSize: 32 }} />
+            <AssignmentIndIcon sx={{ fontSize: { xs: 22, md: 32 } }} />
           </Avatar>
-          <Box>
-            <Typography variant="h4" sx={{ color: PRIMARY_SLATE, fontWeight: 900, mb: 0.5 }}>
+          <Box sx={{ minWidth: 0 }}>
+            <Typography variant="h4" sx={{ color: PRIMARY_SLATE, fontWeight: 900, mb: 0.5, fontSize: { xs: "1.1rem", md: "1.3rem" } }}>
               Orchestrate Intelligence
             </Typography>
             <Typography
@@ -326,7 +329,8 @@ const TaskAssignmentModal = ({ open, onClose, projectData, onSave }) => {
                 color: SECONDARY_SLATE,
                 textTransform: "uppercase",
                 letterSpacing: 1.5,
-                fontWeight: 800
+                fontWeight: 800,
+                fontSize: { xs: "0.65rem", md: "0.75rem" },
               }}
             >
               Stream: {projectData.title}
@@ -344,13 +348,13 @@ const TaskAssignmentModal = ({ open, onClose, projectData, onSave }) => {
         </IconButton>
       </DialogTitle>
 
-      <DialogContent sx={{ p: 4, overflow: "visible" }}>
+      <DialogContent sx={{ p: { xs: 2, sm: 3, md: 4 }, overflow: "visible" }}>
         <DragDropContext onDragEnd={onDragEnd}>
           <Box
             sx={{
               display: "grid",
-              gridTemplateColumns: "350px 1fr",
-              gap: 4,
+              gridTemplateColumns: { xs: "1fr", md: "350px 1fr" },
+              gap: { xs: 2, md: 4 },
               height: "100%",
             }}
           >

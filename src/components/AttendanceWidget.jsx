@@ -29,6 +29,45 @@ const AttendanceWidget = ({ currentUserId }) => {
   const breakStartRef = useRef(null);
   const totalBreakMsRef = useRef(0);
 
+  // ---- LOCALSTORAGE KEYS ----
+  const ATTENDANCE_SESSION_KEY = "attendance_session";
+
+  // ---- RECOVER SESSION FROM LOCALSTORAGE ON MOUNT ----
+  useEffect(() => {
+    const savedSession = localStorage.getItem(ATTENDANCE_SESSION_KEY);
+    if (savedSession) {
+      try {
+        const session = JSON.parse(savedSession);
+        if (session.status === "WORKING") {
+          workStartRef.current = session.workStart;
+          totalBreakMsRef.current = session.totalBreakMs;
+          setStatus("WORKING");
+        } else if (session.status === "ON_BREAK") {
+          workStartRef.current = session.workStart;
+          breakStartRef.current = session.breakStart;
+          totalBreakMsRef.current = session.totalBreakMs;
+          setStatus("ON_BREAK");
+        } else if (session.status === "COMPLETED") {
+          setStatus("COMPLETED");
+        }
+      } catch (error) {
+        console.error("Failed to recover session", error);
+        localStorage.removeItem(ATTENDANCE_SESSION_KEY);
+      }
+    }
+  }, []);
+
+  // ---- SAVE SESSION TO LOCALSTORAGE ----
+  const saveSessionToStorage = (newStatus) => {
+    const session = {
+      status: newStatus,
+      workStart: workStartRef.current,
+      breakStart: breakStartRef.current,
+      totalBreakMs: totalBreakMsRef.current,
+    };
+    localStorage.setItem(ATTENDANCE_SESSION_KEY, JSON.stringify(session));
+  };
+
   // ---- WORK TIMER ----
   useEffect(() => {
     if (status === "WORKING" && workStartRef.current) {
@@ -73,21 +112,29 @@ const AttendanceWidget = ({ currentUserId }) => {
         totalBreakMsRef.current = 0;
         setElapsedSeconds(0);
         setStatus("WORKING");
+        saveSessionToStorage("WORKING");
       }
 
       if (action === "LUNCH_START") {
         breakStartRef.current = now;
         setStatus("ON_BREAK");
+        saveSessionToStorage("ON_BREAK");
       }
 
       if (action === "LUNCH_END") {
         totalBreakMsRef.current += now - breakStartRef.current;
         breakStartRef.current = null;
         setStatus("WORKING");
+        saveSessionToStorage("WORKING");
       }
 
       if (action === "PUNCH_OUT") {
         setStatus("COMPLETED");
+        saveSessionToStorage("COMPLETED");
+        // Clear session after a short delay
+        setTimeout(() => {
+          localStorage.removeItem(ATTENDANCE_SESSION_KEY);
+        }, 1000);
       }
 
       const actionLabel = action.replace("_", " ").toLowerCase();
@@ -125,7 +172,7 @@ const AttendanceWidget = ({ currentUserId }) => {
     <Paper
       elevation={0}
       sx={{
-        p: 3,
+        p: 5,
         height: "100%",
         display: "flex",
         flexDirection: "column",
@@ -138,13 +185,13 @@ const AttendanceWidget = ({ currentUserId }) => {
       }}
     >
       {/* HEADER */}
-      <Box display="flex" justifyContent="space-between" mb={2}>
+      <Box display="flex" justifyContent="space-between" mb={4}>
         <Box>
-          <Typography variant="h6" sx={{ color: PRIMARY_SLATE, fontWeight: 800, letterSpacing: "-0.01em" }}>
-            <AccessTime sx={{ mr: 1, verticalAlign: 'middle', fontSize: 20 }} />
+          <Typography variant="h6" sx={{ color: PRIMARY_SLATE, fontWeight: 800, letterSpacing: "-0.01em", fontSize: "1.5rem" }}>
+            <AccessTime sx={{ mr: 1, verticalAlign: 'middle', fontSize: 28 }} />
             Attendance
           </Typography>
-          <Typography variant="caption" sx={{ color: SECONDARY_SLATE, fontWeight: 500 }}>
+          <Typography variant="caption" sx={{ color: SECONDARY_SLATE, fontWeight: 500, fontSize: "1.1rem" }}>
             {currentTime.toDateString()}
           </Typography>
         </Box>
@@ -156,15 +203,16 @@ const AttendanceWidget = ({ currentUserId }) => {
             border: `1px solid ${alpha(getStatusColor(), 0.3)}`,
             background: alpha(getStatusColor(), 0.1),
             fontWeight: 800,
-            fontSize: "0.7rem",
-            height: "24px"
+            fontSize: "1rem",
+            height: "42px",
+            padding: "12px 18px"
           }}
         />
       </Box>
 
       {/* TIMER */}
-      <Box textAlign="center" py={2}>
-        <Typography variant="h3" sx={{ fontWeight: 900, color: PRIMARY_SLATE, letterSpacing: "-0.04em" }}>
+      <Box textAlign="center" py={4}>
+        <Typography variant="h3" sx={{ fontWeight: 900, color: PRIMARY_SLATE, letterSpacing: "-0.04em", fontSize: "3.5rem" }}>
           {status === "ABSENT"
             ? currentTime.toLocaleTimeString([], {
               hour: "2-digit",
@@ -172,7 +220,7 @@ const AttendanceWidget = ({ currentUserId }) => {
             })
             : formatTime(elapsedSeconds)}
         </Typography>
-        <Typography sx={{ color: SECONDARY_SLATE, fontWeight: 500, mt: 0.5 }}>
+        <Typography sx={{ color: SECONDARY_SLATE, fontWeight: 500, mt: 1, fontSize: "1.2rem" }}>
           {status === "ABSENT" ? "Ready to initialize?" : "Active Session Duration"}
         </Typography>
       </Box>
@@ -184,10 +232,11 @@ const AttendanceWidget = ({ currentUserId }) => {
             fullWidth
             onClick={() => handlePunch("PUNCH_IN")}
             disabled={loading}
-            startIcon={<Business />}
+            startIcon={<Business sx={{ fontSize: 28 }} />}
             sx={{
               borderRadius: "14px",
-              py: 1.5,
+              py: 2.5,
+              fontSize: "1.3rem",
               background: `linear-gradient(135deg, ${INDIGO_ACCENT} 0%, #3730a3 100%)`,
               color: "#fff",
               fontWeight: 700,
@@ -205,9 +254,11 @@ const AttendanceWidget = ({ currentUserId }) => {
               fullWidth
               variant="outlined"
               onClick={() => handlePunch("LUNCH_START")}
-              startIcon={<FreeBreakfast />}
+              startIcon={<FreeBreakfast sx={{ fontSize: 24 }} />}
               sx={{
                 borderRadius: "12px",
+                py: 2,
+                fontSize: "1.2rem",
                 borderColor: GLASS_BORDER,
                 color: SECONDARY_SLATE,
                 fontWeight: 700,
@@ -221,9 +272,11 @@ const AttendanceWidget = ({ currentUserId }) => {
               variant="contained"
               color="error"
               onClick={() => handlePunch("PUNCH_OUT")}
-              startIcon={<Home />}
+              startIcon={<Home sx={{ fontSize: 24 }} />}
               sx={{
                 borderRadius: "12px",
+                py: 2,
+                fontSize: "1.2rem",
                 background: "#ef4444",
                 boxShadow: "0 4px 12px rgba(239, 68, 68, 0.2)",
                 fontWeight: 700,
@@ -239,9 +292,11 @@ const AttendanceWidget = ({ currentUserId }) => {
             fullWidth
             variant="contained"
             onClick={() => handlePunch("LUNCH_END")}
-            startIcon={<Business />}
+            startIcon={<Business sx={{ fontSize: 24 }} />}
             sx={{
               borderRadius: "12px",
+              py: 2,
+              fontSize: "1.2rem",
               background: INDIGO_ACCENT,
               fontWeight: 700,
             }}
@@ -251,7 +306,7 @@ const AttendanceWidget = ({ currentUserId }) => {
         )}
 
         {status === "COMPLETED" && (
-          <Typography align="center" sx={{ color: "#10b981", fontWeight: 700 }}>
+          <Typography align="center" sx={{ color: "#10b981", fontWeight: 700, fontSize: "1.3rem" }}>
             Session finalized. Excellent work.
           </Typography>
         )}

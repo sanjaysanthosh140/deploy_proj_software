@@ -27,7 +27,7 @@ import { useToast } from "../../context/ToastContext";
 
 const menuItems = [
   { text: "Dashboard", icon: <DashboardIcon />, path: "/app/gateway" },
-  { text: "Projects", icon: <FolderIcon />, path: "/app/projects" },
+  // { text: "Projects", icon: <FolderIcon />, path: "/app/projects" },
   { text: "Kanban Board", icon: <ViewKanbanIcon />, path: "/app/kanban" },
   { text: "Backlog", icon: <AssignmentIcon />, path: "/app/backlog" },
   { text: "Teams", icon: <GroupsIcon />, path: "/app/teams" },
@@ -37,8 +37,9 @@ const menuItems = [
 const PRIMARY_SLATE = "#0f172a";
 const SECONDARY_SLATE = "#475569";
 const INDIGO_ACCENT = "#4f46e5";
-const GLASS_BG = "rgba(255, 255, 255, 0.75)";
-const GLASS_BORDER = "rgba(10, 15, 25, 0.08)";
+// liquid glass constants
+const GLASS_BG = "rgba(255, 255, 255, 0.25)"; // more translucent frosted look
+const GLASS_BORDER = "rgba(255, 255, 255, 0.4)"; // brighter edge highlight
 
 const Sidebar = () => {
   const navigate = useNavigate();
@@ -149,9 +150,10 @@ const Sidebar = () => {
           sx={{
             p: 2,
             borderRadius: "20px",
-            background: "rgba(255,255,255,0.4)",
+            background: "rgba(255,255,255,0.25)",
             border: `1px solid ${GLASS_BORDER}`,
-            boxShadow: "0 4px 12px rgba(15, 23, 42, 0.04)",
+            boxShadow: "0 8px 30px rgba(0,0,0,0.15)",
+            backdropFilter: "blur(24px)",
           }}
         >
           <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 1.5 }}>

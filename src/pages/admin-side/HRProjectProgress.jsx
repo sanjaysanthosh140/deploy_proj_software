@@ -67,7 +67,7 @@ const getProjectProgress = (project) => {
 };
 
 // --- Styled Components & Theme Constants ---
-const GLASS_BG = "rgba(255, 255, 255, 0.75)";
+const GLASS_BG = "rgb(255, 255, 255)";
 const GLASS_BORDER = "rgba(10, 15, 25, 0.08)";
 
 const GlassCard = ({ children, sx = {}, hoverEffect = true, ...props }) => (
@@ -149,8 +149,8 @@ const TodoItem = ({ todo }) => {
                 sx={{
                     bgcolor: alpha(statusColor(todo.status), 0.1),
                     color: statusColor(todo.status),
-                    fontSize: "0.65rem",
-                    height: 20,
+                    fontSize: { xs: "0.75rem", md: "0.8rem" },
+                    height: 22,
                     fontWeight: 900,
                     textTransform: "uppercase",
                     border: `1px solid ${alpha(statusColor(todo.status), 0.2)}`,
@@ -181,7 +181,7 @@ const TaskCard = ({ task }) => {
                 borderRadius: "16px !important",
                 mb: 2,
                 "&:before": { display: "none" },
-                overflow: "hidden",
+                overflow: "visible",
                 boxShadow: "none",
                 transition: "all 0.3s ease",
                 "&:hover": {
@@ -203,7 +203,7 @@ const TaskCard = ({ task }) => {
                             sx={{
                                 color: "#0f172a",
                                 fontWeight: 800,
-                                fontSize: "0.95rem",
+                                fontSize: { xs: "1.1rem", sm: "1.2rem", md: "1.35rem" },
                                 overflow: "hidden",
                                 textOverflow: "ellipsis",
                                 whiteSpace: "nowrap",
@@ -221,8 +221,8 @@ const TaskCard = ({ task }) => {
                                 sx={{
                                     bgcolor: alpha(sc, 0.1),
                                     color: sc,
-                                    fontSize: "0.65rem",
-                                    height: 18,
+                                    fontSize: { xs: "0.9rem", md: "1rem" },
+                                    height: 28,
                                     fontWeight: 900,
                                     textTransform: "uppercase",
                                 }}
@@ -233,14 +233,14 @@ const TaskCard = ({ task }) => {
                                 sx={{
                                     bgcolor: alpha(pc, 0.1),
                                     color: pc,
-                                    fontSize: "0.65rem",
-                                    height: 18,
+                                    fontSize: { xs: "0.9rem", md: "1rem" },
+                                    height: 28,
                                     fontWeight: 900,
                                     textTransform: "uppercase"
                                 }}
                             />
                             {task.deadline && (
-                                <Typography sx={{ color: "#64748b", fontSize: "0.75rem", fontWeight: 600 }}>
+                                <Typography sx={{ color: "#64748b", fontSize: { xs: "1rem", md: "1.1rem" }, fontWeight: 600 }}>
                                     Due: {task.deadline}
                                 </Typography>
                             )}
@@ -249,11 +249,11 @@ const TaskCard = ({ task }) => {
                     {todos.length > 0 && (
                         <Box sx={{ textAlign: "right", minWidth: 60 }}>
                             <Typography
-                                sx={{ color: "#0f172a", fontSize: "0.85rem", fontWeight: 900 }}
+                                sx={{ color: "#0f172a", fontSize: { xs: "1.1rem", md: "1.25rem" }, fontWeight: 900 }}
                             >
                                 {todoProgress}%
                             </Typography>
-                            <Typography sx={{ color: "#64748b", fontSize: "0.7rem", fontWeight: 700 }}>
+                            <Typography sx={{ color: "#64748b", fontSize: { xs: "0.95rem", md: "1.05rem" }, fontWeight: 700 }}>
                                 {doneTodos}/{todos.length} items
                             </Typography>
                         </Box>
@@ -261,12 +261,12 @@ const TaskCard = ({ task }) => {
                 </Box>
             </AccordionSummary>
 
-            <AccordionDetails sx={{ px: 2, pb: 2 }}>
+            <AccordionDetails sx={{ px: 2, pb: 2, maxHeight: { xs: "250px", sm: "350px", md: "400px" }, overflowY: "auto", "&::-webkit-scrollbar": { width: "6px" }, "&::-webkit-scrollbar-track": { background: "rgba(0,0,0,0.03)", borderRadius: "10px" }, "&::-webkit-scrollbar-thumb": { background: "rgba(0,0,0,0.15)", borderRadius: "10px" } }}>
                 {todos.length === 0 ? (
                     <Typography
                         sx={{
                             color: "#64748b",
-                            fontSize: "0.85rem",
+                            fontSize: { xs: "1rem", sm: "1.1rem", md: "1.2rem" },
                             textAlign: "center",
                             py: 2,
                             fontWeight: 500,
@@ -276,7 +276,7 @@ const TaskCard = ({ task }) => {
                         No active directives for this task.
                     </Typography>
                 ) : (
-                    <Box sx={{ overflow: "hidden", borderRadius: "12px", background: "rgba(255, 255, 255, 0.5)", p: 1 }}>
+                    <Box sx={{ overflow: "auto", maxHeight: { xs: "200px", sm: "300px", md: "350px" }, borderRadius: "12px", background: "rgba(255, 255, 255, 0.5)", p: 1, "&::-webkit-scrollbar": { width: "6px" }, "&::-webkit-scrollbar-track": { background: "rgba(0,0,0,0.03)", borderRadius: "10px" }, "&::-webkit-scrollbar-thumb": { background: "rgba(0,0,0,0.15)", borderRadius: "10px" } }}>
                         <Box sx={{ px: 1.5, mb: 1.5, mt: 0.5 }}>
                             <LinearProgress
                                 variant="determinate"
@@ -334,11 +334,11 @@ const EmployeeCard = ({ entry, index }) => {
                 <Box sx={{ display: "flex", alignItems: "center", gap: 3, mb: 4 }}>
                     <Avatar
                         sx={{
-                            width: 56,
-                            height: 56,
+                            width: { xs: 48, md: 56 },
+                            height: { xs: 48, md: 56 },
                             background: "linear-gradient(135deg, #0f172a 0%, #334155 100%)",
                             fontWeight: 900,
-                            fontSize: "1.1rem",
+                            fontSize: { xs: "1rem", md: "1.1rem" },
                             boxShadow: "0 8px 16px rgba(10, 15, 25, 0.1)"
                         }}
                     >
@@ -346,11 +346,11 @@ const EmployeeCard = ({ entry, index }) => {
                     </Avatar>
                     <Box sx={{ flex: 1 }}>
                         <Typography
-                            sx={{ color: "#0f172a", fontWeight: 900, fontSize: "1.2rem", mb: 0.5 }}
+                            sx={{ color: "#0f172a", fontWeight: 900, fontSize: { xs: "1.1rem", md: "1.3rem" }, mb: 0.5 }}
                         >
                             {entry.employee}
                         </Typography>
-                        <Typography sx={{ color: "#64748b", fontSize: "0.85rem", fontWeight: 700 }}>
+                        <Typography sx={{ color: "#64748b", fontSize: { xs: "0.9rem", md: "1rem" }, fontWeight: 700 }}>
                             {tasks.length} Operational Tasks •{" "}
                             <Box component="span" sx={{ color: "#0f172a" }}>{totalTodos} Directives</Box>
                         </Typography>
@@ -358,7 +358,7 @@ const EmployeeCard = ({ entry, index }) => {
                     <Box sx={{ textAlign: "right" }}>
                         <Typography
                             sx={{
-                                fontSize: "1.8rem",
+                                fontSize: { xs: "1.5rem", md: "1.8rem" },
                                 fontWeight: 900,
                                 background: "linear-gradient(135deg, #0f172a 0%, #38bdf8 100%)",
                                 backgroundClip: "text",
@@ -369,7 +369,7 @@ const EmployeeCard = ({ entry, index }) => {
                         >
                             {overallProgress}%
                         </Typography>
-                        <Typography sx={{ color: "#64748b", fontSize: "0.75rem", fontWeight: 800, textTransform: "uppercase" }}>
+                        <Typography sx={{ color: "#64748b", fontSize: { xs: "0.8rem", md: "0.85rem" }, fontWeight: 800, textTransform: "uppercase" }}>
                             Capacity
                         </Typography>
                     </Box>
@@ -378,10 +378,10 @@ const EmployeeCard = ({ entry, index }) => {
                 {/* Overall progress bar */}
                 <Box sx={{ mb: 5 }}>
                     <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1, alignItems: "center" }}>
-                        <Typography sx={{ color: "#475569", fontSize: "0.85rem", fontWeight: 800 }}>
+                        <Typography sx={{ color: "#475569", fontSize: { xs: "1rem", md: "1.1rem" }, fontWeight: 800 }}>
                             Workflow Saturation
                         </Typography>
-                        <Typography sx={{ color: "#0f172a", fontSize: "0.85rem", fontWeight: 900 }}>
+                        <Typography sx={{ color: "#0f172a", fontSize: { xs: "1rem", md: "1.1rem" }, fontWeight: 900 }}>
                             {doneTodos} / {totalTodos} Complete
                         </Typography>
                     </Box>
@@ -402,13 +402,13 @@ const EmployeeCard = ({ entry, index }) => {
                 </Box>
 
                 {/* Tasks Section */}
-                <Box>
-                    <Typography sx={{ color: "#0f172a", fontSize: "0.9rem", fontWeight: 900, mb: 2, textTransform: "uppercase", letterSpacing: 1 }}>
+                <Box sx={{ maxHeight: { xs: "400px", sm: "500px", md: "600px" }, overflowY: "auto", "&::-webkit-scrollbar": { width: "6px" }, "&::-webkit-scrollbar-track": { background: "rgba(0,0,0,0.03)", borderRadius: "10px" }, "&::-webkit-scrollbar-thumb": { background: "rgba(0,0,0,0.15)", borderRadius: "10px" } }}>
+                    <Typography sx={{ color: "#0f172a", fontSize: { xs: "1.1rem", md: "1.2rem" }, fontWeight: 900, mb: 2, textTransform: "uppercase", letterSpacing: 1 }}>
                         Assigned Intelligence
                     </Typography>
                     {tasks.length === 0 ? (
                         <Box sx={{ p: 4, textAlign: "center", background: "rgba(15, 23, 42, 0.02)", borderRadius: "16px" }}>
-                            <Typography sx={{ color: "#64748b", fontSize: "0.9rem", fontWeight: 600, fontStyle: "italic" }}>
+                            <Typography sx={{ color: "#64748b", fontSize: { xs: "0.95rem", md: "1.05rem" }, fontWeight: 600, fontStyle: "italic" }}>
                                 No active task streams detected for this specialist.
                             </Typography>
                         </Box>
@@ -469,7 +469,7 @@ const ProjectListCard = ({ project, index, onSelect }) => {
                             bgcolor: alpha(sc, 0.1),
                             color: sc,
                             fontWeight: 800,
-                            fontSize: "0.7rem",
+                            fontSize: { xs: "0.8rem", md: "0.9rem" },
                             textTransform: "uppercase",
                             letterSpacing: 1,
                             borderRadius: "8px",
@@ -486,7 +486,7 @@ const ProjectListCard = ({ project, index, onSelect }) => {
                         textTransform: "uppercase",
                         display: "block",
                         mb: 1,
-                        fontSize: "0.65rem"
+                        fontSize: { xs: "0.75rem", md: "0.85rem" }
                     }}
                 >
                     REF: {project._id?.substring(project._id.length - 6).toUpperCase()}
@@ -496,7 +496,7 @@ const ProjectListCard = ({ project, index, onSelect }) => {
                     sx={{
                         color: "#0f172a",
                         fontWeight: 900,
-                        fontSize: "1.25rem",
+                        fontSize: { xs: "1.25rem", md: "1.4rem" },
                         mb: 1,
                         lineHeight: 1.2,
                         letterSpacing: "-0.02em"
@@ -505,25 +505,17 @@ const ProjectListCard = ({ project, index, onSelect }) => {
                     {project.title}
                 </Typography>
 
-                <Typography
-                    sx={{
-                        color: "#64748b",
-                        fontSize: "0.9rem",
-                        mb: 4,
-                        lineHeight: 1.6,
-                        minHeight: 44,
-                    }}
-                >
-                    {project.description?.length > 80 ? `${project.description.substring(0, 80)}...` : project.description}
-                </Typography>
+<Typography sx={{ color: "#64748b", fontSize: { xs: "1.1rem", md: "1.2rem" }, fontWeight: 600, mb: 3 }}>
+                        {project.description?.length > 80 ? `${project.description.substring(0, 80)}...` : project.description}
+                    </Typography>
 
                 {/* Progress Section */}
                 <Box sx={{ mb: 4 }}>
                     <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1.5, alignItems: "center" }}>
-                        <Typography sx={{ color: "#475569", fontSize: "0.85rem", fontWeight: 700 }}>
+                        <Typography sx={{ color: "#475569", fontSize: { xs: "1rem", md: "1.1rem" }, fontWeight: 700 }}>
                             Deployment Phase
                         </Typography>
-                        <Typography sx={{ color: sc, fontWeight: 900, fontSize: "0.9rem" }}>
+                        <Typography sx={{ color: sc, fontWeight: 900, fontSize: { xs: "1.05rem", md: "1.15rem" } }}>
                             {progress}%
                         </Typography>
                     </Box>
@@ -558,17 +550,17 @@ const ProjectListCard = ({ project, index, onSelect }) => {
                                 height: 24,
                                 background: "rgba(15, 23, 42, 0.1)",
                                 color: "#475569",
-                                fontSize: "0.7rem",
+                                fontSize: { xs: "0.75rem", md: "0.8rem" },
                                 fontWeight: 800
                             }}
                         >
                             <PersonIcon sx={{ fontSize: 14 }} />
                         </Avatar>
-                        <Typography sx={{ color: "#64748b", fontSize: "0.8rem", fontWeight: 600 }}>
+                        <Typography sx={{ color: "#64748b", fontSize: { xs: "1rem", md: "1.1rem" }, fontWeight: 600 }}>
                             {(project.teamMembers ?? []).length} Specialists
                         </Typography>
                     </Box>
-                    <Typography sx={{ color: "#64748b", fontSize: "0.8rem", fontWeight: 600 }}>
+                    <Typography sx={{ color: "#64748b", fontSize: { xs: "1rem", md: "1.1rem" }, fontWeight: 600 }}>
                         {project.deadline ?? "TBD"}
                     </Typography>
                 </Box>
@@ -751,11 +743,14 @@ const HRProjectProgress = () => {
     return (
         <Box
             sx={{
+                height: "100%",
                 minHeight: "100vh",
                 bgcolor: "#f1f5f9",
                 position: "relative",
-                overflow: "hidden",
-                p: { xs: 2, sm: 3, md: 5 },
+                overflowX: "hidden",
+                overflowY: "auto",
+                p: { xs: 2, sm: 3, md: 4 },
+                pb: { xs: 6, md: 8 },
                 color: "#0f172a",
             }}
         >
@@ -769,7 +764,9 @@ const HRProjectProgress = () => {
                         top: "-10%",
                         right: "10%",
                         width: "50vw",
+                        maxWidth: "100%",
                         height: "50vw",
+                        maxHeight: "100%",
                         background: "radial-gradient(circle, rgba(56, 189, 248, 0.08) 0%, transparent 70%)",
                         filter: "blur(60px)",
                     }}
@@ -782,7 +779,9 @@ const HRProjectProgress = () => {
                         bottom: "-10%",
                         left: "10%",
                         width: "50vw",
+                        maxWidth: "100%",
                         height: "50vw",
+                        maxHeight: "100%",
                         background: "radial-gradient(circle, rgba(139, 92, 246, 0.08) 0%, transparent 70%)",
                         filter: "blur(80px)",
                     }}
@@ -853,10 +852,10 @@ const HRProjectProgress = () => {
                                             boxShadow: "0 4px 12px rgba(10, 15, 25, 0.03)",
                                         }}
                                     >
-                                        <Typography sx={{ color: stat.color, fontWeight: 900, fontSize: "1.4rem", lineHeight: 1.2 }}>
+                                        <Typography sx={{ color: stat.color, fontWeight: 900, fontSize: { xs: "1.2rem", md: "1.5rem" }, lineHeight: 1.2 }}>
                                             {stat.value}
                                         </Typography>
-                                        <Typography sx={{ color: "#64748b", fontSize: "0.7rem", fontWeight: 800, textTransform: "uppercase", letterSpacing: 0.5 }}>
+                                        <Typography sx={{ color: "#64748b", fontSize: { xs: "0.75rem", md: "0.85rem" }, fontWeight: 800, textTransform: "uppercase", letterSpacing: 0.5 }}>
                                             {stat.label}
                                         </Typography>
                                     </Box>
@@ -943,7 +942,7 @@ const HRProjectProgress = () => {
                             }}
                         >
                             <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-                                <Typography sx={{ color: "#64748b", fontSize: "0.85rem", fontWeight: 700 }}>
+                                <Typography sx={{ color: "#64748b", fontSize: { xs: "0.9rem", md: "1rem" }, fontWeight: 700 }}>
                                     Priority Level:
                                 </Typography>
                                 <Chip
@@ -955,19 +954,19 @@ const HRProjectProgress = () => {
                                         fontWeight: 900,
                                         borderRadius: "8px",
                                         textTransform: "uppercase",
-                                        fontSize: "0.7rem"
+                                        fontSize: { xs: "0.8rem", md: "0.9rem" }
                                     }}
                                 />
                             </Box>
                             <Box sx={{ height: "20px", width: "1px", bgcolor: GLASS_BORDER, display: { xs: "none", md: "block" } }} />
-                            <Typography sx={{ color: "#64748b", fontSize: "0.85rem", fontWeight: 700 }}>
+                            <Typography sx={{ color: "#64748b", fontSize: { xs: "0.9rem", md: "1rem" }, fontWeight: 700 }}>
                                 Deadline:{" "}
                                 <Box component="span" sx={{ color: "#0f172a", fontWeight: 900 }}>
                                     {selectedProject.deadline ?? "Pending Clearance"}
                                 </Box>
                             </Typography>
                             <Box sx={{ height: "20px", width: "1px", bgcolor: GLASS_BORDER, display: { xs: "none", md: "block" } }} />
-                            <Typography sx={{ color: "#64748b", fontSize: "0.85rem", fontWeight: 700 }}>
+                            <Typography sx={{ color: "#64748b", fontSize: { xs: "0.9rem", md: "1rem" }, fontWeight: 700 }}>
                                 Active Unit:{" "}
                                 <Box component="span" sx={{ color: "#0f172a", fontWeight: 900 }}>
                                     {(selectedProject.teamMembers ?? []).length} Specialists

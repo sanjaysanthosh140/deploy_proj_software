@@ -3,17 +3,16 @@
  * AntyGravity Instruction:
  * Apply rules from /docs/component_analysis_prompt.md
  */import React, { useState } from 'react';
-import { AppBar, Toolbar, Box, InputBase, IconButton, Badge, Typography, Menu, MenuItem, Avatar } from '@mui/material';
+import { AppBar, Toolbar, Box, InputBase, IconButton, Typography, Menu, MenuItem, Avatar } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
-import NotificationsIcon from '@mui/icons-material/Notifications';
-import EmailIcon from '@mui/icons-material/Email';
 import { styled, alpha } from '@mui/material/styles';
 
 const PRIMARY_SLATE = "#0f172a";
 const SECONDARY_SLATE = "#475569";
 const INDIGO_ACCENT = "#4f46e5";
-const GLASS_BG = "rgba(255, 255, 255, 0.75)";
-const GLASS_BORDER = "rgba(10, 15, 25, 0.08)";
+// liquid glass constants
+const GLASS_BG = "rgba(255, 255, 255, 0.25)"; // more translucent frosted surface
+const GLASS_BORDER = "rgba(255, 255, 255, 0.4)"; // highlight edge
 
 const Search = styled('div')(({ theme }) => ({
     position: 'relative',
@@ -102,20 +101,9 @@ const Topbar = () => {
                     />
                 </Search>
 
-                {/* Right Icons */}
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                    <IconButton size="large" sx={{ color: alpha(SECONDARY_SLATE, 0.6) }}>
-                        <Badge badgeContent={4} sx={{ '& .MuiBadge-badge': { background: '#ef4444', color: '#fff' } }}>
-                            <EmailIcon />
-                        </Badge>
-                    </IconButton>
-
-                    <IconButton size="large" sx={{ color: alpha(SECONDARY_SLATE, 0.6) }}>
-                        <Badge badgeContent={12} sx={{ '& .MuiBadge-badge': { background: INDIGO_ACCENT, color: '#fff' } }}>
-                            <NotificationsIcon />
-                        </Badge>
-                    </IconButton>
-
+                {/* Right Icons (mail/msg removed per design) */}
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    {/* no mail or message icons, only user avatar/menu remains */}
                     <Box
                         onClick={handleMenuClick}
                         sx={{

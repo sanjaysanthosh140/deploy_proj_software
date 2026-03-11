@@ -1,3 +1,15 @@
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  overflow-x: hidden;
+}
+
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -5,7 +17,7 @@
 
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  background-color: #e6edf5;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -23,11 +35,14 @@ a:hover {
 }
 
 body {
-  margin: 0;
   min-width: 320px;
-  min-height: 100vh;
-  background-color: #0a0e17;
-  color: #fff;
+  height: 100%;
+  background: linear-gradient(135deg, #e6edf5 0%, #cfd8e5 100%);
+  background-size: cover;
+  background-attachment: fixed;
+  color: #213547;
+  backdrop-filter: blur(4px);
+  overflow: hidden;
 }
 
 h1 {

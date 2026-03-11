@@ -132,7 +132,8 @@ const ProjectsPreview = ({ userId }) => {
             sx={{
               fontWeight: 800,
               color: PRIMARY_SLATE,
-              letterSpacing: "-0.01em"
+              letterSpacing: "-0.01em",
+              fontSize: "1.6rem"
             }}
           >
             Assigned Protocols
@@ -145,7 +146,7 @@ const ProjectsPreview = ({ userId }) => {
             color: INDIGO_ACCENT,
             textTransform: "none",
             fontWeight: 800,
-            fontSize: "0.85rem",
+            fontSize: "1.35rem",
             "&:hover": {
               bgcolor: alpha(INDIGO_ACCENT, 0.05),
             },
@@ -156,13 +157,13 @@ const ProjectsPreview = ({ userId }) => {
       </Box>
 
       {/* Projects Grid */}
-      <Grid container spacing={2}>
+      <Grid container spacing={6}>
         {projects.map((project, index) => {
           const daysRemaining = getDaysRemaining(project.deadline);
           const isUrgent = daysRemaining <= 7;
 
           return (
-            <Grid size={{ xs: 12, md: 4 }} key={project._id}>
+            <Grid size={{ xs: 12, md: 12 }} key={project._id}>
               <motion.div
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -170,7 +171,7 @@ const ProjectsPreview = ({ userId }) => {
               >
                 <Paper
                   sx={{
-                    p: 2.5,
+                    p: 4,
                     borderRadius: "24px",
                     background: GLASS_BG,
                     backdropFilter: "blur(48px) saturate(180%)",
@@ -182,6 +183,7 @@ const ProjectsPreview = ({ userId }) => {
                     display: "flex",
                     flexDirection: "column",
                     boxShadow: "0 8px 32px -4px rgba(10, 15, 25, 0.04)",
+                    minHeight: "480px",
                     "&:hover": {
                       transform: "translateY(-4px)",
                       borderColor: alpha(getPriorityColor(project.priority), 0.4),
@@ -218,12 +220,13 @@ const ProjectsPreview = ({ userId }) => {
                       size="small"
                       sx={{
                         alignSelf: "flex-start",
-                        mb: 1.5,
+                        mb: 2.5,
                         bgcolor: `${getPriorityColor(project.priority)}20`,
                         color: getPriorityColor(project.priority),
                         fontWeight: 700,
                         border: `1px solid ${getPriorityColor(project.priority)}40`,
-                        fontSize: "0.7rem",
+                        fontSize: "1.2rem",
+                        padding: "10px 18px"
                       }}
                     />
 
@@ -233,48 +236,49 @@ const ProjectsPreview = ({ userId }) => {
                       sx={{
                         fontWeight: 800,
                         color: PRIMARY_SLATE,
-                        mb: 2,
+                        mb: 3,
                         lineHeight: 1.3,
                         display: "-webkit-box",
                         WebkitLineClamp: 2,
                         WebkitBoxOrient: "vertical",
                         overflow: "hidden",
                         minHeight: "2.6em",
-                        letterSpacing: "-0.01em"
+                        letterSpacing: "-0.01em",
+                        fontSize: "1.5rem"
                       }}
                     >
                       {project.title}
                     </Typography>
 
                     {/* Progress */}
-                    <Box sx={{ mb: 2 }}>
+                    <Box sx={{ mb: 3 }}>
                       <Box
                         sx={{
                           display: "flex",
                           justifyContent: "space-between",
-                          mb: 0.5,
+                          mb: 1,
                         }}
                       >
                         <Box
                           sx={{
                             display: "flex",
                             alignItems: "center",
-                            gap: 0.5,
+                            gap: 0.8,
                           }}
                         >
                           <TrendingUpIcon
-                            sx={{ fontSize: 13, color: alpha(SECONDARY_SLATE, 0.6) }}
+                            sx={{ fontSize: 18, color: alpha(SECONDARY_SLATE, 0.6) }}
                           />
                           <Typography
                             variant="caption"
-                            sx={{ color: SECONDARY_SLATE, fontWeight: 600 }}
+                            sx={{ color: SECONDARY_SLATE, fontWeight: 600, fontSize: "1.25rem" }}
                           >
                             Progress
                           </Typography>
                         </Box>
                         <Typography
                           variant="caption"
-                          sx={{ color: INDIGO_ACCENT, fontWeight: 800 }}
+                          sx={{ color: INDIGO_ACCENT, fontWeight: 800, fontSize: "1.25rem" }}
                         >
                           {project.progress}%
                         </Typography>
@@ -284,7 +288,7 @@ const ProjectsPreview = ({ userId }) => {
                       <Box
                         sx={{
                           position: "relative",
-                          height: 6,
+                          height: 12,
                           borderRadius: 3,
                           bgcolor: "rgba(255, 255, 255, 0.05)",
                           overflow: "hidden",
@@ -326,13 +330,13 @@ const ProjectsPreview = ({ userId }) => {
                       sx={{
                         display: "flex",
                         alignItems: "center",
-                        gap: 0.5,
-                        mb: 2,
+                        gap: 0.8,
+                        mb: 3,
                       }}
                     >
                       <AccessTimeIcon
                         sx={{
-                          fontSize: 14,
+                          fontSize: 20,
                           color: isUrgent ? "#ffab00" : "#a0aec0",
                         }}
                       />
@@ -341,6 +345,7 @@ const ProjectsPreview = ({ userId }) => {
                         sx={{
                           color: isUrgent ? "#ffab00" : "#a0aec0",
                           fontWeight: isUrgent ? 700 : 500,
+                          fontSize: "1.25rem"
                         }}
                       >
                         {daysRemaining} days left
@@ -348,20 +353,20 @@ const ProjectsPreview = ({ userId }) => {
                     </Box>
 
                     {/* Action Buttons */}
-                    <Box sx={{ display: "flex", gap: 1.5, mt: "auto" }}>
+                    <Box sx={{ display: "flex", gap: 2, mt: "auto" }}>
                       <Button
                         variant="contained"
                         size="small"
                         disableElevation
-                        startIcon={<VisibilityIcon sx={{ fontSize: 16 }} />}
+                        startIcon={<VisibilityIcon sx={{ fontSize: 22 }} />}
                         onClick={() => navigate(`/app/projects/${project._id}`)}
                         sx={{
                           flex: 1,
                           borderRadius: "12px",
                           textTransform: "none",
                           fontWeight: 800,
-                          fontSize: "0.8rem",
-                          py: 1,
+                          fontSize: "1.35rem",
+                          py: 2,
                           background: INDIGO_ACCENT,
                           "&:hover": {
                             background: "#3730a3",
@@ -374,15 +379,15 @@ const ProjectsPreview = ({ userId }) => {
                         <Button
                           variant="outlined"
                           size="small"
-                          startIcon={<PersonAddIcon sx={{ fontSize: 16 }} />}
+                          startIcon={<PersonAddIcon sx={{ fontSize: 22 }} />}
                           onClick={() => handleEnroll(project._id)}
                           sx={{
                             flex: 1,
                             borderRadius: "10px",
                             textTransform: "none",
                             fontWeight: 600,
-                            fontSize: "0.8rem",
-                            py: 0.75,
+                            fontSize: "1.35rem",
+                            py: 1.8,
                             borderColor: "rgba(0, 230, 118, 0.5)",
                             color: "#00e676",
                             "&:hover": {

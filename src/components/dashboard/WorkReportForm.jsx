@@ -1,8 +1,4 @@
-/**
- * AntyGravity Instruction:
- * Apply rules from /docs/component_analysis_prompt.md
- */
-import React, { useState } from "react";
+
 import {
   Box,
   Typography,
@@ -12,6 +8,7 @@ import {
   CircularProgress,
   alpha,
 } from "@mui/material";
+import { useState } from "react";
 import SendIcon from "@mui/icons-material/Send";
 import axios from "axios";
 import { useToast } from "../../context/ToastContext";
@@ -80,31 +77,38 @@ const WorkReportForm = ({ deptId }) => {
         boxShadow: "0 12px 32px -4px rgba(10, 15, 25, 0.04)",
       }}
     >
-      <Typography variant="h5" sx={{ mb: 3, fontWeight: 900, color: PRIMARY_SLATE, letterSpacing: "-0.02em" }}>
+      <Typography variant="h4" sx={{ mb: 4, fontWeight: 900, color: PRIMARY_SLATE, letterSpacing: "-0.02em", fontSize: { xs: "2rem", sm: "2.4rem" } }}>
         Mission Logs & Protocol Reporting
       </Typography>
       <TextField
         fullWidth
         multiline
-        rows={8}
+        rows={12}
         variant="outlined"
         placeholder="Log your active accomplishments..."
         value={report}
         onChange={(e) => setReport(e.target.value)}
         sx={{
-          mb: 3,
+          mb: 4,
           "& .MuiOutlinedInput-root": {
+            fontSize: { xs: "1.3rem", sm: "1.5rem" },
             color: PRIMARY_SLATE,
             fontWeight: 500,
             bgcolor: "rgba(255,255,255,0.4)",
             borderRadius: "16px",
+            padding: { xs: "1.75rem", sm: "2rem" },
             "& fieldset": { borderColor: GLASS_BORDER },
             "&:hover fieldset": { borderColor: alpha(INDIGO_ACCENT, 0.2) },
             "&.Mui-focused fieldset": { borderColor: INDIGO_ACCENT },
           },
+          "& .MuiOutlinedInput-input": {
+            fontSize: { xs: "1.3rem", sm: "1.5rem" },
+            lineHeight: 1.8,
+          },
           "& .MuiInputBase-input::placeholder": {
             color: alpha(SECONDARY_SLATE, 0.5),
             opacity: 1,
+            fontSize: { xs: "1.2rem", sm: "1.35rem" },
           }
         }}
       />
@@ -113,14 +117,15 @@ const WorkReportForm = ({ deptId }) => {
           type="submit"
           variant="contained"
           disabled={loading}
-          endIcon={loading ? <CircularProgress size={20} color="inherit" /> : <SendIcon />}
+          endIcon={loading ? <CircularProgress size={28} color="inherit" /> : <SendIcon />}
           sx={{
             background: INDIGO_ACCENT,
             color: "#fff",
             fontWeight: 700,
+            fontSize: { xs: "1.25rem", sm: "1.45rem" },
             borderRadius: "12px",
-            px: 4,
-            py: 1.2,
+            px: { xs: 4, sm: 6 },
+            py: { xs: 1.8, sm: 2.2 },
             textTransform: "none",
             boxShadow: `0 4px 14px ${alpha(INDIGO_ACCENT, 0.3)}`,
             "&.Mui-disabled": {
