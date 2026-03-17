@@ -19,6 +19,8 @@ import {
   Fade,
   Alert,
   alpha,
+  useTheme,
+  useMediaQuery,
 } from "@mui/material";
 import { motion, AnimatePresence } from "framer-motion";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
@@ -31,36 +33,39 @@ import GroupsIcon from "@mui/icons-material/Groups";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import axios from "axios";
 
-// --- iOS Liquid Glass Design Constants ---
 const PRIMARY_BG = "#e6edf5";
 const SECONDARY_BG = "#d9e3ef";
 const TERTIARY_BG = "#cfd8e5";
 
 const glassEffect = {
-  background: "rgba(255, 255, 255, 0.25)",
-  backdropFilter: "blur(30px) saturate(160%)",
-  border: "1px solid rgba(255, 255, 255, 0.45)",
-  borderRadius: "22px",
-  boxShadow: "0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 1px rgba(255, 255, 255, 0.5)",
+  background: "rgba(255, 255, 255, 0.45)",
+  backdropFilter: "blur(40px) saturate(200%)",
+  border: "1px solid rgba(255, 255, 255, 0.55)",
+  borderRadius: "28px",
+  boxShadow: "0 12px 40px rgba(0, 0, 0, 0.1), inset 0 1px 1px rgba(255, 255, 255, 0.6)",
   transition: "all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
   position: "relative",
   overflow: "visible",
 };
 
 const iPhoneGlassButton = {
-  background: "rgba(255, 255, 255, 0.3)",
-  backdropFilter: "blur(20px)",
-  border: "1px solid rgba(255, 255, 255, 0.45)",
-  borderRadius: "16px",
-  color: "rgba(0, 0, 0, 0.8)",
+  background: "rgba(255, 255, 255, 0.5)",
+  backdropFilter: "blur(25px)",
+  border: "1px solid rgba(255, 255, 255, 0.6)",
+  borderRadius: "18px",
+  color: "rgba(0, 0, 0, 0.9)",
   fontWeight: 1000,
   textTransform: "none",
-  boxShadow: "0 4px 15px rgba(0, 0, 0, 0.05)",
-  transition: "all 0.3s ease",
+  letterSpacing: "-0.02em",
+  boxShadow: "0 8px 20px rgba(0, 0, 0, 0.05)",
+  transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
   "&:hover": {
-    background: "rgba(255, 255, 255, 0.45)",
-    transform: "translateY(-2px)",
-    boxShadow: "0 10px 25px rgba(0, 0, 0, 0.1)",
+    background: "rgba(255, 255, 255, 0.7)",
+    transform: "translateY(-3px) scale(1.02)",
+    boxShadow: "0 15px 35px rgba(0, 0, 0, 0.1)",
+  },
+  "&:active": {
+    transform: "translateY(-1px) scale(0.98)",
   }
 };
 
@@ -82,6 +87,10 @@ const CreateProjectDialog = ({ open, onClose, onSubmit, initialData }) => {
   const [selectedTeam, setSelectedTeam] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const isTablet = useMediaQuery(theme.breakpoints.down("md"));
 
   const steps = ["Project Details", "Add Tasks", "Assign Team"];
 
@@ -352,15 +361,18 @@ const CreateProjectDialog = ({ open, onClose, onSubmit, initialData }) => {
       PaperProps={{
         sx: {
           background: `linear-gradient(135deg, ${PRIMARY_BG} 60%, ${SECONDARY_BG} 100%)`,
-          backdropFilter: "blur(50px) saturate(180%)",
-          borderRadius: "32px",
-          border: "1px solid rgba(255, 255, 255, 0.5)",
-          boxShadow: "0 40px 100px -20px rgba(0, 0, 0, 0.15)",
-          minHeight: "680px",
+          backdropFilter: "blur(60px) saturate(200%)",
+          borderRadius: isMobile ? "0px" : "40px",
+          border: isMobile ? "none" : "1px solid rgba(255, 255, 255, 0.6)",
+          boxShadow: "0 60px 140px -40px rgba(0, 0, 0, 0.2)",
+          minHeight: isMobile ? "100vh" : "720px",
+          maxHeight: isMobile ? "100vh" : "90vh",
           overflow: "hidden",
           position: "relative",
+          margin: isMobile ? 0 : 2,
         },
       }}
+      fullScreen={isMobile}
     >
       {/* Background Mesh Blobs Internal */}
       <Box sx={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, zIndex: 0, pointerEvents: "none", opacity: 0.6 }}>
@@ -398,89 +410,102 @@ const CreateProjectDialog = ({ open, onClose, onSubmit, initialData }) => {
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          background: "rgba(255, 255, 255, 0.45)",
-          backdropFilter: "blur(20px)",
-          borderBottom: "1px solid rgba(255, 255, 255, 0.5)",
-          py: 3,
-          px: 4,
+          background: "rgba(255, 255, 255, 0.55)",
+          backdropFilter: "blur(30px)",
+          borderBottom: "1px solid rgba(255, 255, 255, 0.6)",
+          py: { xs: 2.5, md: 4 },
+          px: { xs: 3, md: 5 },
           zIndex: 1,
         }}
       >
         <Typography
           variant="h5"
           sx={{
-            color: "rgba(0,0,0,0.85)",
+            color: "rgba(0,0,0,0.9)",
             fontWeight: 1000,
             display: "flex",
             alignItems: "center",
-            gap: 2.5,
-            letterSpacing: "-0.04em",
-            fontSize: "1.75rem",
+            gap: { xs: 2, md: 3 },
+            letterSpacing: "-0.05em",
+            fontSize: { xs: "1.4rem", md: "2rem" },
           }}
         >
           <Box
             sx={{
-              width: 52,
-              height: 52,
-              borderRadius: "18px",
+              width: { xs: 44, md: 56 },
+              height: { xs: 44, md: 56 },
+              borderRadius: "20px",
               background: "linear-gradient(135deg, #0f172a 0%, #334155 100%)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              boxShadow: "0 8px 16px rgba(0, 0, 0, 0.12)",
-              border: "1px solid rgba(255,255,255,0.2)",
+              boxShadow: "0 10px 20px rgba(0, 0, 0, 0.15)",
+              border: "1px solid rgba(255,255,255,0.3)",
             }}
           >
             {initialData ? (
-              <EditIcon sx={{ color: "#fff", fontSize: 26 }} />
+              <EditIcon sx={{ color: "#fff", fontSize: { xs: 22, md: 28 } }} />
             ) : (
-              <AddIcon sx={{ color: "#fff", fontSize: 32 }} />
+              <AddIcon sx={{ color: "#fff", fontSize: { xs: 28, md: 36 } }} />
             )}
           </Box>
-          {initialData ? "Update Project System" : "Create New Project"}
+          {initialData ? "Refine Project Intelligence" : "Project Genesis"}
         </Typography>
         <IconButton
           onClick={handleClose}
           sx={{
             ...iPhoneGlassButton,
             p: 1.5,
-            bgcolor: "rgba(255,255,255,0.5)",
+            bgcolor: "rgba(255,255,255,0.6)",
+            borderRadius: "14px",
           }}
         >
-          <CloseIcon sx={{ color: "rgba(0,0,0,0.6)" }} />
+          <CloseIcon sx={{ color: "rgba(0,0,0,0.7)", fontSize: { xs: 20, md: 24 } }} />
         </IconButton>
       </DialogTitle>
 
-      <DialogContent sx={{ py: 4, px: 3, overflow: "visible" }}>
+      <DialogContent sx={{ py: { xs: 3, md: 5 }, px: { xs: 2.5, md: 5 }, overflowY: "auto", overflowX: "hidden" }}>
         {/* Stepper */}
-        <Stepper activeStep={activeStep} sx={{ mb: 6, px: 2, zIndex: 1, position: "relative" }}>
+        <Stepper
+          activeStep={activeStep}
+          orientation={isMobile ? "vertical" : "horizontal"}
+          sx={{
+            mb: { xs: 4, md: 7 },
+            zIndex: 1,
+            position: "relative",
+            "& .MuiStepConnector-line": {
+              borderColor: "rgba(0,0,0,0.1)",
+              borderWidth: "2px",
+            }
+          }}
+        >
           {steps.map((label) => (
             <Step key={label}>
               <StepLabel
                 sx={{
                   "& .MuiStepLabel-label": {
-                    color: "rgba(0,0,0,0.45)",
-                    fontWeight: 900,
-                    fontSize: "0.75rem",
+                    color: "rgba(0,0,0,0.5)",
+                    fontWeight: 1000,
+                    fontSize: { xs: "0.7rem", md: "0.85rem" },
                     textTransform: "uppercase",
-                    letterSpacing: "1.5px",
-                    mt: 1,
+                    letterSpacing: "2px",
+                    mt: { xs: 0, md: 1.5 },
                   },
                   "& .MuiStepLabel-label.Mui-active": {
-                    color: "rgba(0,0,0,0.85)",
+                    color: "rgba(0,0,0,0.9)",
                   },
                   "& .MuiStepLabel-label.Mui-completed": {
-                    color: "#4ade80",
+                    color: "#10b981",
                   },
                   "& .MuiStepIcon-root": {
-                    width: 28,
-                    height: 28,
-                    color: "rgba(0,0,0,0.06)",
-                    border: "2px solid rgba(255,255,255,0.4)",
+                    width: { xs: 26, md: 32 },
+                    height: { xs: 26, md: 32 },
+                    color: "rgba(0,0,0,0.08)",
+                    border: "2px solid rgba(255,255,255,0.5)",
                     borderRadius: "50%",
-                    "&.Mui-active": { color: "#00d4ff" },
-                    "&.Mui-completed": { color: "#4ade80" },
-                    "& .MuiStepIcon-text": { fontWeight: 1000, fill: "rgba(0,0,0,0.3)" }
+                    "&.Mui-active": { color: "#00d4ff", boxShadow: "0 0 20px rgba(0, 212, 255, 0.4)" },
+                    "&.Mui-completed": { color: "#10b981" },
+                    "& .MuiStepIcon-text": { fontWeight: 1000, fill: "rgba(0,0,0,0.4)" }
                   }
                 }}
               >
@@ -518,7 +543,7 @@ const CreateProjectDialog = ({ open, onClose, onSubmit, initialData }) => {
               exit={{ opacity: 0, x: -20 }}
               transition={{ duration: 0.3 }}
             >
-              <Box sx={{ display: "flex", flexDirection: "column", gap: 3.5, position: "relative", zIndex: 1 }}>
+              <Box sx={{ display: "flex", flexDirection: "column", gap: { xs: 3, md: 5 }, position: "relative", zIndex: 1 }}>
                 <TextField
                   label="Project Title"
                   name="title"
@@ -527,49 +552,50 @@ const CreateProjectDialog = ({ open, onClose, onSubmit, initialData }) => {
                   fullWidth
                   required
                   placeholder="e.g., Quantum Edge Infrastructure"
-                  InputLabelProps={{ sx: { color: "rgba(0,0,0,0.5)", fontWeight: 900, textTransform: "uppercase", letterSpacing: 1, fontSize: "0.75rem" } }}
+                  InputLabelProps={{ sx: { color: "rgba(0,0,0,0.6)", fontWeight: 1000, textTransform: "uppercase", letterSpacing: 2, fontSize: { xs: "0.65rem", md: "0.8rem" } } }}
                   sx={{
-                    input: { color: "rgba(0,0,0,0.85)", fontWeight: 800, fontSize: "1.1rem" },
+                    input: { color: "rgba(0,0,0,0.9)", fontWeight: 800, fontSize: { xs: "1rem", md: "1.25rem" }, py: 2 },
                     "& .MuiOutlinedInput-root": {
-                      background: "rgba(255,255,255,0.4)",
-                      backdropFilter: "blur(10px)",
-                      borderRadius: "18px",
-                      px: 1,
-                      "& fieldset": { borderColor: "rgba(255,255,255,0.6)" },
-                      "&:hover fieldset": { borderColor: "rgba(255,255,255,0.8)" },
-                      "&.Mui-focused fieldset": { borderColor: "#00d4ff", borderWidth: "2px" },
+                      background: "rgba(255,255,255,0.45)",
+                      backdropFilter: "blur(20px)",
+                      borderRadius: "22px",
+                      px: 1.5,
+                      "& fieldset": { borderColor: "rgba(255,255,255,0.7)" },
+                      "&:hover fieldset": { borderColor: "rgba(255,255,255,1)" },
+                      "&.Mui-focused fieldset": { borderColor: "#00d4ff", borderWidth: "2.5px" },
                     },
                   }}
                 />
 
                 <TextField
-                  label="Description"
+                  label="Strategic Narrative (Description)"
                   name="description"
                   value={projectData.description}
                   onChange={handleProjectChange}
                   fullWidth
                   required
                   multiline
-                  rows={4}
-                  placeholder="Describe the operational scope..."
-                  InputLabelProps={{ sx: { color: "rgba(0,0,0,0.5)", fontWeight: 900, textTransform: "uppercase", letterSpacing: 1, fontSize: "0.75rem" } }}
+                  rows={isMobile ? 3 : 5}
+                  placeholder="Describe the operational scope and long-term vision..."
+                  InputLabelProps={{ sx: { color: "rgba(0,0,0,0.6)", fontWeight: 1000, textTransform: "uppercase", letterSpacing: 2, fontSize: { xs: "0.65rem", md: "0.8rem" } } }}
                   sx={{
                     "& .MuiOutlinedInput-root": {
-                      color: "rgba(0,0,0,0.8)",
-                      background: "rgba(255,255,255,0.4)",
-                      backdropFilter: "blur(10px)",
-                      borderRadius: "18px",
-                      fontWeight: 700,
-                      "& fieldset": { borderColor: "rgba(255,255,255,0.6)" },
-                      "&:hover fieldset": { borderColor: "rgba(255,255,255,0.8)" },
-                      "&.Mui-focused fieldset": { borderColor: "#00d4ff", borderWidth: "2px" },
+                      color: "rgba(0,0,0,0.85)",
+                      background: "rgba(255,255,255,0.45)",
+                      backdropFilter: "blur(20px)",
+                      borderRadius: "24px",
+                      fontWeight: 800,
+                      p: 2,
+                      "& fieldset": { borderColor: "rgba(255,255,255,0.7)" },
+                      "&:hover fieldset": { borderColor: "rgba(255,255,255,1)" },
+                      "&.Mui-focused fieldset": { borderColor: "#00d4ff", borderWidth: "2.5px" },
                     },
                   }}
                 />
 
-                <Box sx={{ display: "flex", gap: 3 }}>
+                <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, gap: { xs: 3, md: 4 } }}>
                   <TextField
-                    label="Deadline"
+                    label="Temporal Limit (Deadline)"
                     name="deadline"
                     type="date"
                     value={projectData.deadline}
@@ -577,25 +603,27 @@ const CreateProjectDialog = ({ open, onClose, onSubmit, initialData }) => {
                     sx={{
                       flex: 1.2,
                       input: {
-                        color: "rgba(0,0,0,0.85)",
-                        fontWeight: 800,
+                        color: "rgba(0,0,0,0.9)",
+                        fontWeight: 900,
+                        fontSize: "1.1rem",
                         colorScheme: "light"
                       },
                       "& .MuiOutlinedInput-root": {
-                        background: "rgba(255,255,255,0.4)",
-                        borderRadius: "18px",
-                        "& fieldset": { borderColor: "rgba(255,255,255,0.6)" },
-                        "&:hover fieldset": { borderColor: "rgba(255,255,255,0.8)" },
-                        "&.Mui-focused fieldset": { borderColor: "#00d4ff", borderWidth: "2px" },
+                        background: "rgba(255,255,255,0.45)",
+                        borderRadius: "20px",
+                        p: 0.5,
+                        "& fieldset": { borderColor: "rgba(255,255,255,0.7)" },
+                        "&:hover fieldset": { borderColor: "rgba(255,255,255,1)" },
+                        "&.Mui-focused fieldset": { borderColor: "#00d4ff", borderWidth: "2.5px" },
                       },
-                      "& .MuiInputBase-input::-webkit-calendar-picker-indicator": { filter: "invert(0.2)" },
+                      "& .MuiInputBase-input::-webkit-calendar-picker-indicator": { filter: "invert(0.1)", transform: "scale(1.2)", cursor: "pointer" },
                     }}
-                    InputLabelProps={{ shrink: true, sx: { color: "rgba(0,0,0,0.5)", fontWeight: 900, textTransform: "uppercase", letterSpacing: 1, fontSize: "0.75rem" } }}
+                    InputLabelProps={{ shrink: true, sx: { color: "rgba(0,0,0,0.6)", fontWeight: 1000, textTransform: "uppercase", letterSpacing: 2, fontSize: { xs: "0.65rem", md: "0.8rem" } } }}
                   />
 
                   <TextField
                     select
-                    label="Priority"
+                    label="Priority Vector"
                     name="priority"
                     value={projectData.priority}
                     onChange={handleProjectChange}
@@ -603,18 +631,19 @@ const CreateProjectDialog = ({ open, onClose, onSubmit, initialData }) => {
                       flex: 1,
                       "& .MuiOutlinedInput-root": {
                         color: getPriorityColor(projectData.priority),
-                        background: "rgba(255,255,255,0.4)",
-                        borderRadius: "18px",
+                        background: "rgba(255,255,255,0.45)",
+                        borderRadius: "20px",
                         fontWeight: 1000,
-                        "& fieldset": { borderColor: "rgba(255,255,255,0.6)" },
-                        "&:hover fieldset": { borderColor: "rgba(255,255,255,0.8)" },
-                        "&.Mui-focused fieldset": { borderColor: "#00d4ff", borderWidth: "2px" },
+                        fontSize: "1.1rem",
+                        "& fieldset": { borderColor: "rgba(255,255,255,0.7)" },
+                        "&:hover fieldset": { borderColor: "rgba(255,255,255,1)" },
+                        "&.Mui-focused fieldset": { borderColor: "#00d4ff", borderWidth: "2.5px" },
                       },
                     }}
-                    InputLabelProps={{ sx: { color: "rgba(0,0,0,0.5)", fontWeight: 900, textTransform: "uppercase", letterSpacing: 1, fontSize: "0.75rem" } }}
+                    InputLabelProps={{ sx: { color: "rgba(0,0,0,0.6)", fontWeight: 1000, textTransform: "uppercase", letterSpacing: 2, fontSize: { xs: "0.65rem", md: "0.8rem" } } }}
                   >
                     {["Low", "Medium", "High", "Critical"].map(p => (
-                      <MenuItem key={p} value={p} sx={{ fontWeight: 800, color: getPriorityColor(p) }}>{p}</MenuItem>
+                      <MenuItem key={p} value={p} sx={{ fontWeight: 1000, color: getPriorityColor(p), py: 2 }}>{p}</MenuItem>
                     ))}
                   </TextField>
                 </Box>
@@ -634,116 +663,118 @@ const CreateProjectDialog = ({ open, onClose, onSubmit, initialData }) => {
                 {/* Add Todo Form */}
                 <Paper
                   sx={{
-                    p: 4,
-                    mb: 5,
-                    background: "rgba(255, 255, 255, 0.3)",
-                    backdropFilter: "blur(15px)",
-                    border: "1px solid rgba(255, 255, 255, 0.5)",
-                    borderRadius: "24px",
-                    boxShadow: "0 15px 35px rgba(0, 0, 0, 0.05)",
+                    p: { xs: 3, md: 5 },
+                    mb: 4,
+                    background: "rgba(255, 255, 255, 0.55)",
+                    backdropFilter: "blur(30px)",
+                    border: "1px solid rgba(255, 255, 255, 0.7)",
+                    borderRadius: "32px",
+                    boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.08)",
                     position: "relative",
                     zIndex: 1,
                   }}
                 >
                   <Typography
                     variant="subtitle1"
-                    sx={{ color: "rgba(0,0,0,0.85)", mb: 3.5, fontWeight: 1000, letterSpacing: "-0.03em", fontSize: "1.25rem" }}
+                    sx={{ color: "rgba(0,0,0,0.9)", mb: 4, fontWeight: 1000, letterSpacing: "-0.05em", fontSize: { xs: "1.2rem", md: "1.5rem" } }}
                   >
-                    Add Task Intelligence
+                    Task Intelligence Architect
                   </Typography>
                   <Box
-                    sx={{ display: "flex", flexDirection: "column", gap: 3 }}
+                    sx={{ display: "flex", flexDirection: "column", gap: { xs: 3, md: 4 } }}
                   >
                     <TextField
-                      label="Task Title"
+                      label="Protocol Title"
                       name="title"
                       value={newTodo.title}
                       onChange={handleTodoChange}
                       fullWidth
-                      size="small"
-                      placeholder="e.g., Define System Architecture"
-                      InputLabelProps={{ sx: { color: "rgba(0,0,0,0.5)", fontWeight: 900, textTransform: "uppercase", letterSpacing: 1, fontSize: "0.75rem" } }}
+                      size="medium"
+                      placeholder="e.g., Deploy Neural Gateway"
+                      InputLabelProps={{ sx: { color: "rgba(0,0,0,0.6)", fontWeight: 1000, textTransform: "uppercase", letterSpacing: 2, fontSize: "0.75rem" } }}
                       sx={{
-                        input: { color: "rgba(0,0,0,0.8)", fontWeight: 700 },
+                        input: { color: "rgba(0,0,0,0.9)", fontWeight: 800, fontSize: "1rem" },
                         "& .MuiOutlinedInput-root": {
-                          background: "rgba(255,255,255,0.45)",
-                          borderRadius: "14px",
-                          "& fieldset": { borderColor: "rgba(255,255,255,0.6)" },
-                          "&:hover fieldset": { borderColor: "rgba(255,255,255,0.8)" },
+                          background: "rgba(255,255,255,0.4)",
+                          borderRadius: "18px",
+                          "& fieldset": { borderColor: "rgba(255,255,255,0.7)" },
+                          "&:hover fieldset": { borderColor: "rgba(255,255,255,1)" },
                         },
                       }}
                     />
-                    <Box sx={{ display: "flex", gap: 2.5 }}>
+                    <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, gap: 3 }}>
                       <TextField
                         select
-                        label="Priority"
+                        label="Priority Vector"
                         name="priority"
                         value={newTodo.priority}
                         onChange={handleTodoChange}
-                        size="small"
+                        size="medium"
                         sx={{
                           flex: 1,
                           "& .MuiOutlinedInput-root": {
                             color: getPriorityColor(newTodo.priority),
-                            background: "rgba(255,255,255,0.45)",
-                            borderRadius: "14px",
+                            background: "rgba(255,255,255,0.4)",
+                            borderRadius: "18px",
                             fontWeight: 1000,
-                            "& fieldset": { borderColor: "rgba(255,255,255,0.6)" },
-                            "&:hover fieldset": { borderColor: "rgba(255,255,255,0.8)" },
+                            "& fieldset": { borderColor: "rgba(255,255,255,0.7)" },
+                            "&:hover fieldset": { borderColor: "rgba(255,255,255,1)" },
                           },
                         }}
-                        InputLabelProps={{ sx: { color: "rgba(0,0,0,0.5)", fontWeight: 900, textTransform: "uppercase", letterSpacing: 1, fontSize: "0.75rem" } }}
+                        InputLabelProps={{ sx: { color: "rgba(0,0,0,0.6)", fontWeight: 1000, textTransform: "uppercase", letterSpacing: 2, fontSize: "0.75rem" } }}
                       >
-                        <MenuItem value="Low" sx={{ fontWeight: 800, color: getPriorityColor("Low") }}>Low</MenuItem>
-                        <MenuItem value="Medium" sx={{ fontWeight: 800, color: getPriorityColor("Medium") }}>Medium</MenuItem>
-                        <MenuItem value="High" sx={{ fontWeight: 800, color: getPriorityColor("High") }}>High</MenuItem>
-                        <MenuItem value="Critical" sx={{ fontWeight: 800, color: getPriorityColor("Critical") }}>Critical</MenuItem>
+                        <MenuItem value="Low" sx={{ fontWeight: 1000, color: getPriorityColor("Low") }}>Low</MenuItem>
+                        <MenuItem value="Medium" sx={{ fontWeight: 1000, color: getPriorityColor("Medium") }}>Medium</MenuItem>
+                        <MenuItem value="High" sx={{ fontWeight: 1000, color: getPriorityColor("High") }}>High</MenuItem>
+                        <MenuItem value="Critical" sx={{ fontWeight: 1000, color: getPriorityColor("Critical") }}>Critical</MenuItem>
                       </TextField>
                       <TextField
-                        label="Due Date"
+                        label="Temporal Limit"
                         name="dueDate"
                         type="date"
                         value={newTodo.dueDate}
                         onChange={handleTodoChange}
-                        size="small"
+                        size="medium"
                         sx={{
                           flex: 1,
                           input: {
-                            color: "rgba(0,0,0,0.8)",
-                            fontWeight: 800,
+                            color: "rgba(0,0,0,0.9)",
+                            fontWeight: 900,
                             colorScheme: "light"
                           },
                           "& .MuiOutlinedInput-root": {
-                            background: "rgba(255,255,255,0.45)",
-                            borderRadius: "14px",
-                            "& fieldset": { borderColor: "rgba(255,255,255,0.6)" },
-                            "&:hover fieldset": { borderColor: "rgba(255,255,255,0.8)" },
+                            background: "rgba(255,255,255,0.4)",
+                            borderRadius: "18px",
+                            "& fieldset": { borderColor: "rgba(255,255,255,0.7)" },
+                            "&:hover fieldset": { borderColor: "rgba(255,255,255,1)" },
                           },
-                          "& .MuiInputBase-input::-webkit-calendar-picker-indicator": { filter: "invert(0.2)" },
+                          "& .MuiInputBase-input::-webkit-calendar-picker-indicator": { filter: "invert(0.1)" },
                         }}
                         InputLabelProps={{
                           shrink: true,
-                          sx: { color: "rgba(0,0,0,0.5)", fontWeight: 900, textTransform: "uppercase", letterSpacing: 1, fontSize: "0.75rem" }
+                          sx: { color: "rgba(0,0,0,0.6)", fontWeight: 1000, textTransform: "uppercase", letterSpacing: 2, fontSize: "0.75rem" }
                         }}
                       />
                     </Box>
                     <Button
                       variant="contained"
-                      startIcon={<AddIcon />}
+                      startIcon={<AddIcon sx={{ fontSize: 24 }} />}
                       onClick={handleAddTodo}
                       sx={{
                         ...iPhoneGlassButton,
                         background: "linear-gradient(135deg, #0f172a 0%, #334155 100%)",
                         color: "#fff",
-                        py: 1.5,
+                        py: 2.5,
                         mt: 1,
+                        fontSize: "1rem",
                         "&:hover": {
                           background: "linear-gradient(135deg, #1e293b 0%, #475569 100%)",
-                          transform: "translateY(-1px)",
+                          transform: "translateY(-4px)",
+                          boxShadow: "0 20px 40px rgba(0,0,0,0.2)"
                         },
                       }}
                     >
-                      Capture Task
+                      Capture Protocol
                     </Button>
                   </Box>
                 </Paper>
@@ -751,45 +782,54 @@ const CreateProjectDialog = ({ open, onClose, onSubmit, initialData }) => {
                 {/* Todos List */}
                 <Typography
                   variant="subtitle1"
-                  sx={{ color: "rgba(0,0,0,0.85)", mb: 2.5, fontWeight: 1000, fontSize: "1.1rem", position: "relative", zIndex: 1 }}
+                  sx={{ color: "rgba(0,0,0,0.9)", mb: 3, fontWeight: 1000, fontSize: "1.25rem", position: "relative", zIndex: 1, letterSpacing: "-0.04em" }}
                 >
-                  Project Backlog ({todos.length} units)
+                  Registry Backlog <Box component="span" sx={{ color: "rgba(0,0,0,0.4)", fontWeight: 800, ml: 1, fontSize: "0.9rem" }}>| {todos.length} Protocols</Box>
                 </Typography>
-                <Box sx={{ maxHeight: 320, overflowY: "auto", pr: 1, zIndex: 1, position: "relative" }}>
+                <Box sx={{
+                  maxHeight: isMobile ? 400 : 500,
+                  overflowY: "auto",
+                  pr: 1.5,
+                  zIndex: 1,
+                  position: "relative",
+                  "&::-webkit-scrollbar": { width: "6px" },
+                  "&::-webkit-scrollbar-thumb": { background: "rgba(0,0,0,0.1)", borderRadius: "10px" }
+                }}>
                   {todos.length === 0 ? (
                     <Typography
                       variant="body2"
-                      sx={{ color: "rgba(0,0,0,0.4)", textAlign: "center", py: 8, fontWeight: 700, fontStyle: "italic" }}
+                      sx={{ color: "rgba(0,0,0,0.4)", textAlign: "center", py: 10, fontWeight: 800, fontStyle: "italic", fontSize: "1rem" }}
                     >
-                      The project backlog is currently void. Add task units above.
+                      The registry is currently optimized. Define protocols above.
                     </Typography>
                   ) : (
                     todos.map((todo) => (
                       <Paper
                         key={todo._id}
                         sx={{
-                          p: 2.5,
-                          mb: 2,
-                          background: "rgba(255, 255, 255, 0.35)",
-                          backdropFilter: "blur(12px)",
-                          border: "1px solid rgba(255, 255, 255, 0.5)",
-                          borderRadius: "20px",
+                          p: 3,
+                          mb: 2.5,
+                          background: "rgba(255, 255, 255, 0.45)",
+                          backdropFilter: "blur(15px)",
+                          border: "1px solid rgba(255, 255, 255, 0.6)",
+                          borderRadius: "24px",
                           display: "flex",
                           justifyContent: "space-between",
                           alignItems: "center",
-                          boxShadow: "0 4px 15px rgba(0, 0, 0, 0.03)",
-                          transition: "all 0.3s ease",
+                          boxShadow: "0 10px 30px rgba(0, 0, 0, 0.04)",
+                          transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
                           "&:hover": {
-                            background: "rgba(255, 255, 255, 0.5)",
-                            transform: "scale(1.01)",
-                            boxShadow: "0 8px 25px rgba(0, 0, 0, 0.06)",
+                            background: "rgba(255, 255, 255, 0.75)",
+                            transform: "scale(1.02) translateX(10px)",
+                            boxShadow: "0 20px 50px rgba(0, 0, 0, 0.12)",
+                            borderColor: "#00d4ff",
                           }
                         }}
                       >
                         <Box sx={{ flex: 1 }}>
                           <Typography
                             variant="body1"
-                            sx={{ color: "rgba(0,0,0,0.85)", fontWeight: 1000, mb: 1, fontSize: "1rem" }}
+                            sx={{ color: "rgba(0,0,0,0.9)", fontWeight: 1000, mb: 1.5, fontSize: "1.1rem", letterSpacing: "-0.02em" }}
                           >
                             {todo.title}
                           </Typography>
@@ -849,7 +889,7 @@ const CreateProjectDialog = ({ open, onClose, onSubmit, initialData }) => {
               transition={{ duration: 0.3 }}
             >
               <DragDropContext onDragEnd={handleDragEnd}>
-                <Box sx={{ display: "flex", gap: 3, minHeight: 400 }}>
+                <Box sx={{ display: "flex", flexDirection: { xs: "column", md: "row" }, gap: { xs: 4, md: 5 }, minHeight: 450 }}>
                   {/* Available Employees */}
                   <Box sx={{ flex: 1, position: "relative", zIndex: 1 }}>
                     <Box
@@ -874,17 +914,18 @@ const CreateProjectDialog = ({ open, onClose, onSubmit, initialData }) => {
                           ref={provided.innerRef}
                           {...provided.droppableProps}
                           sx={{
-                            p: 2.5,
+                            p: { xs: 2.5, md: 4 },
                             minHeight: 400,
                             background: snapshot.isDraggingOver
                               ? "rgba(0, 212, 255, 0.08)"
-                              : "rgba(255, 255, 255, 0.2)",
+                              : "rgba(255, 255, 255, 0.25)",
                             border: snapshot.isDraggingOver
                               ? "2px dashed #00d4ff"
-                              : "2px dashed rgba(255, 255, 255, 0.5)",
-                            borderRadius: "28px",
+                              : "2px dashed rgba(255, 255, 255, 0.6)",
+                            borderRadius: "32px",
                             transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
-                            backdropFilter: "blur(10px)",
+                            backdropFilter: "blur(20px)",
+                            boxShadow: snapshot.isDraggingOver ? "inset 0 0 40px rgba(0, 212, 255, 0.1)" : "none"
                           }}
                         >
                           {availableEmployees.map((employee, index) => (
@@ -1011,17 +1052,18 @@ const CreateProjectDialog = ({ open, onClose, onSubmit, initialData }) => {
                           ref={provided.innerRef}
                           {...provided.droppableProps}
                           sx={{
-                            p: 2.5,
+                            p: { xs: 2.5, md: 4 },
                             minHeight: 400,
                             background: snapshot.isDraggingOver
-                              ? "rgba(74, 222, 128, 0.08)"
-                              : "rgba(74, 222, 128, 0.03)",
+                              ? "rgba(16, 185, 129, 0.1)"
+                              : "rgba(16, 185, 129, 0.04)",
                             border: snapshot.isDraggingOver
-                              ? "2px dashed #4ade80"
-                              : "2px dashed rgba(74, 222, 128, 0.2)",
-                            borderRadius: "28px",
+                              ? "2px dashed #10b981"
+                              : "2px dashed rgba(16, 185, 129, 0.3)",
+                            borderRadius: "32px",
                             transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
-                            backdropFilter: "blur(10px)",
+                            backdropFilter: "blur(20px)",
+                            boxShadow: snapshot.isDraggingOver ? "inset 0 0 40px rgba(16, 185, 129, 0.1)" : "none"
                           }}
                         >
                           {selectedTeam.map((employee, index) => (
@@ -1066,11 +1108,11 @@ const CreateProjectDialog = ({ open, onClose, onSubmit, initialData }) => {
                                     <Avatar
                                       sx={{
                                         background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
-                                        width: 40,
-                                        height: 40,
-                                        fontSize: "0.85rem",
-                                        fontWeight: 900,
-                                        boxShadow: "0 4px 8px rgba(16, 185, 129, 0.2)"
+                                        width: 44,
+                                        height: 44,
+                                        fontSize: "0.9rem",
+                                        fontWeight: 1000,
+                                        boxShadow: "0 6px 15px rgba(16, 185, 129, 0.25)"
                                       }}
                                     >
                                       {employee.avatar}
@@ -1079,16 +1121,16 @@ const CreateProjectDialog = ({ open, onClose, onSubmit, initialData }) => {
                                       <Typography
                                         variant="body2"
                                         sx={{
-                                          color: "rgba(0,0,0,0.85)",
+                                          color: "rgba(0,0,0,0.9)",
                                           fontWeight: 1000,
-                                          fontSize: "0.95rem"
+                                          fontSize: "1rem"
                                         }}
                                       >
                                         {employee.name}
                                       </Typography>
                                       <Typography
                                         variant="caption"
-                                        sx={{ color: "rgba(0,0,0,0.45)", fontWeight: 800, textTransform: "uppercase", letterSpacing: 0.5 }}
+                                        sx={{ color: "rgba(0,0,0,0.5)", fontWeight: 1000, textTransform: "uppercase", letterSpacing: 1 }}
                                       >
                                         {employee.department}
                                       </Typography>
@@ -1135,61 +1177,78 @@ const CreateProjectDialog = ({ open, onClose, onSubmit, initialData }) => {
         </AnimatePresence>
 
         {/* Navigation Buttons */}
-        <Box sx={{ display: "flex", justifyContent: "space-between", mt: 2, pt: 3, borderTop: "1px solid rgba(255,255,255,0.4)", zIndex: 1, position: "relative" }}>
+        <Box sx={{
+          display: "flex",
+          flexDirection: { xs: "column-reverse", sm: "row" },
+          justifyContent: "space-between",
+          gap: 3,
+          mt: 4,
+          pt: 4,
+          borderTop: "1px solid rgba(255,255,255,0.5)",
+          zIndex: 1,
+          position: "relative"
+        }}>
           <Button
             onClick={handleBack}
             disabled={activeStep === 0}
             sx={{
               ...iPhoneGlassButton,
-              px: 5,
+              px: { xs: 3, md: 5 },
+              py: 2,
               opacity: activeStep === 0 ? 0 : 1,
-              bgcolor: "rgba(255,255,255,0.4)",
+              bgcolor: "rgba(255,255,255,0.5)",
+              fontSize: "0.9rem",
+              width: { xs: "100%", sm: "auto" }
             }}
           >
-            Back
+            Tactical Regression (Back)
           </Button>
-          <Box sx={{ display: "flex", gap: 2.5 }}>
+          <Box sx={{ display: "flex", gap: 3, width: { xs: "100%", sm: "auto" } }}>
             {activeStep < steps.length - 1 ? (
               <Button
                 variant="contained"
                 onClick={handleNext}
+                fullWidth={isMobile}
                 sx={{
                   ...iPhoneGlassButton,
                   background: "linear-gradient(135deg, #0f172a 0%, #334155 100%)",
                   color: "#fff",
-                  px: 6,
-                  py: 1.5,
-                  borderRadius: "18px",
+                  px: { xs: 4, md: 7 },
+                  py: 2,
+                  fontSize: "1rem",
+                  width: { xs: "100%", sm: "auto" },
                   "&:hover": {
                     background: "linear-gradient(135deg, #1e293b 0%, #475569 100%)",
-                    transform: "translateY(-1px)",
+                    transform: "translateY(-4px)",
+                    boxShadow: "0 20px 40px rgba(0,0,0,0.2)"
                   },
                 }}
               >
-                Continue
+                Advance Protocol
               </Button>
             ) : (
               <Button
                 variant="contained"
                 onClick={handleSubmit}
                 disabled={loading}
+                fullWidth={isMobile}
                 sx={{
                   ...iPhoneGlassButton,
-                  background: "linear-gradient(135deg, #4ade80 0%, #10b981 100%)",
+                  background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
                   color: "#fff",
-                  px: 6,
-                  py: 1.5,
-                  borderRadius: "18px",
+                  px: { xs: 4, md: 7 },
+                  py: 2,
                   fontSize: "1rem",
+                  width: { xs: "100%", sm: "auto" },
                   "&:hover": {
-                    background: "linear-gradient(135deg, #5ee490 0%, #11c287 100%)",
-                    transform: "translateY(-1px)",
-                    boxShadow: "0 15px 35px rgba(16, 185, 129, 0.3)",
+                    background: "linear-gradient(135deg, #34d399 0%, #10b981 100%)",
+                    transform: "translateY(-4px)",
+                    boxShadow: "0 20px 40px rgba(16, 185, 129, 0.4)",
                   },
                   "&:disabled": { opacity: 0.6 },
                 }}
               >
-                {loading ? "Initializing..." : (initialData ? "Commit Changes" : "Protocol Deployment")}
+                {loading ? "Initializing..." : (initialData ? "Refine Synthesis" : "Finalize Protocol")}
               </Button>
             )}
           </Box>

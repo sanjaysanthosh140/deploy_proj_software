@@ -1,315 +1,195 @@
 /**
- * AntyGravity Instruction:
- * Apply rules from /docs/component_analysis_prompt.md
- */import React, { useState, useEffect, useRef } from "react";
-import { Box, Typography, Button, Paper, Chip, alpha } from "@mui/material";
+ * AttendanceWidget.jsx — full-width horizontal layout.
+ * Left: clock / status info.  Right: action buttons.
+ * All API logic preserved exactly.
+ */
+import React, { useState, useEffect, useRef } from "react";
+import { Box, Typography, Button, Paper, Chip, Divider, alpha } from "@mui/material";
 import { AccessTime, FreeBreakfast, Business, Home } from "@mui/icons-material";
 import axios from "axios";
 import { useToast } from "../context/ToastContext";
 
+const PRIMARY_SLATE   = "#0f172a";
+const SECONDARY_SLATE = "#475569";
+const INDIGO_ACCENT   = "#4f46e5";
+const GLASS_BG        = "rgba(255, 255, 255, 0.82)";
+const GLASS_BORDER    = "rgba(10, 15, 25, 0.08)";
+
 const AttendanceWidget = ({ currentUserId }) => {
   const { showToast } = useToast();
-  // ---- CLOCK (manual safe clock) ----
-  const [currentTime, setCurrentTime] = useState(() => new Date());
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentTime((prev) => new Date(prev.getTime() + 1000));
-    }, 1000);
-    return () => clearInterval(timer);
-  }, []);
-
-  // ---- STATES ----
-  const [status, setStatus] = useState("ABSENT");
+  const [currentTime, setCurrentTime]       = useState(() => new Date());
+  const [status, setStatus]                 = useState("ABSENT");
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
-  const [loading, setLoading] = useState(false);
-
-  // ---- TIME REFS (no re-render issues) ----
-  const workStartRef = useRef(null);
-  const breakStartRef = useRef(null);
+  const [loading, setLoading]               = useState(false);
+  const workStartRef    = useRef(null);
+  const breakStartRef   = useRef(null);
   const totalBreakMsRef = useRef(0);
-
-  // ---- LOCALSTORAGE KEYS ----
   const ATTENDANCE_SESSION_KEY = "attendance_session";
 
-  // ---- RECOVER SESSION FROM LOCALSTORAGE ON MOUNT ----
   useEffect(() => {
-    const savedSession = localStorage.getItem(ATTENDANCE_SESSION_KEY);
-    if (savedSession) {
+    const t = setInterval(() => setCurrentTime(new Date()), 1000);
+    return () => clearInterval(t);
+  }, []);
+
+  useEffect(() => {
+    const saved = localStorage.getItem(ATTENDANCE_SESSION_KEY);
+    if (saved) {
       try {
-        const session = JSON.parse(savedSession);
-        if (session.status === "WORKING") {
-          workStartRef.current = session.workStart;
-          totalBreakMsRef.current = session.totalBreakMs;
-          setStatus("WORKING");
-        } else if (session.status === "ON_BREAK") {
-          workStartRef.current = session.workStart;
-          breakStartRef.current = session.breakStart;
-          totalBreakMsRef.current = session.totalBreakMs;
-          setStatus("ON_BREAK");
-        } else if (session.status === "COMPLETED") {
-          setStatus("COMPLETED");
-        }
-      } catch (error) {
-        console.error("Failed to recover session", error);
-        localStorage.removeItem(ATTENDANCE_SESSION_KEY);
-      }
+        const s = JSON.parse(saved);
+        if (s.status === "WORKING")      { workStartRef.current = s.workStart; totalBreakMsRef.current = s.totalBreakMs; setStatus("WORKING"); }
+        else if (s.status === "ON_BREAK"){ workStartRef.current = s.workStart; breakStartRef.current = s.breakStart; totalBreakMsRef.current = s.totalBreakMs; setStatus("ON_BREAK"); }
+        else if (s.status === "COMPLETED") setStatus("COMPLETED");
+      } catch { localStorage.removeItem(ATTENDANCE_SESSION_KEY); }
     }
   }, []);
 
-  // ---- SAVE SESSION TO LOCALSTORAGE ----
-  const saveSessionToStorage = (newStatus) => {
-    const session = {
-      status: newStatus,
-      workStart: workStartRef.current,
-      breakStart: breakStartRef.current,
-      totalBreakMs: totalBreakMsRef.current,
-    };
-    localStorage.setItem(ATTENDANCE_SESSION_KEY, JSON.stringify(session));
+  const saveSession = (newStatus) => {
+    localStorage.setItem(ATTENDANCE_SESSION_KEY, JSON.stringify({
+      status: newStatus, workStart: workStartRef.current,
+      breakStart: breakStartRef.current, totalBreakMs: totalBreakMsRef.current,
+    }));
   };
 
-  // ---- WORK TIMER ----
   useEffect(() => {
     if (status === "WORKING" && workStartRef.current) {
-      const now = currentTime.getTime();
-      const workedMs = now - workStartRef.current - totalBreakMsRef.current;
+      const workedMs = currentTime.getTime() - workStartRef.current - totalBreakMsRef.current;
       setElapsedSeconds(Math.max(0, Math.floor(workedMs / 1000)));
     }
   }, [status, currentTime]);
 
-  // ---- FORMAT TIME ----
-  const formatTime = (seconds) => {
-    const h = Math.floor(seconds / 3600);
-    const m = Math.floor((seconds % 3600) / 60);
-    const s = seconds % 60;
-    return `${h.toString().padStart(2, "0")}:${m
-      .toString()
-      .padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
-  };
+  const formatTime = (s) =>
+    `${String(Math.floor(s / 3600)).padStart(2, "0")}:${String(Math.floor((s % 3600) / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
 
-  // ---- PUNCH HANDLER ----
   const handlePunch = async (action) => {
     setLoading(true);
     const now = currentTime.getTime();
-
     const token = localStorage.getItem("token");
     try {
-      await axios.post(
-        "http://localhost:8080/admin/attendance",
-        {
-          action,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        },
-      );
-
-      if (action === "PUNCH_IN") {
-        workStartRef.current = now;
-        totalBreakMsRef.current = 0;
-        setElapsedSeconds(0);
-        setStatus("WORKING");
-        saveSessionToStorage("WORKING");
-      }
-
-      if (action === "LUNCH_START") {
-        breakStartRef.current = now;
-        setStatus("ON_BREAK");
-        saveSessionToStorage("ON_BREAK");
-      }
-
-      if (action === "LUNCH_END") {
-        totalBreakMsRef.current += now - breakStartRef.current;
-        breakStartRef.current = null;
-        setStatus("WORKING");
-        saveSessionToStorage("WORKING");
-      }
-
-      if (action === "PUNCH_OUT") {
-        setStatus("COMPLETED");
-        saveSessionToStorage("COMPLETED");
-        // Clear session after a short delay
-        setTimeout(() => {
-          localStorage.removeItem(ATTENDANCE_SESSION_KEY);
-        }, 1000);
-      }
-
-      const actionLabel = action.replace("_", " ").toLowerCase();
-      showToast(`Protocol ${actionLabel} executed successfully.`, "success");
-    } catch (err) {
-      console.error("Punch failed", err);
-      showToast("Signal interference detected. Protocol execution failed.", "error");
-    } finally {
-      setLoading(false);
-    }
+      await axios.post("http://localhost:8080/admin/attendance", { action },
+        { headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" } });
+      if (action === "PUNCH_IN")    { workStartRef.current = now; totalBreakMsRef.current = 0; setElapsedSeconds(0); setStatus("WORKING"); saveSession("WORKING"); }
+      if (action === "LUNCH_START") { breakStartRef.current = now; setStatus("ON_BREAK"); saveSession("ON_BREAK"); }
+      if (action === "LUNCH_END")   { totalBreakMsRef.current += now - breakStartRef.current; breakStartRef.current = null; setStatus("WORKING"); saveSession("WORKING"); }
+      if (action === "PUNCH_OUT")   { setStatus("COMPLETED"); saveSession("COMPLETED"); setTimeout(() => localStorage.removeItem(ATTENDANCE_SESSION_KEY), 1000); }
+      showToast(`${action.replace("_", " ").toLowerCase()} executed.`, "success");
+    } catch { showToast("Protocol execution failed.", "error"); }
+    finally  { setLoading(false); }
   };
 
-  const PRIMARY_SLATE = "#0f172a";
-  const SECONDARY_SLATE = "#475569";
-  const INDIGO_ACCENT = "#4f46e5";
-  const GLASS_BG = "rgba(255, 255, 255, 0.75)";
-  const GLASS_BORDER = "rgba(10, 15, 25, 0.08)";
+  const getStatusColor = () => ({ WORKING: "#10b981", ON_BREAK: "#f59e0b", COMPLETED: "#6366f1" }[status] ?? "#ef4444");
 
-  // ---- STATUS COLOR ----
-  const getStatusColor = () => {
-    switch (status) {
-      case "WORKING":
-        return "#10b981"; // Emerald
-      case "ON_BREAK":
-        return "#f59e0b"; // Amber
-      case "COMPLETED":
-        return "#6366f1"; // Indigo
-      default:
-        return "#ef4444"; // Red
-    }
+  const btnBase = {
+    borderRadius: "12px", textTransform: "none", fontWeight: 700,
+    fontSize: { xs: "0.82rem", sm: "0.88rem", md: "0.92rem" },
+    py: { xs: 1, sm: 1.2 }, px: { xs: 2.5, sm: 3.5 },
+    minWidth: { xs: 120, sm: 140 },
   };
 
-  // ---- UI ----
   return (
-    <Paper
-      elevation={0}
-      sx={{
-        p: 5,
-        height: "100%",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "space-between",
-        background: GLASS_BG,
-        backdropFilter: "blur(48px) saturate(180%)",
-        borderRadius: "24px",
-        border: `1px solid ${GLASS_BORDER}`,
-        boxShadow: "0 12px 32px -4px rgba(10, 15, 25, 0.04)",
-      }}
-    >
-      {/* HEADER */}
-      <Box display="flex" justifyContent="space-between" mb={4}>
-        <Box>
-          <Typography variant="h6" sx={{ color: PRIMARY_SLATE, fontWeight: 800, letterSpacing: "-0.01em", fontSize: "1.5rem" }}>
-            <AccessTime sx={{ mr: 1, verticalAlign: 'middle', fontSize: 28 }} />
-            Attendance
-          </Typography>
-          <Typography variant="caption" sx={{ color: SECONDARY_SLATE, fontWeight: 500, fontSize: "1.1rem" }}>
-            {currentTime.toDateString()}
-          </Typography>
+    <Paper elevation={0} sx={{
+      p: { xs: 2, sm: 2.5, md: 3 },
+      background: GLASS_BG,
+      backdropFilter: "blur(48px) saturate(180%)",
+      borderRadius: "20px",
+      border: `1px solid ${GLASS_BORDER}`,
+      boxShadow: "0 6px 24px -4px rgba(10,15,25,0.07)",
+    }}>
+      {/* ── Horizontal flex: info LEFT | divider | actions RIGHT ── */}
+      <Box sx={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: { xs: 2, sm: 3 } }}>
+
+        {/* LEFT — clock + status */}
+        <Box sx={{ display: "flex", alignItems: "center", gap: { xs: 2, sm: 3 }, flex: "1 1 auto", minWidth: 0 }}>
+          {/* Date + label */}
+          <Box sx={{ minWidth: 0 }}>
+            <Typography sx={{ display: "flex", alignItems: "center", gap: 0.7, fontWeight: 800, color: PRIMARY_SLATE, fontSize: { xs: "0.95rem", sm: "1rem", md: "1.05rem" }, letterSpacing: "-0.01em" }}>
+              <AccessTime sx={{ fontSize: { xs: 16, sm: 18 } }} />
+              Attendance
+            </Typography>
+            <Typography sx={{ color: alpha(SECONDARY_SLATE, 0.7), fontSize: { xs: "0.72rem", sm: "0.78rem" }, mt: 0.2 }}>
+              {currentTime.toDateString()}
+            </Typography>
+          </Box>
+
+          {/* Clock / Timer */}
+          <Box sx={{ textAlign: "center" }}>
+            <Typography sx={{ fontWeight: 900, color: PRIMARY_SLATE, letterSpacing: "-0.04em", lineHeight: 1, fontSize: { xs: "1.8rem", sm: "2.2rem", md: "2.6rem" } }}>
+              {status === "ABSENT"
+                ? currentTime.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+                : formatTime(elapsedSeconds)}
+            </Typography>
+            <Typography sx={{ color: alpha(SECONDARY_SLATE, 0.6), fontSize: { xs: "0.7rem", sm: "0.75rem" }, mt: 0.3 }}>
+              {status === "ABSENT" ? "Ready to punch in?" : "Active session"}
+            </Typography>
+          </Box>
+
+          {/* Status chip */}
+          <Chip
+            label={status.replace("_", " ")}
+            size="small"
+            sx={{
+              color: getStatusColor(),
+              border: `1px solid ${alpha(getStatusColor(), 0.35)}`,
+              background: alpha(getStatusColor(), 0.1),
+              fontWeight: 700,
+              fontSize: { xs: "0.68rem", sm: "0.72rem" },
+              height: { xs: 24, sm: 26 },
+              "& .MuiChip-label": { px: 1.2 },
+            }}
+          />
         </Box>
 
-        <Chip
-          label={status.replace("_", " ")}
-          sx={{
-            color: getStatusColor(),
-            border: `1px solid ${alpha(getStatusColor(), 0.3)}`,
-            background: alpha(getStatusColor(), 0.1),
-            fontWeight: 800,
-            fontSize: "1rem",
-            height: "42px",
-            padding: "12px 18px"
-          }}
-        />
-      </Box>
+        {/* Divider (hidden on xs) */}
+        <Divider orientation="vertical" flexItem sx={{ display: { xs: "none", sm: "block" }, borderColor: GLASS_BORDER }} />
 
-      {/* TIMER */}
-      <Box textAlign="center" py={4}>
-        <Typography variant="h3" sx={{ fontWeight: 900, color: PRIMARY_SLATE, letterSpacing: "-0.04em", fontSize: "3.5rem" }}>
-          {status === "ABSENT"
-            ? currentTime.toLocaleTimeString([], {
-              hour: "2-digit",
-              minute: "2-digit",
-            })
-            : formatTime(elapsedSeconds)}
-        </Typography>
-        <Typography sx={{ color: SECONDARY_SLATE, fontWeight: 500, mt: 1, fontSize: "1.2rem" }}>
-          {status === "ABSENT" ? "Ready to initialize?" : "Active Session Duration"}
-        </Typography>
-      </Box>
-
-      {/* ACTIONS */}
-      <Box mt={2}>
-        {status === "ABSENT" && (
-          <Button
-            fullWidth
-            onClick={() => handlePunch("PUNCH_IN")}
-            disabled={loading}
-            startIcon={<Business sx={{ fontSize: 28 }} />}
-            sx={{
-              borderRadius: "14px",
-              py: 2.5,
-              fontSize: "1.3rem",
-              background: `linear-gradient(135deg, ${INDIGO_ACCENT} 0%, #3730a3 100%)`,
-              color: "#fff",
-              fontWeight: 700,
-              boxShadow: `0 8px 20px ${alpha(INDIGO_ACCENT, 0.25)}`,
-              "& .MuiButton-startIcon": { mr: 1 }
-            }}
-          >
-            Initialize Session
-          </Button>
-        )}
-
-        {status === "WORKING" && (
-          <Box display="flex" gap={2}>
+        {/* RIGHT — Action buttons */}
+        <Box sx={{ display: "flex", gap: 1.5, flexWrap: "wrap", alignItems: "center", flexShrink: 0 }}>
+          {status === "ABSENT" && (
             <Button
-              fullWidth
+              onClick={() => handlePunch("PUNCH_IN")} disabled={loading}
+              startIcon={<Business sx={{ fontSize: { xs: 16, sm: 18 } }} />}
+              variant="contained"
+              sx={{ ...btnBase, background: `linear-gradient(135deg, ${INDIGO_ACCENT} 0%, #3730a3 100%)`, color: "#fff", boxShadow: `0 4px 12px ${alpha(INDIGO_ACCENT, 0.25)}` }}
+            >
+              Punch In
+            </Button>
+          )}
+
+          {status === "WORKING" && <>
+            <Button
+              onClick={() => handlePunch("LUNCH_START")} disabled={loading}
+              startIcon={<FreeBreakfast sx={{ fontSize: { xs: 15, sm: 16 } }} />}
               variant="outlined"
-              onClick={() => handlePunch("LUNCH_START")}
-              startIcon={<FreeBreakfast sx={{ fontSize: 24 }} />}
-              sx={{
-                borderRadius: "12px",
-                py: 2,
-                fontSize: "1.2rem",
-                borderColor: GLASS_BORDER,
-                color: SECONDARY_SLATE,
-                fontWeight: 700,
-                "&:hover": { borderColor: alpha(INDIGO_ACCENT, 0.3), background: alpha(INDIGO_ACCENT, 0.05) }
-              }}
+              sx={{ ...btnBase, borderColor: alpha(INDIGO_ACCENT, 0.3), color: SECONDARY_SLATE, "&:hover": { borderColor: INDIGO_ACCENT, bgcolor: alpha(INDIGO_ACCENT, 0.04) } }}
             >
               Break
             </Button>
             <Button
-              fullWidth
+              onClick={() => handlePunch("PUNCH_OUT")} disabled={loading}
+              startIcon={<Home sx={{ fontSize: { xs: 15, sm: 16 } }} />}
               variant="contained"
-              color="error"
-              onClick={() => handlePunch("PUNCH_OUT")}
-              startIcon={<Home sx={{ fontSize: 24 }} />}
-              sx={{
-                borderRadius: "12px",
-                py: 2,
-                fontSize: "1.2rem",
-                background: "#ef4444",
-                boxShadow: "0 4px 12px rgba(239, 68, 68, 0.2)",
-                fontWeight: 700,
-              }}
+              sx={{ ...btnBase, background: "#ef4444", boxShadow: "0 4px 10px rgba(239,68,68,0.2)" }}
             >
-              Terminate
+              Punch Out
             </Button>
-          </Box>
-        )}
+          </>}
 
-        {status === "ON_BREAK" && (
-          <Button
-            fullWidth
-            variant="contained"
-            onClick={() => handlePunch("LUNCH_END")}
-            startIcon={<Business sx={{ fontSize: 24 }} />}
-            sx={{
-              borderRadius: "12px",
-              py: 2,
-              fontSize: "1.2rem",
-              background: INDIGO_ACCENT,
-              fontWeight: 700,
-            }}
-          >
-            Resume Protocol
-          </Button>
-        )}
+          {status === "ON_BREAK" && (
+            <Button
+              onClick={() => handlePunch("LUNCH_END")} disabled={loading}
+              startIcon={<Business sx={{ fontSize: { xs: 15, sm: 16 } }} />}
+              variant="contained"
+              sx={{ ...btnBase, background: INDIGO_ACCENT }}
+            >
+              Resume
+            </Button>
+          )}
 
-        {status === "COMPLETED" && (
-          <Typography align="center" sx={{ color: "#10b981", fontWeight: 700, fontSize: "1.3rem" }}>
-            Session finalized. Excellent work.
-          </Typography>
-        )}
+          {status === "COMPLETED" && (
+            <Typography sx={{ color: "#10b981", fontWeight: 700, fontSize: { xs: "0.85rem", sm: "0.9rem" } }}>
+              ✓ Session complete. Great work!
+            </Typography>
+          )}
+        </Box>
       </Box>
     </Paper>
   );

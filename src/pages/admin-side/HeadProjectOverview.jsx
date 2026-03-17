@@ -69,11 +69,10 @@ const SECONDARY_BG = "#d9e3ef";
 const TERTIARY_BG = "#cfd8e5";
 
 const glassEffect = {
-  background: "rgba(255, 255, 255, 0.25)",
-  backdropFilter: "blur(30px) saturate(160%)",
-  border: "1px solid rgba(255, 255, 255, 0.45)",
+  background: "#ffffff",
+  border: "1px solid rgba(0, 0, 0, 0.06)",
   borderRadius: "20px",
-  boxShadow: "0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 1px rgba(255, 255, 255, 0.5)",
+  boxShadow: "0 8px 32px rgba(0, 0, 0, 0.04)",
   transition: "all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
   position: "relative",
   overflow: "hidden",
@@ -110,9 +109,9 @@ const GlassCard = ({ children, sx = {}, hoverEffect = true }) => (
     {...(hoverEffect ? {
       whileHover: {
         translateY: -5,
-        boxShadow: "0 20px 40px rgba(0, 0, 0, 0.12)",
-        background: "rgba(255, 255, 255, 0.35)",
-        borderColor: "rgba(255, 255, 255, 0.6)",
+        boxShadow: "0 20px 40px rgba(0, 0, 0, 0.08)",
+        background: "#ffffff",
+        borderColor: "rgba(0, 0, 0, 0.12)",
       }
     } : {})}
     initial={{ opacity: 0, y: 20 }}
@@ -168,7 +167,7 @@ const TodoItem = ({ todo }) => {
           {todo.title}
         </Typography>
         {todo.createdAt && (
-          <Typography sx={{ color: "#64748b", fontSize: "0.72rem", mt: 0.5, fontWeight: 600 }}>
+          <Typography sx={{ color: "#64748b", fontSize: "0.76rem", mt: 0.5, fontWeight: 600 }}>
             Detected: {todo.createdAt}
           </Typography>
         )}
@@ -179,7 +178,7 @@ const TodoItem = ({ todo }) => {
         sx={{
           bgcolor: alpha(statusColor(todo.status), 0.1),
           color: statusColor(todo.status),
-          fontSize: "0.65rem",
+          fontSize: "0.7rem",
           height: 20,
           fontWeight: 900,
           textTransform: "uppercase",
@@ -251,8 +250,8 @@ const TaskCard = ({ task }) => {
                 sx={{
                   bgcolor: alpha(sc, 0.1),
                   color: sc,
-                  fontSize: "0.65rem",
-                  height: 18,
+                  fontSize: "0.75rem",
+                  height: 20,
                   fontWeight: 900,
                   textTransform: "uppercase",
                 }}
@@ -263,14 +262,14 @@ const TaskCard = ({ task }) => {
                 sx={{
                   bgcolor: alpha(pc, 0.1),
                   color: pc,
-                  fontSize: "0.65rem",
-                  height: 18,
+                  fontSize: "0.75rem",
+                  height: 20,
                   fontWeight: 900,
                   textTransform: "uppercase"
                 }}
               />
               {task.duedate && (
-                <Typography sx={{ color: "#64748b", fontSize: "0.75rem", fontWeight: 600 }}>
+                <Typography sx={{ color: "#64748b", fontSize: "0.8rem", fontWeight: 600 }}>
                   Due: {task.duedate}
                 </Typography>
               )}
@@ -283,7 +282,7 @@ const TaskCard = ({ task }) => {
               >
                 {todoProgress}%
               </Typography>
-              <Typography sx={{ color: "#64748b", fontSize: "0.7rem", fontWeight: 700 }}>
+              <Typography sx={{ color: "#64748b", fontSize: "0.75rem", fontWeight: 700 }}>
                 {doneTodos}/{todos.length} items
               </Typography>
             </Box>
@@ -328,7 +327,7 @@ const TaskCard = ({ task }) => {
                   borderRadius: 3,
                   bgcolor: "rgba(0, 0, 0, 0.05)",
                   "& .MuiLinearProgress-bar": {
-                    background: "linear-gradient(90deg, #00d4ff, #4ade80)",
+                    background: "linear-gradient(90deg, #00d4ff, #0072ff)",
                     borderRadius: 3,
                     boxShadow: "0 0 10px rgba(0, 212, 255, 0.3)",
                   },
@@ -393,7 +392,7 @@ const EmployeeCard = ({ entry, index }) => {
             >
               {entry.employee}
             </Typography>
-            <Typography sx={{ color: "#64748b", fontSize: "0.85rem", fontWeight: 700 }}>
+            <Typography sx={{ color: "#64748b", fontSize: "0.9rem", fontWeight: 700 }}>
               {tasks.length} Operational Tasks •{" "}
               <Box component="span" sx={{ color: "#0f172a" }}>{totalTodos} Directives</Box>
             </Typography>
@@ -436,7 +435,7 @@ const EmployeeCard = ({ entry, index }) => {
               borderRadius: 5,
               bgcolor: "rgba(0, 0, 0, 0.05)",
               "& .MuiLinearProgress-bar": {
-                background: "linear-gradient(90deg, #38bdf8, #818cf8)",
+                background: "linear-gradient(90deg, #38bdf8, #0072ff)",
                 borderRadius: 5,
                 boxShadow: "0 0 20px rgba(56, 189, 248, 0.4)",
               },
@@ -549,7 +548,7 @@ const ProjectListCard = ({ project, index, onSelect }) => {
             textTransform: "uppercase",
             display: "block",
             mb: 1.5,
-            fontSize: "0.7rem"
+            fontSize: "0.75rem"
           }}
         >
           REF: {project._id?.substring(project._id.length - 6).toUpperCase()}
@@ -599,9 +598,9 @@ const ProjectListCard = ({ project, index, onSelect }) => {
               borderRadius: 4,
               bgcolor: "rgba(0, 0, 0, 0.05)",
               "& .MuiLinearProgress-bar": {
-                background: `linear-gradient(90deg, ${sc}, ${alpha(sc, 0.7)})`,
+                background: "linear-gradient(90deg, #00d4ff, #0072ff)",
                 borderRadius: 4,
-                boxShadow: `0 0 15px ${alpha(sc, 0.3)}`,
+                boxShadow: `0 0 15px ${alpha("#00d4ff", 0.3)}`,
               },
             }}
           />
@@ -933,7 +932,7 @@ const HeadProjectOverview = () => {
                 variant="h1"
                 sx={{
                   fontWeight: 900,
-                  fontSize: { xs: "2rem", md: "3.2rem" },
+                  fontSize: { xs: "1.8rem", sm: "2.4rem", md: "2.8rem" },
                   background: "linear-gradient(135deg, #0f172a 0%, #475569 100%)",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
@@ -944,7 +943,7 @@ const HeadProjectOverview = () => {
               >
                 {selectedProject ? selectedProject.title : "Project Intelligence"}
               </Typography>
-              <Typography sx={{ color: "#64748b", fontWeight: 500, fontSize: "0.95rem", letterSpacing: 0.2 }}>
+              <Typography sx={{ color: "#64748b", fontWeight: 500, fontSize: "1rem", letterSpacing: 0.2 }}>
                 {selectedProject
                   ? `Strategic employee progression and tactical daily insights`
                   : "Select a high-value enterprise project to monitor operational efficiency"}
@@ -1030,9 +1029,11 @@ const HeadProjectOverview = () => {
                   "& .MuiOutlinedInput-root": {
                     ...glassEffect,
                     borderRadius: "20px",
-                    fontWeight: 700,
+                    fontWeight: 800,
+                    color: "rgba(0,0,0,0.9)",
                     px: 1,
                     py: 0.5,
+                    "& input": { color: "rgba(0,0,0,0.9)" },
                     "& fieldset": { border: "none" },
                     "&:hover": { background: "rgba(255,255,255,0.35)" },
                     "&.Mui-focused": { background: "rgba(255,255,255,0.4)", boxShadow: "0 8px 32px rgba(0,0,0,0.12)" },

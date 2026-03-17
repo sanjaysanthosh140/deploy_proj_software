@@ -1,7 +1,10 @@
 /**
- * AntyGravity Instruction:
- * Apply rules from /docs/component_analysis_prompt.md
- */import React from "react";
+ * Sidebar.jsx – fully responsive.
+ * Desktop (md+): permanent sidebar, 260px wide with labels.
+ * Tablet (sm):   permanent sidebar, 72px icon-only.
+ * Mobile (xs):   temporary drawer, slides in from left on hamburger press.
+ */
+import React from "react";
 import {
   Drawer,
   List,
@@ -11,15 +14,12 @@ import {
   Box,
   Typography,
   Avatar,
-  Divider,
   IconButton,
   alpha,
+  useTheme,
+  useMediaQuery,
 } from "@mui/material";
 import DashboardIcon from "@mui/icons-material/Dashboard";
-import FolderIcon from "@mui/icons-material/Folder";
-import ViewKanbanIcon from "@mui/icons-material/ViewKanban";
-import AssignmentIcon from "@mui/icons-material/Assignment";
-import GroupsIcon from "@mui/icons-material/Groups";
 import SettingsIcon from "@mui/icons-material/Settings";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -27,73 +27,68 @@ import { useToast } from "../../context/ToastContext";
 
 const menuItems = [
   { text: "Dashboard", icon: <DashboardIcon />, path: "/app/gateway" },
-  // { text: "Projects", icon: <FolderIcon />, path: "/app/projects" },
-  { text: "Kanban Board", icon: <ViewKanbanIcon />, path: "/app/kanban" },
-  { text: "Backlog", icon: <AssignmentIcon />, path: "/app/backlog" },
-  { text: "Teams", icon: <GroupsIcon />, path: "/app/teams" },
   { text: "Settings", icon: <SettingsIcon />, path: "/app/settings" },
 ];
 
 const PRIMARY_SLATE = "#0f172a";
 const SECONDARY_SLATE = "#475569";
 const INDIGO_ACCENT = "#4f46e5";
-// liquid glass constants
-const GLASS_BG = "rgba(255, 255, 255, 0.25)"; // more translucent frosted look
-const GLASS_BORDER = "rgba(255, 255, 255, 0.4)"; // brighter edge highlight
+const GLASS_BG = "rgba(255, 255, 255, 0.25)";
+const GLASS_BORDER = "rgba(255, 255, 255, 0.4)";
 
-const Sidebar = () => {
+const DRAWER_WIDTH = 260;
+const MINI_WIDTH = 72;
+
+const Sidebar = ({ mobileOpen, onClose, isMobile, drawerWidth = DRAWER_WIDTH }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { showToast } = useToast();
+  const theme = useTheme();
+  const isSmall = useMediaQuery(theme.breakpoints.between("sm", "md")); // 481–768
 
-  return (
-    <Drawer
-      variant="permanent"
+  // Icon-only when small tablet (not mobile, not full desktop)
+  const collapsed = isSmall && !isMobile;
+  const currentWidth = isMobile ? drawerWidth : collapsed ? MINI_WIDTH : drawerWidth;
+
+  const drawerContent = (
+    <Box
       sx={{
-        width: 260,
-        flexShrink: 0,
-        "& .MuiDrawer-paper": {
-          width: 260,
-          boxSizing: "border-box",
-          background: GLASS_BG,
-          backdropFilter: "blur(48px) saturate(180%)",
-          borderRight: `1px solid ${GLASS_BORDER}`,
-          boxShadow: "10px 0 40px rgba(10, 15, 25, 0.04)",
-          transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
-        },
+        width: currentWidth,
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        background: GLASS_BG,
+        backdropFilter: "blur(48px) saturate(180%)",
+        borderRight: `1px solid ${GLASS_BORDER}`,
+        boxShadow: "10px 0 40px rgba(10, 15, 25, 0.04)",
+        transition: "width 0.3s cubic-bezier(0.4,0,0.2,1)",
+        overflowX: "hidden",
       }}
     >
-      <Box sx={{ p: 3, display: "flex", alignItems: "center", gap: 2 }}>
-        {/* Branding removed as requested */}
-      </Box>
+      {/* Brand / logo area */}
+      <Box sx={{ p: collapsed ? 1 : 3, minHeight: 64, display: "flex", alignItems: "center" }} />
 
-      {/* Divider removed */}
-
-      <List sx={{ px: 2, mt: 2 }}>
+      {/* Nav items */}
+      <List sx={{ px: collapsed ? 0.5 : 1.5, mt: 1, flexGrow: 1 }}>
         {menuItems.map((item) => {
           const isActive = location.pathname === item.path;
-          const isImplemented = ["Dashboard", "Projects"].includes(item.text);
-
           return (
             <ListItem
               key={item.text}
               onClick={() => {
-                if (isImplemented) {
-                  navigate(item.path);
-                } else {
-                  showToast(`${item.text} protocol is being finalized. Access restricted to Level 2 Specialists.`, "info");
-                }
+                navigate(item.path);
+                if (isMobile) onClose();
               }}
               sx={{
-                mb: 1,
+                mb: 0.5,
                 gap: 1.5,
                 borderRadius: "12px",
-                position: "relative",
                 cursor: "pointer",
+                position: "relative",
                 transition: "all 0.3s ease",
-                px: 2,
+                px: collapsed ? 1 : 2,
                 py: 1.5,
-                opacity: isImplemented ? 1 : 0.6,
+                justifyContent: collapsed ? "center" : "flex-start",
                 background: isActive
                   ? `linear-gradient(90deg, ${alpha(INDIGO_ACCENT, 0.08)} 0%, transparent 100%)`
                   : "transparent",
@@ -107,19 +102,20 @@ const Sidebar = () => {
                   height: isActive ? "24px" : "0px",
                   backgroundColor: INDIGO_ACCENT,
                   borderRadius: "0 4px 4px 0",
-                  transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                  transition: "height 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
                   boxShadow: isActive ? `0 0 12px ${alpha(INDIGO_ACCENT, 0.4)}` : "none",
                 },
                 "&:hover": {
-                  background: isImplemented ? alpha(INDIGO_ACCENT, 0.04) : "transparent",
-                  transform: isImplemented ? "translateX(4px)" : "none",
+                  background: alpha(INDIGO_ACCENT, 0.04),
+                  transform: "translateX(4px)",
                 },
               }}
             >
               <ListItemIcon
                 sx={{
                   color: isActive ? INDIGO_ACCENT : alpha(SECONDARY_SLATE, 0.6),
-                  minWidth: 42,
+                  minWidth: 0,
+                  mr: collapsed ? 0 : 1.5,
                   display: "flex",
                   justifyContent: "center",
                   transition: "color 0.3s ease",
@@ -127,80 +123,133 @@ const Sidebar = () => {
               >
                 {item.icon}
               </ListItemIcon>
-              <ListItemText
-                primary={item.text}
-                primaryTypographyProps={{
-                  fontSize: "0.95rem",
-                  fontWeight: isActive ? 800 : 500,
-                  color: isActive ? PRIMARY_SLATE : alpha(SECONDARY_SLATE, 0.7),
-                  letterSpacing: "0.01em",
-                  transition: "color 0.3s ease",
-                }}
-                sx={{ m: 0 }}
-              />
+              {!collapsed && (
+                <ListItemText
+                  primary={item.text}
+                  primaryTypographyProps={{
+                    fontSize: "0.9rem",
+                    fontWeight: isActive ? 800 : 500,
+                    color: isActive ? PRIMARY_SLATE : alpha(SECONDARY_SLATE, 0.7),
+                    letterSpacing: "0.01em",
+                    noWrap: true,
+                  }}
+                  sx={{ m: 0 }}
+                />
+              )}
             </ListItem>
           );
         })}
       </List>
 
-      <Box sx={{ flexGrow: 1 }} />
-
-      <Box sx={{ p: 2 }}>
-        <Box
-          sx={{
-            p: 2,
-            borderRadius: "20px",
-            background: "rgba(255,255,255,0.25)",
-            border: `1px solid ${GLASS_BORDER}`,
-            boxShadow: "0 8px 30px rgba(0,0,0,0.15)",
-            backdropFilter: "blur(24px)",
-          }}
-        >
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 1.5 }}>
-            <Avatar
-              src="/broken-image.jpg"
-              sx={{
-                width: 36,
-                height: 36,
-                border: `2px solid ${alpha(INDIGO_ACCENT, 0.2)}`,
-                bgcolor: alpha(INDIGO_ACCENT, 0.1)
-              }}
-            />
-            <Box>
-              <Typography
-                variant="subtitle2"
-                sx={{ color: PRIMARY_SLATE, fontWeight: 800, lineHeight: 1.2 }}
-              >
-                Alkor User
-              </Typography>
-              <Typography variant="caption" sx={{ color: SECONDARY_SLATE, fontWeight: 500 }}>
-                Product Owner
-              </Typography>
-            </Box>
-          </Box>
-          <IconButton
-            size="small"
+      {/* User card – hide in collapsed mode */}
+      {!collapsed && (
+        <Box sx={{ p: 2 }}>
+          <Box
             sx={{
-              width: "100%",
-              borderRadius: "10px",
-              py: 0.8,
-              color: alpha(SECONDARY_SLATE, 0.6),
-              fontSize: "0.8rem",
-              fontWeight: 700,
-              textTransform: "none",
-              border: `1px solid ${alpha(SECONDARY_SLATE, 0.1)}`,
-              "&:hover": {
-                color: "#ef4444",
-                background: alpha("#ef4444", 0.08),
-                borderColor: alpha("#ef4444", 0.2),
-              },
+              p: 2,
+              borderRadius: "20px",
+              background: "rgba(255,255,255,0.25)",
+              border: `1px solid ${GLASS_BORDER}`,
+              boxShadow: "0 8px 30px rgba(0,0,0,0.15)",
+              backdropFilter: "blur(24px)",
             }}
           >
-            <LogoutIcon sx={{ fontSize: 16, mr: 1 }} /> Logout
-          </IconButton>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 1.5 }}>
+              <Avatar
+                src="/broken-image.jpg"
+                sx={{
+                  width: 36,
+                  height: 36,
+                  border: `2px solid ${alpha(INDIGO_ACCENT, 0.2)}`,
+                  bgcolor: alpha(INDIGO_ACCENT, 0.1),
+                  flexShrink: 0,
+                }}
+              />
+              <Box sx={{ minWidth: 0 }}>
+                <Typography
+                  variant="subtitle2"
+                  noWrap
+                  sx={{ color: PRIMARY_SLATE, fontWeight: 800, lineHeight: 1.2 }}
+                >
+                  Alkor User
+                </Typography>
+                <Typography variant="caption" noWrap sx={{ color: SECONDARY_SLATE, fontWeight: 500 }}>
+                  Product Owner
+                </Typography>
+              </Box>
+            </Box>
+            <IconButton
+              size="small"
+              sx={{
+                width: "100%",
+                borderRadius: "10px",
+                py: 0.8,
+                color: alpha(SECONDARY_SLATE, 0.6),
+                fontSize: "0.8rem",
+                fontWeight: 700,
+                textTransform: "none",
+                border: `1px solid ${alpha(SECONDARY_SLATE, 0.1)}`,
+                "&:hover": {
+                  color: "#ef4444",
+                  background: alpha("#ef4444", 0.08),
+                  borderColor: alpha("#ef4444", 0.2),
+                },
+              }}
+            >
+              <LogoutIcon sx={{ fontSize: 16, mr: 1 }} /> Logout
+            </IconButton>
+          </Box>
         </Box>
-      </Box>
-    </Drawer>
+      )}
+    </Box>
+  );
+
+  return (
+    <>
+      {/* Mobile: temporary drawer */}
+      {isMobile && (
+        <Drawer
+          variant="temporary"
+          open={mobileOpen}
+          onClose={onClose}
+          ModalProps={{ keepMounted: true }}
+          sx={{
+            display: { xs: "block", md: "none" },
+            "& .MuiDrawer-paper": {
+              width: drawerWidth,
+              boxSizing: "border-box",
+              border: "none",
+              background: "transparent",
+            },
+          }}
+        >
+          {drawerContent}
+        </Drawer>
+      )}
+
+      {/* Desktop/Tablet: permanent drawer */}
+      {!isMobile && (
+        <Drawer
+          variant="permanent"
+          open
+          sx={{
+            display: { xs: "none", md: "block" },
+            width: currentWidth,
+            flexShrink: 0,
+            "& .MuiDrawer-paper": {
+              width: currentWidth,
+              boxSizing: "border-box",
+              border: "none",
+              background: "transparent",
+              transition: "width 0.3s cubic-bezier(0.4,0,0.2,1)",
+              overflowX: "hidden",
+            },
+          }}
+        >
+          {drawerContent}
+        </Drawer>
+      )}
+    </>
   );
 };
 

@@ -1,7 +1,3 @@
-/**
- * AntyGravity Instruction:
- * Apply rules from /docs/component_analysis_prompt.md
- */
 
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -44,37 +40,37 @@ import axios from "axios";
 import CreateProjectDialog from "../../components/CreateProjectDialog";
 
 // --- iOS Liquid Glass Design Constants ---
-const PRIMARY_BG = "#ffffff";
-const SECONDARY_BG = "#eff2f5";
-const TERTIARY_BG = "#e9eef5";
+const PRIMARY_BG = "#e6edf5";
+const SECONDARY_BG = "#d9e3ef";
+const TERTIARY_BG = "#cfd8e5";
 
 const glassEffect = {
-  background: "rgba(255, 255, 255, 0.25)",
-  backdropFilter: "blur(30px) saturate(160%)",
-  border: "1px solid rgba(255, 255, 255, 0.45)",
-  borderRadius: "20px",
-  boxShadow: "0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 1px rgba(255, 255, 255, 0.5)",
-  transition: "all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+  background: "rgba(255, 255, 255, 1)",
+  backdropFilter: "blur(25px) saturate(160%)",
+  border: "1px solid rgba(255, 255, 255, 0.7)",
+  borderRadius: "28px",
+  boxShadow: "0 15px 45px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 1)",
+  transition: "all 0.5s cubic-bezier(0.23, 1, 0.32, 1)",
   position: "relative",
   overflow: "hidden",
 };
 
 const iPhoneGlassButton = {
-  background: "rgba(255, 255, 255, 0.25)",
+  background: "rgba(255, 255, 255, 1)",
   backdropFilter: "blur(20px)",
-  border: "1px solid rgba(255, 255, 255, 0.4)",
-  borderRadius: "16px",
-  color: "rgba(0, 0, 0, 0.8)",
-  fontWeight: 900,
+  border: "1px solid rgba(255, 255, 255, 0.7)",
+  borderRadius: "20px",
+  color: "#1e293b",
+  fontWeight: 1000,
   textTransform: "none",
-  boxShadow: "0 4px 15px rgba(0, 0, 0, 0.05)",
-  transition: "all 0.3s ease",
-  "& .MuiButton-startIcon svg": { fontSize: 22 },
+  boxShadow: "0 8px 25px rgba(0, 0, 0, 0.04)",
+  transition: "all 0.4s ease",
+  "& .MuiButton-startIcon svg": { fontSize: 24 },
   "&:hover": {
-    background: "rgba(255, 255, 255, 0.4)",
-    transform: "translateY(-2px)",
-    boxShadow: "0 10px 25px rgba(0, 0, 0, 0.1)",
-    border: "1px solid rgba(255, 255, 255, 0.6)",
+    background: "rgba(255, 255, 255, 1)",
+    transform: "translateY(-4px)",
+    boxShadow: "0 15px 35px rgba(0, 0, 0, 0.08)",
+    border: "1px solid rgba(255, 255, 255, 1)",
   }
 };
 
@@ -269,7 +265,7 @@ const Head = () => {
             maxWidth: "100%",
             height: "60vw",
             maxHeight: "100%",
-            background: "radial-gradient(circle, rgba(255, 255, 255, 0.4) 0%, transparent 70%)",
+            background: "radial-gradient(circle, rgba(255, 255, 255, 1) 0%, transparent 70%)",
             filter: "blur(100px)",
           }}
         />
@@ -297,7 +293,7 @@ const Head = () => {
       {/* Header Section */}
       <Fade in={true} timeout={1000}>
         <Box sx={{ mb: 6, position: "relative", zIndex: 1 }}>
-        <Box sx={{ display: "flex", alignItems: "center", gap: { xs: 2, sm: 3 } }}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: { xs: 2, sm: 3 } }}>
             <Box
               sx={{
                 width: 80,
@@ -346,7 +342,7 @@ const Head = () => {
       </Fade>
 
       {/* Stats Cards (Control Center Widgets) */}
-      <Grid container spacing={4} sx={{ mb: 6, position: "relative", zIndex: 1 }}>
+      <Grid container spacing={{ xs: 3, md: 5 }} sx={{ mb: 8, position: "relative", zIndex: 1 }}>
         {[
           { title: "Active Protocols", value: tasks.length, color: "#4ade80", icon: <AssessmentIcon /> },
           { title: "Processing", value: tasks.filter((t) => t.status === "in_progress").length, color: "#38bdf8", icon: <FolderIcon /> },
@@ -356,20 +352,35 @@ const Head = () => {
           <Grid item xs={12} sm={6} md={3} key={idx}>
             <Box sx={{
               ...glassEffect,
-              p: 3,
+              p: { xs: 3.5, md: 4.5 },
+              textAlign: "center",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
               "&:hover": {
-                background: "rgba(255, 255, 255, 0.35)",
-                transform: "translateY(-5px)",
-                boxShadow: "0 15px 40px rgba(0,0,0,0.1)"
+                background: "rgba(255, 255, 255, 1)",
+                transform: "translateY(-10px)",
+                boxShadow: "0 30px 60px rgba(0,0,0,0.08)"
               }
             }}>
-              <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 2 }}>
-                <Box sx={{ color: stat.color, "& svg": { fontSize: 28 } }}>{stat.icon}</Box>
-                <Typography variant="h3" sx={{ fontWeight: 1000, color: "rgba(0,0,0,0.8)", lineHeight: 1 }}>
-                  {stat.value}
-                </Typography>
+              <Box sx={{
+                width: 64,
+                height: 64,
+                borderRadius: "20px",
+                background: alpha(stat.color, 0.1),
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                mb: 2.5,
+                color: stat.color,
+                "& svg": { fontSize: 32 }
+              }}>
+                {stat.icon}
               </Box>
-              <Typography sx={{ color: "rgba(0,0,0,0.4)", fontWeight: 800, fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "1px" }}>
+              <Typography variant="h3" sx={{ fontWeight: 1000, color: "#1e293b", lineHeight: 1, mb: 1, fontSize: "2.5rem" }}>
+                {stat.value}
+              </Typography>
+              <Typography sx={{ color: "rgba(30,40,70,0.45)", fontWeight: 900, fontSize: "0.85rem", textTransform: "uppercase", letterSpacing: "2px" }}>
                 {stat.title}
               </Typography>
             </Box>
@@ -380,10 +391,10 @@ const Head = () => {
       {/* Action Suite (Edge Mirror Buttons) */}
       <Box
         sx={{
-          mb: 6,
+          mb: 8,
           display: "flex",
-          gap: 2.5,
-          justifyContent: "flex-start",
+          gap: 3,
+          justifyContent: "center",
           flexWrap: "wrap",
           position: "relative",
           zIndex: 1,
@@ -393,7 +404,7 @@ const Head = () => {
           variant="contained"
           startIcon={<AddIcon />}
           onClick={() => setOpenDialog(true)}
-          sx={{ ...iPhoneGlassButton, px: 3, py: 1.8 }}
+          sx={{ ...iPhoneGlassButton, px: 5, py: 2.2, minWidth: "220px" }}
         >
           Initialize Task
         </Button>
@@ -401,7 +412,7 @@ const Head = () => {
           variant="contained"
           startIcon={<FolderIcon />}
           onClick={() => setOpenProjectDialog(true)}
-          sx={{ ...iPhoneGlassButton, px: 3, py: 1.8 }}
+          sx={{ ...iPhoneGlassButton, px: 5, py: 2.2, minWidth: "220px" }}
         >
           New Project
         </Button>
@@ -409,7 +420,7 @@ const Head = () => {
           variant="contained"
           startIcon={<AssessmentIcon />}
           onClick={() => navigate("/head/projects")}
-          sx={{ ...iPhoneGlassButton, px: 3, py: 1.8 }}
+          sx={{ ...iPhoneGlassButton, px: 5, py: 2.2, minWidth: "220px" }}
         >
           Project Hub
         </Button>
@@ -417,113 +428,69 @@ const Head = () => {
           variant="contained"
           startIcon={<DashboardCustomizeIcon />}
           onClick={() => navigate("/head/project-overview")}
-          sx={{ ...iPhoneGlassButton, px: 3, py: 1.8 }}
+          sx={{ ...iPhoneGlassButton, px: 5, py: 2.2, minWidth: "220px" }}
         >
           Analytics Map
         </Button>
       </Box>
 
       {/* Protocols Intelligence (Tasks Table) */}
-      <Box sx={{ display: { xs: "none", md: "block" }, position: "relative", zIndex: 1 }}>
-        <Box sx={{ ...glassEffect, p: 0 }}>
-          <TableContainer>
-            <Table>
-              <TableHead>
-                <TableRow sx={{ background: "rgba(0,0,0,0.03)" }}>
-                  {["Identifier", "Active Protocol", "Sequence Description", "Priority", "Validation Status", "Temporal Limit"].map((head) => (
-                    <TableCell key={head} sx={{ color: "rgba(0,0,0,0.4)", fontWeight: 900, textTransform: "uppercase", fontSize: "0.75rem", letterSpacing: "1px", py: 3 }}>
-                      {head}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {tasks.map((task) => (
-                  <TableRow
-                    key={task.id}
-                    sx={{
-                      borderBottom: "1px solid rgba(0,0,0,0.05)",
-                      "&:hover": { background: "rgba(255,255,255,0.3)" },
-                    }}
-                  >
-                    <TableCell>
-                      <Chip label={task.id} size="small" sx={{ fontWeight: 800, bgcolor: "rgba(0,0,0,0.05)", color: "rgba(0,0,0,0.5)", borderRadius: "8px" }} />
-                    </TableCell>
-                    <TableCell sx={{ color: "rgba(0,0,0,0.8)", fontWeight: 800, fontSize: "1rem" }}>
-                      {task.title}
-                    </TableCell>
-                    <TableCell sx={{ color: "rgba(0,0,0,0.45)", fontWeight: 600 }}>
-                      {task.desc.substring(0, 80)}...
-                    </TableCell>
-                    <TableCell>
-                      <Chip
-                        label={task.priority}
-                        size="small"
-                        sx={{
-                          backgroundColor: `${priorityColors[task.priority]}15`,
-                          color: priorityColors[task.priority],
-                          fontWeight: 900,
-                          borderRadius: "8px",
-                          letterSpacing: "0.5px"
-                        }}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Chip
-                        label={task.status.replace("_", " ")}
-                        size="small"
-                        sx={{
-                          backgroundColor: `${statusColors[task.status]}15`,
-                          color: statusColors[task.status],
-                          fontWeight: 900,
-                          borderRadius: "8px",
-                          letterSpacing: "0.5px"
-                        }}
-                      />
-                    </TableCell>
-                    <TableCell sx={{ color: "rgba(0,0,0,0.6)", fontWeight: 700 }}>
-                      {task.deadline}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </Box>
-      </Box>
-
-      {/* Tasks Cards - Mobile View */}
-      <Box sx={{ display: { xs: "block", md: "none" }, position: "relative", zIndex: 1 }}>
-        <Grid container spacing={2}>
+      {/* table removed  */}
+      {/* Protocols Intelligence (Tasks Cards) */}
+      <Box sx={{ position: "relative", zIndex: 1 }}>
+        <Typography variant="h5" sx={{ mb: 4, fontWeight: 1000, color: "#1e293b", letterSpacing: "-1px" }}>
+          Active Protocols Registry
+        </Typography>
+        <Grid container spacing={3}>
           {tasks.map((task) => (
-            <Grid item xs={12} key={task.id}>
-              <Box sx={{ ...glassEffect, p: 3 }}>
-                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 2 }}>
+            <Grid item xs={12} sm={6} md={4} key={task.id}>
+              <Box sx={{
+                ...glassEffect,
+                p: 4,
+                "&:hover": {
+                  background: "rgba(255, 255, 255, 1)",
+                  transform: "scale(1.02)",
+                  boxShadow: "0 25px 55px rgba(0,0,0,0.12)"
+                }
+              }}>
+                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 2.5 }}>
                   <Chip
                     label={`ID: ${task.id}`}
                     size="small"
-                    sx={{ bgcolor: "rgba(0,0,0,0.05)", color: "rgba(0,0,0,0.5)", fontWeight: 800, borderRadius: "8px" }}
+                    sx={{ bgcolor: "rgba(30,40,70,0.06)", color: "rgba(30,40,70,0.5)", fontWeight: 1000, borderRadius: "10px" }}
                   />
-                  <Typography sx={{ color: "rgba(0,0,0,0.4)", fontSize: "0.85rem", fontWeight: 700 }}>
+                  <Typography sx={{ color: "rgba(30,40,70,0.4)", fontSize: "0.85rem", fontWeight: 800 }}>
                     {task.deadline}
                   </Typography>
                 </Box>
-                <Typography sx={{ color: "rgba(0,0,0,0.8)", fontWeight: 900, mb: 1.5, fontSize: "1.25rem", letterSpacing: "-0.5px" }}>
+                <Typography sx={{ color: "#1e293b", fontWeight: 1000, mb: 1.5, fontSize: "1.35rem", letterSpacing: "-0.5px" }}>
                   {task.title}
                 </Typography>
-                <Typography sx={{ color: "rgba(0,0,0,0.45)", mb: 3, fontSize: "0.95rem", lineHeight: 1.6, fontWeight: 600 }}>
+                <Typography sx={{ color: "rgba(30,40,70,0.5)", mb: 4, fontSize: "0.95rem", lineHeight: 1.6, fontWeight: 600, height: "3.2em", overflow: "hidden" }}>
                   {task.desc}
                 </Typography>
-                <Box sx={{ display: "flex", gap: 1.5, flexWrap: "wrap" }}>
+                <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
                   <Chip
                     label={task.priority}
                     size="small"
-                    sx={{ bgcolor: `${priorityColors[task.priority]}15`, color: priorityColors[task.priority], fontWeight: 900, borderRadius: "8px" }}
+                    sx={{
+                      bgcolor: alpha(priorityColors[task.priority], 0.1),
+                      color: priorityColors[task.priority],
+                      fontWeight: 1000,
+                      borderRadius: "10px",
+                      px: 1
+                    }}
                   />
                   <Chip
                     label={task.status.replace("_", " ")}
                     size="small"
-                    sx={{ bgcolor: `${statusColors[task.status]}15`, color: statusColors[task.status], fontWeight: 900, borderRadius: "8px" }}
+                    sx={{
+                      bgcolor: alpha(statusColors[task.status], 0.1),
+                      color: statusColors[task.status],
+                      fontWeight: 1000,
+                      borderRadius: "10px",
+                      px: 1
+                    }}
                   />
                 </Box>
               </Box>
@@ -569,7 +536,7 @@ const Head = () => {
               sx={{
                 "& .MuiOutlinedInput-root": {
                   borderRadius: "16px",
-                  bgcolor: "rgba(255,255,255,0.4)",
+                  bgcolor: "rgba(255, 255, 255, 0.45)",
                   fontWeight: 700,
                   "& fieldset": { borderColor: "rgba(0,0,0,0.05)" },
                   "&.Mui-focused fieldset": { borderColor: "rgba(0,0,0,0.8)" },

@@ -1,34 +1,41 @@
 /**
- * AntyGravity Instruction:
- * Apply rules from /docs/component_analysis_prompt.md
+ * EmployeeLayout.jsx
+ * Responsive layout: permanent sidebar on md+, collapsible drawer on mobile.
  */
-import React from "react";
+import React, { useState } from "react";
 import { Box, useTheme, useMediaQuery, CssBaseline } from "@mui/material";
-import Sidebar from "./Sidebar";
-import Topbar from "./Topbar";
+// import Sidebar from "./Sidebar";
+// import Topbar from "./Topbar";
 import { Outlet } from "react-router-dom";
+
+const DRAWER_WIDTH = 260;
+const MINI_WIDTH = 72; // icon-only collapsed width on small tablets
 
 const EmployeeLayout = () => {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
-  const drawerWidth = 260;
+  const isMobile = useMediaQuery(theme.breakpoints.down("md")); // < 769px
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  const handleDrawerToggle = () => setMobileOpen((prev) => !prev);
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        minHeight: "100vh",
-        bgcolor: "#f8fafc",
-      }}
-    >
+    <Box sx={{ display: "flex", height: "100vh", overflow: "hidden", bgcolor: "#f8fafc" }}>
       <CssBaseline />
 
-      {/* Sidebar Navigation */}
+      {/* Sidebar / Navigation */}
       <Box
         component="nav"
-        sx={{ width: { md: drawerWidth }, flexShrink: { md: 0 } }}
+        sx={{
+          width: 0,
+          flexShrink: 0,
+        }}
       >
-        <Sidebar />
+        {/* <Sidebar
+          mobileOpen={mobileOpen}
+          onClose={handleDrawerToggle}
+          isMobile={isMobile}
+          drawerWidth={DRAWER_WIDTH}
+        /> */}
       </Box>
 
       {/* Main Content Wrapper */}
@@ -37,20 +44,24 @@ const EmployeeLayout = () => {
           flexGrow: 1,
           display: "flex",
           flexDirection: "column",
-          width: { md: `calc(100% - ${drawerWidth}px)` },
+          // On desktop subtract sidebar width; on mobile use full width
+          width: "100%",
+          minWidth: 0, // prevent flex child from overflowing
           transition: "width 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+          overflowX: "hidden",
         }}
       >
-        {/* Top Header */}
-        <Topbar />
+        {/* Top Header — pass toggle so it can render hamburger on mobile */}
+        {/* <Topbar onMenuToggle={handleDrawerToggle} isMobile={isMobile} /> */}
 
-        {/* Content Area */}
+        {/* Content Area – scrolls vertically */}
         <Box
           component="main"
           sx={{
             flexGrow: 1,
-            p: { xs: 2, sm: 3, md: 4 },
+            minHeight: 0,       // key: lets flex child shrink so overflow kicks in
             overflowX: "hidden",
+            overflowY: "auto",
             position: "relative",
             zIndex: 1,
           }}

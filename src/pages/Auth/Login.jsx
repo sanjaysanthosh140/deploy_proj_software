@@ -1,8 +1,3 @@
-/**
- * Login — iOS Liquid Glass UI
- * All API logic preserved exactly.
- * Design: frosted glass panel over soft blurred gradient background.
- */
 import React, { useState } from "react";
 import {
   Box,
@@ -84,35 +79,32 @@ const Login = () => {
   const inputSx = {
     mb: 2,
     "& .MuiOutlinedInput-root": {
-      borderRadius: "14px",
-      background: "rgba(255,255,255,0.28)",
-      backdropFilter: "blur(16px)",
-      WebkitBackdropFilter: "blur(16px)",
-      transition: "all 0.25s ease",
+      borderRadius: "12px",
+      background: "#fff",
+      transition: "all 0.2s ease",
       "& fieldset": {
-        borderColor: "rgba(255,255,255,0.5)",
+        borderColor: "#e0e0e0",
         borderWidth: "1px",
       },
       "&:hover fieldset": {
-        borderColor: "rgba(255,255,255,0.75)",
+        borderColor: "#bdbdbd",
       },
       "&.Mui-focused": {
-        background: "rgba(255,255,255,0.38)",
         "& fieldset": {
-          borderColor: "rgba(255,255,255,0.9)",
+          borderColor: "#1a1a1a",
           borderWidth: "1.5px",
         },
       },
     },
     "& input": {
-      color: "rgba(12,20,50,0.85)",
-      fontWeight: 600,
-      fontSize: "0.92rem",
-      "&::placeholder": { color: "rgba(30,50,100,0.38)", opacity: 1 },
+      color: "#1a1a1a",
+      fontWeight: 500,
+      fontSize: "0.95rem",
+      "&::placeholder": { color: "#9e9e9e", opacity: 1 },
     },
     "& .MuiInputAdornment-root svg": {
-      color: "rgba(30,50,100,0.35)",
-      fontSize: "19px",
+      color: "#757575",
+      fontSize: "20px",
     },
   };
 
@@ -123,36 +115,12 @@ const Login = () => {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        position: "relative",
-        overflow: "hidden",
-        p: 2,
-        /* iOS-style soft gradient background */
-        background: "linear-gradient(160deg, #dde6f0 0%, #cfd9e8 35%, #c8d5e6 60%, #d4dff0 100%)",
+        bgcolor: "#fcfcfc",
+        p: { xs: 2.5, sm: 4 },
       }}
     >
-      {/* ── Blurred background orbs ── */}
-      <Box sx={{ position: "absolute", inset: 0, zIndex: 0, pointerEvents: "none", overflow: "hidden" }}>
-        <Box sx={{
-          position: "absolute", top: "-10%", left: "-5%",
-          width: "55vw", height: "55vw",
-          background: "radial-gradient(circle, rgba(160,185,230,0.6) 0%, transparent 65%)",
-          filter: "blur(70px)",
-        }} />
-        <Box sx={{
-          position: "absolute", bottom: "-5%", right: "-5%",
-          width: "50vw", height: "50vw",
-          background: "radial-gradient(circle, rgba(180,195,235,0.55) 0%, transparent 65%)",
-          filter: "blur(80px)",
-        }} />
-        <Box sx={{
-          position: "absolute", top: "40%", left: "35%",
-          width: "40vw", height: "40vw",
-          background: "radial-gradient(circle, rgba(200,215,245,0.4) 0%, transparent 65%)",
-          filter: "blur(90px)",
-        }} />
-      </Box>
 
-      {/* ── Liquid Glass Login Card ── */}
+      {/* ── Login Card ── */}
       <motion.div
         initial={{ opacity: 0, y: 28, scale: 0.97 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -162,42 +130,14 @@ const Login = () => {
         <Box
           sx={{
             width: "100%",
-            p: { xs: 4, md: 5 },
-            borderRadius: "28px",
-            overflow: "hidden",
-            position: "relative",
-
-            /* Liquid glass surface */
-            background: "rgba(255,255,255,0.22)",
-            backdropFilter: "blur(40px) saturate(160%)",
-            WebkitBackdropFilter: "blur(40px) saturate(160%)",
-            border: "1px solid rgba(255,255,255,0.50)",
-            boxShadow: [
-              "0 24px 64px rgba(0,0,0,0.12)",
-              "0 8px 24px rgba(0,0,0,0.06)",
-              "inset 0 1.5px 0 rgba(255,255,255,0.75)",
-              "inset 0 -1px 0 rgba(255,255,255,0.2)",
-            ].join(", "),
+            p: { xs: 4, md: 6 },
+            borderRadius: "24px",
+            bgcolor: "#ffffff",
+            border: "1px solid #eaeaea",
+            boxShadow: "0 20px 50px rgba(0,0,0,0.05)",
           }}
         >
-          {/* Inner diagonal sheen */}
-          <Box sx={{
-            position: "absolute", inset: 0, borderRadius: "27px",
-            background: "linear-gradient(135deg, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0.08) 40%, rgba(255,255,255,0.02) 100%)",
-            pointerEvents: "none", zIndex: 0,
-          }} />
-          {/* Top-right corner sparkle */}
-          <Box sx={{
-            position: "absolute", top: 0, right: 0, width: 90, height: 90,
-            background: "radial-gradient(circle at top right, rgba(255,255,255,0.65) 0%, transparent 65%)",
-            borderRadius: "0 28px 0 0", pointerEvents: "none", zIndex: 0,
-          }} />
-          {/* Bottom-left reflection */}
-          <Box sx={{
-            position: "absolute", bottom: 0, left: 0, width: 70, height: 70,
-            background: "radial-gradient(circle at bottom left, rgba(255,255,255,0.35) 0%, transparent 65%)",
-            borderRadius: "0 0 0 28px", pointerEvents: "none", zIndex: 0,
-          }} />
+
 
           {/* ── Card content ── */}
           <Box sx={{ position: "relative", zIndex: 1 }}>
@@ -247,22 +187,17 @@ const Login = () => {
                 sx={{
                   width: 52,
                   height: 52,
-                  borderRadius: "16px",
-                  background: "rgba(255,255,255,0.35)",
-                  border: "1px solid rgba(255,255,255,0.7)",
-                  backdropFilter: "blur(16px)",
+                  borderRadius: "14px",
+                  background: "#1a1a1a",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   mx: "auto",
                   mb: 2.5,
-                  boxShadow: [
-                    "0 8px 20px rgba(0,0,0,0.08)",
-                    "inset 0 1px 0 rgba(255,255,255,0.9)",
-                  ].join(", "),
+                  boxShadow: "0 8px 16px rgba(0,0,0,0.1)",
                 }}
               >
-                <BoltIcon sx={{ fontSize: 24, color: "rgba(30,50,100,0.6)" }} />
+                <BoltIcon sx={{ fontSize: 24, color: "#fff" }} />
               </Box>
 
               <Typography
@@ -279,7 +214,7 @@ const Login = () => {
               </Typography>
               <Typography
                 variant="body2"
-                sx={{ color: "rgba(30,50,100,0.5)", fontWeight: 500, lineHeight: 1.6, fontSize: "0.84rem" }}
+                sx={{ color: "#757575", fontWeight: 500, lineHeight: 1.6, fontSize: "0.85rem" }}
               >
                 Sign in to access your project workspace
               </Typography>
@@ -378,22 +313,12 @@ const Login = () => {
                   borderRadius: "14px",
                   textTransform: "none",
                   letterSpacing: 0.2,
-                  /* Liquid glass dark pill */
-                  background: "rgba(20,30,60,0.7)",
-                  backdropFilter: "blur(20px)",
-                  WebkitBackdropFilter: "blur(20px)",
-                  border: "1px solid rgba(255,255,255,0.15)",
+                  background: "#1a1a1a",
                   color: "#fff",
-                  boxShadow: [
-                    "0 8px 24px rgba(0,0,0,0.18)",
-                    "inset 0 1px 0 rgba(255,255,255,0.15)",
-                  ].join(", "),
+                  boxShadow: "0 10px 20px rgba(0,0,0,0.15)",
                   "&:hover": {
-                    background: "rgba(20,30,60,0.85)",
-                    boxShadow: [
-                      "0 12px 32px rgba(0,0,0,0.22)",
-                      "inset 0 1px 0 rgba(255,255,255,0.18)",
-                    ].join(", "),
+                    background: "#333",
+                    boxShadow: "0 15px 30px rgba(0,0,0,0.2)",
                   },
                 }}
               >
@@ -404,91 +329,32 @@ const Login = () => {
             {/* Divider */}
             <Box sx={{ mt: 3.5, mb: 3 }}>
               <Stack direction="row" alignItems="center" spacing={2}>
-                <Box sx={{ flex: 1, height: "1px", bgcolor: "rgba(255,255,255,0.45)" }} />
+                <Box sx={{ flex: 1, height: "1px", bgcolor: "#efefef" }} />
                 <Typography
                   variant="caption"
-                  sx={{ color: "rgba(30,50,100,0.4)", fontWeight: 700, letterSpacing: 1, whiteSpace: "nowrap" }}
+                  sx={{ color: "#9e9e9e", fontWeight: 700, letterSpacing: 1, whiteSpace: "nowrap" }}
                 >
                   OR CONTINUE WITH
                 </Typography>
-                <Box sx={{ flex: 1, height: "1px", bgcolor: "rgba(255,255,255,0.45)" }} />
+                <Box sx={{ flex: 1, height: "1px", bgcolor: "#efefef" }} />
               </Stack>
             </Box>
 
             {/* OAuth Buttons */}
             <Stack direction="row" spacing={1.5}>
-              <Button
-                variant="outlined"
-                fullWidth
-                startIcon={<GoogleIcon />}
-                onClick={async () => {
-                  try {
-                    window.location.href = "http://localhost:8080/auth/google";
-                  } catch (error) {
-                    console.log(error);
-                    showToast("Google Login Failed", "error");
-                  }
-                }}
-                sx={{
-                  borderRadius: "13px",
-                  textTransform: "none",
-                  fontWeight: 700,
-                  fontSize: "0.85rem",
-                  color: "rgba(12,20,50,0.75)",
-                  border: "1px solid rgba(255,255,255,0.55)",
-                  background: "rgba(255,255,255,0.28)",
-                  backdropFilter: "blur(16px)",
-                  boxShadow: "inset 0 1px 0 rgba(255,255,255,0.7)",
-                  "&:hover": {
-                    background: "rgba(255,255,255,0.42)",
-                    border: "1px solid rgba(255,255,255,0.75)",
-                    transform: "translateY(-1px)",
-                  },
-                }}
-              >
-                Google
-              </Button>
 
-              <Button
-                variant="outlined"
-                fullWidth
-                startIcon={<GitHubIcon />}
-                onClick={async () => {
-                  try {
-                    window.location.href = "http://localhost:8080/auth/github";
-                  } catch (error) {
-                    console.log(error);
-                    showToast("GitHub Login Failed", "error");
-                  }
-                }}
-                sx={{
-                  borderRadius: "13px",
-                  textTransform: "none",
-                  fontWeight: 700,
-                  fontSize: "0.85rem",
-                  color: "rgba(12,20,50,0.75)",
-                  border: "1px solid rgba(255,255,255,0.55)",
-                  background: "rgba(255,255,255,0.28)",
-                  backdropFilter: "blur(16px)",
-                  boxShadow: "inset 0 1px 0 rgba(255,255,255,0.7)",
-                  "&:hover": {
-                    background: "rgba(255,255,255,0.42)",
-                    border: "1px solid rgba(255,255,255,0.75)",
-                    transform: "translateY(-1px)",
-                  },
-                }}
-              >
-                GitHub
-              </Button>
+
             </Stack>
+
+
 
             {/* Sign up link */}
             <Box sx={{ mt: 3.5, textAlign: "center" }}>
-              <Typography variant="body2" sx={{ color: "rgba(30,50,100,0.45)", fontWeight: 500, fontSize: "0.83rem" }}>
+              <Typography variant="body2" sx={{ color: "#757575", fontWeight: 500, fontSize: "0.85rem" }}>
                 Don't have an account?{" "}
                 <span
-                  style={{ color: "rgba(60,80,200,0.75)", fontWeight: 800, cursor: "pointer" }}
-                  onClick={() => navigate("/signup")}
+                  style={{ color: "#1a1a1a", fontWeight: 700, cursor: "pointer", textDecoration: "underline" }}
+                // onClick={() => navigate("/signup")}
                 >
                   Sign Up
                 </span>

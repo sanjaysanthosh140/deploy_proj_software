@@ -69,46 +69,50 @@ const WorkReportForm = ({ deptId }) => {
       component="form"
       onSubmit={handleSubmit}
       sx={{
-        p: { xs: 3, md: 5 },
+        p: { xs: 2, sm: 2.5, md: 3 },
         background: GLASS_BG,
         backdropFilter: "blur(48px) saturate(180%)",
         border: `1px solid ${GLASS_BORDER}`,
-        borderRadius: "24px",
-        boxShadow: "0 12px 32px -4px rgba(10, 15, 25, 0.04)",
+        borderRadius: "20px",
+        boxShadow: "0 6px 20px -4px rgba(10,15,25,0.06)",
       }}
     >
-      <Typography variant="h4" sx={{ mb: 4, fontWeight: 900, color: PRIMARY_SLATE, letterSpacing: "-0.02em", fontSize: { xs: "2rem", sm: "2.4rem" } }}>
-        Mission Logs & Protocol Reporting
-      </Typography>
+      <Box sx={{ display: "flex", alignItems: "center", gap: 0.8, mb: { xs: 1.5, sm: 2 } }}>
+        <Box sx={{ width: 3, height: 16, borderRadius: 1, bgcolor: INDIGO_ACCENT, flexShrink: 0 }} />
+        <Typography sx={{ fontWeight: 800, color: PRIMARY_SLATE, fontSize: { xs: "0.9rem", sm: "0.95rem" }, letterSpacing: "-0.01em" }}>
+          Daily Work Report
+        </Typography>
+      </Box>
       <TextField
         fullWidth
         multiline
-        rows={12}
+        rows={7}
         variant="outlined"
-        placeholder="Log your active accomplishments..."
+        placeholder="What did you accomplish today? Any blockers?"
         value={report}
         onChange={(e) => setReport(e.target.value)}
         sx={{
-          mb: 4,
+          mb: { xs: 1.5, sm: 2 },
           "& .MuiOutlinedInput-root": {
-            fontSize: { xs: "1.3rem", sm: "1.5rem" },
+            fontSize: { xs: "0.82rem", sm: "0.87rem" },
             color: PRIMARY_SLATE,
             fontWeight: 500,
             bgcolor: "rgba(255,255,255,0.4)",
-            borderRadius: "16px",
-            padding: { xs: "1.75rem", sm: "2rem" },
+            borderRadius: "12px",
             "& fieldset": { borderColor: GLASS_BORDER },
             "&:hover fieldset": { borderColor: alpha(INDIGO_ACCENT, 0.2) },
             "&.Mui-focused fieldset": { borderColor: INDIGO_ACCENT },
           },
           "& .MuiOutlinedInput-input": {
-            fontSize: { xs: "1.3rem", sm: "1.5rem" },
-            lineHeight: 1.8,
+            fontSize: { xs: "0.82rem", sm: "0.87rem" },
+            lineHeight: 1.7,
+            py: 1.5,
+            px: 2,
           },
           "& .MuiInputBase-input::placeholder": {
             color: alpha(SECONDARY_SLATE, 0.5),
             opacity: 1,
-            fontSize: { xs: "1.2rem", sm: "1.35rem" },
+            fontSize: { xs: "0.78rem", sm: "0.82rem" },
           }
         }}
       />
@@ -117,24 +121,24 @@ const WorkReportForm = ({ deptId }) => {
           type="submit"
           variant="contained"
           disabled={loading}
-          endIcon={loading ? <CircularProgress size={28} color="inherit" /> : <SendIcon />}
+          endIcon={loading ? <CircularProgress size={14} color="inherit" /> : <SendIcon sx={{ fontSize: 14 }} />}
           sx={{
             background: INDIGO_ACCENT,
             color: "#fff",
             fontWeight: 700,
-            fontSize: { xs: "1.25rem", sm: "1.45rem" },
-            borderRadius: "12px",
-            px: { xs: 4, sm: 6 },
-            py: { xs: 1.8, sm: 2.2 },
+            fontSize: { xs: "0.78rem", sm: "0.82rem" },
+            borderRadius: "10px",
+            px: { xs: 2.5, sm: 3 },
+            py: { xs: 0.8, sm: 0.9 },
             textTransform: "none",
-            boxShadow: `0 4px 14px ${alpha(INDIGO_ACCENT, 0.3)}`,
+            boxShadow: `0 4px 10px ${alpha(INDIGO_ACCENT, 0.25)}`,
             "&.Mui-disabled": {
               background: alpha(SECONDARY_SLATE, 0.1),
               color: alpha(SECONDARY_SLATE, 0.3),
             },
           }}
         >
-          {loading ? "Transmitting..." : "Log Activity"}
+          {loading ? "Submitting..." : "Submit Report"}
         </Button>
       </Box>
     </Paper>

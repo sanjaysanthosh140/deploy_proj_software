@@ -8,6 +8,7 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
+  DialogActions,
   Box,
   Typography,
   IconButton,
@@ -28,10 +29,10 @@ import SendIcon from "@mui/icons-material/Send";
 import axios from "axios";
 
 // --- Theme Constants ---
-const GLASS_BG = "rgb(255, 255, 255)";
-const GLASS_BORDER = "rgba(10, 15, 25, 0.08)";
-const PRIMARY_SLATE = "#0f172a";
-const SECONDARY_SLATE = "#475569";
+const GLASS_BG = "#ffffff";
+const GLASS_BORDER = "rgba(0, 0, 0, 0.08)";
+const PRIMARY_SLATE = "rgba(0, 0, 0, 0.95)";
+const SECONDARY_SLATE = "rgba(0, 0, 0, 0.55)";
 
 const TaskAssignmentModal = ({ open, onClose, projectData, onSave }) => {
   const [unassignedTasks, setUnassignedTasks] = useState([]);
@@ -283,13 +284,12 @@ const TaskAssignmentModal = ({ open, onClose, projectData, onSave }) => {
       fullWidth
       PaperProps={{
         sx: {
-          background: GLASS_BG,
-          backdropFilter: "blur(48px) saturate(160%)",
-          WebkitBackdropFilter: "blur(48px) saturate(160%)",
+          background: "#ffffff",
           borderRadius: "32px",
           border: `1px solid ${GLASS_BORDER}`,
-          boxShadow: "0 40px 80px -20px rgba(10, 15, 25, 0.12)",
-          minHeight: "85vh",
+          boxShadow: "0 40px 100px -20px rgba(0, 0, 0, 0.1)",
+          minHeight: { xs: "90vh", md: "80vh" },
+          margin: { xs: 1, sm: 2, md: 4 },
           overflow: "hidden",
         },
       }}
@@ -308,16 +308,17 @@ const TaskAssignmentModal = ({ open, onClose, projectData, onSave }) => {
           <Avatar
             variant="rounded"
             sx={{
-              background: "linear-gradient(135deg, #0f172a 0%, #334155 100%)",
-              color: "#fff",
-              width: { xs: 40, md: 56 },
-              height: { xs: 40, md: 56 },
+              background: "rgba(0, 0, 0, 0.03)",
+              color: "rgba(0, 0, 0, 0.8)",
+              width: { xs: 40, md: 52 },
+              height: { xs: 40, md: 52 },
               borderRadius: "16px",
-              boxShadow: "0 8px 16px rgba(10, 15, 25, 0.08)",
+              boxShadow: "none",
+              border: "1px solid rgba(0, 0, 0, 0.05)",
               flexShrink: 0,
             }}
           >
-            <AssignmentIndIcon sx={{ fontSize: { xs: 22, md: 32 } }} />
+            <AssignmentIndIcon sx={{ fontSize: { xs: 22, md: 30 } }} />
           </Avatar>
           <Box sx={{ minWidth: 0 }}>
             <Typography variant="h4" sx={{ color: PRIMARY_SLATE, fontWeight: 900, mb: 0.5, fontSize: { xs: "1.1rem", md: "1.3rem" } }}>
@@ -348,405 +349,405 @@ const TaskAssignmentModal = ({ open, onClose, projectData, onSave }) => {
         </IconButton>
       </DialogTitle>
 
-      <DialogContent sx={{ p: { xs: 2, sm: 3, md: 4 }, overflow: "visible" }}>
-        <DragDropContext onDragEnd={onDragEnd}>
-          <Box
-            sx={{
-              display: "grid",
-              gridTemplateColumns: { xs: "1fr", md: "350px 1fr" },
-              gap: { xs: 2, md: 4 },
-              height: "100%",
-            }}
-          >
-            {/* Left Column: Unassigned Tasks */}
-            <Box>
-              <Box
-                sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 3 }}
-              >
-                <ChecklistIcon sx={{ color: "#38bdf8" }} />
-                <Typography
-                  variant="h6"
-                  sx={{ color: PRIMARY_SLATE, fontWeight: 900, letterSpacing: "-0.01em" }}
+      <DialogContent sx={{ p: { xs: 2, sm: 3, md: 4 }, overflowY: "auto", py: 0 }}>
+        <Box sx={{ py: 3 }}>
+          <DragDropContext onDragEnd={onDragEnd}>
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: { xs: "1fr", md: "1.1fr 2.9fr" },
+                gap: { xs: 3, md: 5 },
+                height: "100%",
+                width: "100%",
+              }}
+            >
+              {/* Left Column: Unassigned Tasks */}
+              <Box>
+                <Box
+                  sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 3 }}
                 >
-                  Backlog Portfolio
-                </Typography>
-              </Box>
-
-              <Droppable droppableId="unassigned">
-                {(provided, snapshot) => (
-                  <Box
-                    {...provided.droppableProps}
-                    ref={provided.innerRef}
-                    sx={{
-                      bgcolor: snapshot.isDraggingOver
-                        ? "rgba(15, 23, 42, 0.05)"
-                        : "rgba(15, 23, 42, 0.02)",
-                      borderRadius: "24px",
-                      p: 2.5,
-                      minHeight: "60vh",
-                      maxHeight: "65vh",
-                      overflowY: "auto",
-                      border: "1px solid",
-                      borderColor: snapshot.isDraggingOver ? "rgba(15, 23, 42, 0.15)" : GLASS_BORDER,
-                      boxShadow: snapshot.isDraggingOver ? "0 8px 32px rgba(10, 15, 25, 0.05)" : "none",
-                      transition: "all 0.3s ease",
-                    }}
+                  <ChecklistIcon sx={{ color: "#38bdf8" }} />
+                  <Typography
+                    variant="h6"
+                    sx={{ color: PRIMARY_SLATE, fontWeight: 900, letterSpacing: "-0.01em" }}
                   >
-                    {unassignedTasks.map((task, index) => (
-                      <Draggable
-                        key={task._id}
-                        draggableId={task._id}
-                        index={index}
-                      >
-                        {(provided, snapshot) => {
-                          const child = (
-                            <Paper
-                              ref={provided.innerRef}
-                              {...provided.draggableProps}
-                              {...provided.dragHandleProps}
-                              sx={{
-                                p: 2,
-                                mb: 2,
-                                background: snapshot.isDragging
-                                  ? "rgba(255, 255, 255, 0.9)"
-                                  : "rgba(255, 255, 255, 0.6)",
-                                backdropFilter: snapshot.isDragging
-                                  ? "blur(12px) saturate(180%)"
-                                  : "blur(20px) saturate(120%)",
-                                border: `1px solid ${snapshot.isDragging ? "rgba(15, 23, 42, 0.15)" : GLASS_BORDER}`,
-                                borderRadius: "16px",
-                                boxShadow: snapshot.isDragging
-                                  ? "0 20px 40px rgba(10, 15, 25, 0.15)"
-                                  : "0 4px 12px rgba(10, 15, 25, 0.03)",
-                                cursor: "grab",
-                                width: snapshot.isDragging ? "300px" : "auto",
-                                zIndex: 9999,
-                                transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-                                "&:hover": {
-                                  background: "rgba(255, 255, 255, 0.8)",
-                                  borderColor: "rgba(15, 23, 42, 0.1)",
-                                  transform: "translateY(-2px)",
-                                  boxShadow: "0 8px 20px rgba(10, 15, 25, 0.05)"
-                                },
-                              }}
-                            >
-                              <Typography
+                    Backlog Portfolio
+                  </Typography>
+                </Box>
+
+                <Droppable droppableId="unassigned">
+                  {(provided, snapshot) => (
+                    <Box
+                      {...provided.droppableProps}
+                      ref={provided.innerRef}
+                      sx={{
+                        bgcolor: snapshot.isDraggingOver
+                          ? "rgba(0, 0, 0, 0.05)"
+                          : "rgba(0, 0, 0, 0.02)",
+                        borderRadius: "24px",
+                        p: { xs: 2, md: 3 },
+                        minHeight: "55vh",
+                        maxHeight: "60vh",
+                        overflowY: "auto",
+                        border: "1px solid",
+                        borderColor: snapshot.isDraggingOver ? "rgba(0, 0, 0, 0.1)" : GLASS_BORDER,
+                        transition: "all 0.3s ease",
+                      }}
+                    >
+                      {unassignedTasks.map((task, index) => (
+                        <Draggable
+                          key={task._id}
+                          draggableId={task._id}
+                          index={index}
+                        >
+                          {(provided, snapshot) => {
+                            const child = (
+                              <Paper
+                                ref={provided.innerRef}
+                                {...provided.draggableProps}
+                                {...provided.dragHandleProps}
                                 sx={{
-                                  color: PRIMARY_SLATE,
-                                  fontWeight: 800,
-                                  mb: 1,
-                                  letterSpacing: "-0.01em"
+                                  p: 2,
+                                  mb: 2,
+                                  background: "#ffffff",
+                                  border: `1px solid ${snapshot.isDragging ? "rgba(0, 0, 0, 0.15)" : "rgba(0,0,0,0.06)"}`,
+                                  borderRadius: "16px",
+                                  boxShadow: snapshot.isDragging
+                                    ? "0 20px 40px rgba(0, 0, 0, 0.12)"
+                                    : "0 2px 8px rgba(0, 0, 0, 0.02)",
+                                  cursor: "grab",
+                                  width: snapshot.isDragging ? "280px" : "auto",
+                                  zIndex: 9999,
+                                  transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                                  "&:hover": {
+                                    borderColor: "rgba(0, 0, 0, 0.12)",
+                                    transform: "translateY(-2px)",
+                                    boxShadow: "0 8px 24px rgba(0, 0, 0, 0.06)"
+                                  },
                                 }}
                               >
-                                {task.title}
-                              </Typography>
-                              <Chip
-                                label={task.priority}
-                                size="small"
-                                sx={{
-                                  height: 20,
-                                  fontSize: "0.65rem",
-                                  fontWeight: 800,
-                                  bgcolor:
-                                    task.priority === "Critical"
-                                      ? "rgba(244, 63, 94, 0.1)"
-                                      : "rgba(15, 23, 42, 0.05)",
-                                  color:
-                                    task.priority === "Critical"
-                                      ? "#e11d48"
-                                      : PRIMARY_SLATE,
-                                  borderRadius: "6px"
-                                }}
-                              />
-                              {(task.dueDate || task.duedate) && (
                                 <Typography
-                                  variant="caption"
                                   sx={{
-                                    color: SECONDARY_SLATE,
-                                    display: "block",
-                                    mt: 1.5,
-                                    fontSize: "0.65rem",
-                                    fontWeight: 700,
+                                    color: PRIMARY_SLATE,
+                                    fontWeight: 800,
+                                    mb: 1,
+                                    letterSpacing: "-0.01em"
                                   }}
                                 >
-                                  Due:{" "}
-                                  {new Date(
-                                    task.dueDate || task.duedate,
-                                  ).toLocaleDateString()}
+                                  {task.title}
                                 </Typography>
-                              )}
-                            </Paper>
-                          );
+                                <Chip
+                                  label={task.priority}
+                                  size="small"
+                                  sx={{
+                                    height: 20,
+                                    fontSize: "0.65rem",
+                                    fontWeight: 800,
+                                    bgcolor:
+                                      task.priority === "Critical"
+                                        ? "rgba(244, 63, 94, 0.1)"
+                                        : "rgba(15, 23, 42, 0.05)",
+                                    color:
+                                      task.priority === "Critical"
+                                        ? "#e11d48"
+                                        : PRIMARY_SLATE,
+                                    borderRadius: "6px"
+                                  }}
+                                />
+                                {(task.dueDate || task.duedate) && (
+                                  <Typography
+                                    variant="caption"
+                                    sx={{
+                                      color: SECONDARY_SLATE,
+                                      display: "block",
+                                      mt: 1.5,
+                                      fontSize: "0.65rem",
+                                      fontWeight: 700,
+                                    }}
+                                  >
+                                    Due:{" "}
+                                    {new Date(
+                                      task.dueDate || task.duedate,
+                                    ).toLocaleDateString()}
+                                  </Typography>
+                                )}
+                              </Paper>
+                            );
 
-                          if (snapshot.isDragging) {
-                            return ReactDOM.createPortal(child, document.body);
-                          }
-                          return child;
-                        }}
-                      </Draggable>
-                    ))}
-                    {provided.placeholder}
-                    {unassignedTasks.length === 0 && (
-                      <Box sx={{ p: 4, textAlign: "center", color: SECONDARY_SLATE }}>
-                        <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                          No unassigned tasks remaining
-                        </Typography>
-                      </Box>
-                    )}
-                  </Box>
-                )}
-              </Droppable>
-            </Box>
-
-            {/* Right Side: Specialist Columns */}
-            <Box>
-              <Box
-                sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 3 }}
-              >
-                <PersonIcon sx={{ color: "#10b981" }} />
-                <Typography
-                  variant="h6"
-                  sx={{ color: PRIMARY_SLATE, fontWeight: 900, letterSpacing: "-0.01em" }}
-                >
-                  Resource Deployment
-                </Typography>
+                            if (snapshot.isDragging) {
+                              return ReactDOM.createPortal(child, document.body);
+                            }
+                            return child;
+                          }}
+                        </Draggable>
+                      ))}
+                      {provided.placeholder}
+                      {unassignedTasks.length === 0 && (
+                        <Box sx={{ p: 4, textAlign: "center", color: SECONDARY_SLATE }}>
+                          <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                            No unassigned tasks remaining
+                          </Typography>
+                        </Box>
+                      )}
+                    </Box>
+                  )}
+                </Droppable>
               </Box>
 
-              <Box
-                sx={{
-                  maxHeight: "65vh",
-                  overflowY: "auto",
-                  pr: 1,
-                  "&::-webkit-scrollbar": { width: 6 },
-                  "&::-webkit-scrollbar-thumb": {
-                    bgcolor: "rgba(255,255,255,0.1)",
-                    borderRadius: 3,
-                  },
-                }}
-              >
+              {/* Right Side: Specialist Columns */}
+              <Box>
+                <Box
+                  sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 3 }}
+                >
+                  <PersonIcon sx={{ color: "#10b981" }} />
+                  <Typography
+                    variant="h6"
+                    sx={{ color: PRIMARY_SLATE, fontWeight: 900, letterSpacing: "-0.01em" }}
+                  >
+                    Resource Deployment
+                  </Typography>
+                </Box>
+
                 <Box
                   sx={{
-                    display: "grid",
-                    gridTemplateColumns: {
-                      xs: "1fr",
-                      md: "repeat(2, 1fr)",
-                      lg: "repeat(3, 1fr)",
+                    maxHeight: "65vh",
+                    overflowY: "auto",
+                    pr: 1,
+                    "&::-webkit-scrollbar": { width: 6 },
+                    "&::-webkit-scrollbar-thumb": {
+                      bgcolor: "rgba(0,0,0,0.05)",
+                      borderRadius: 3,
                     },
-                    gap: 3,
-                    pb: 2,
                   }}
                 >
-                  {specialists.map((specialist) => (
-                    <Box key={specialist.stableId} sx={{ width: "100%" }}>
-                      <Droppable
-                        droppableId={`specialist-${specialist.stableId}`}
-                      >
-                        {(provided, snapshot) => (
-                          <Box
-                            {...provided.droppableProps}
-                            ref={provided.innerRef}
-                            sx={{
-                              bgcolor: snapshot.isDraggingOver
-                                ? "rgba(15, 23, 42, 0.05)"
-                                : "rgba(15, 23, 42, 0.02)",
-                              borderRadius: "24px",
-                              p: 2,
-                              minHeight: "50vh",
-                              border: "1px solid",
-                              borderColor: snapshot.isDraggingOver ? "rgba(15, 23, 42, 0.15)" : GLASS_BORDER,
-                              boxShadow: snapshot.isDraggingOver ? "0 8px 32px rgba(10, 15, 25, 0.05)" : "none",
-                              transition: "all 0.3s ease",
-                            }}
-                          >
-                            {/* Specialist Header */}
+                  <Box
+                    sx={{
+                      display: "grid",
+                      gridTemplateColumns: {
+                        xs: "1fr",
+                        md: "repeat(2, 1fr)",
+                        lg: "repeat(3, 1fr)",
+                      },
+                      gap: 3,
+                      pb: 2,
+                    }}
+                  >
+                    {specialists.map((specialist) => (
+                      <Box key={specialist.stableId} sx={{ width: "100%" }}>
+                        <Droppable
+                          droppableId={`specialist-${specialist.stableId}`}
+                        >
+                          {(provided, snapshot) => (
                             <Box
+                              {...provided.droppableProps}
+                              ref={provided.innerRef}
                               sx={{
-                                display: "flex",
-                                alignItems: "center",
-                                gap: 1.5,
-                                mb: 3,
+                                bgcolor: snapshot.isDraggingOver
+                                  ? "rgba(0, 0, 0, 0.05)"
+                                  : "rgba(0, 0, 0, 0.02)",
+                                borderRadius: "24px",
+                                p: { xs: 2, md: 3 },
+                                minHeight: "50vh",
+                                border: "1px solid",
+                                borderColor: snapshot.isDraggingOver ? "rgba(0, 0, 0, 0.1)" : GLASS_BORDER,
+                                transition: "all 0.3s ease",
                               }}
                             >
-                              <Avatar
+                              {/* Specialist Header */}
+                              <Box
                                 sx={{
-                                  width: 36,
-                                  height: 36,
-                                  background: "linear-gradient(135deg, #0f172a 0%, #334155 100%)",
-                                  color: "#fff",
-                                  borderRadius: "10px",
-                                  boxShadow: "0 4px 8px rgba(10, 15, 25, 0.1)"
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: 1.5,
+                                  mb: 3,
                                 }}
                               >
-                                {specialist.name?.charAt(0)}
-                              </Avatar>
-                              <Box>
-                                <Typography
-                                  variant="subtitle2"
-                                  sx={{ color: PRIMARY_SLATE, fontWeight: 800 }}
-                                >
-                                  {specialist.name}
-                                </Typography>
-                                <Typography
-                                  variant="caption"
-                                  sx={{ color: SECONDARY_SLATE, fontWeight: 600, textTransform: "uppercase", fontSize: "0.65rem" }}
-                                >
-                                  {specialist.role || "Specialist"}
-                                </Typography>
-                              </Box>
-                            </Box>
-
-                            {/* Assigned Tasks */}
-                            {specialist.assignedTasks.map((task, index) => (
-                              <Draggable
-                                key={task._id}
-                                draggableId={task._id}
-                                index={index}
-                              >
-                                {(provided, snapshot) => {
-                                  const child = (
-                                    <Paper
-                                      ref={provided.innerRef}
-                                      {...provided.draggableProps}
-                                      {...provided.dragHandleProps}
-                                      sx={{
-                                        p: 1.5,
-                                        mb: 1.5,
-                                        background: snapshot.isDragging
-                                          ? "rgba(255, 255, 255, 0.9)"
-                                          : "rgba(255, 255, 255, 0.6)",
-                                        backdropFilter: snapshot.isDragging
-                                          ? "blur(12px) saturate(180%)"
-                                          : "blur(20px) saturate(120%)",
-                                        border: `1px solid ${snapshot.isDragging ? "rgba(15, 23, 42, 0.15)" : GLASS_BORDER}`,
-                                        borderRadius: "12px",
-                                        boxShadow: snapshot.isDragging
-                                          ? "0 20px 40px rgba(10, 15, 25, 0.15)"
-                                          : "0 4px 12px rgba(10, 15, 25, 0.03)",
-                                        width: snapshot.isDragging
-                                          ? "240px"
-                                          : "auto",
-                                        zIndex: 9999,
-                                        transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-                                        "&:hover": {
-                                          background: "rgba(255, 255, 255, 0.8)",
-                                          borderColor: "rgba(15, 23, 42, 0.1)",
-                                          transform: "translateY(-1px)",
-                                        },
-                                      }}
-                                    >
-                                      <Typography
-                                        variant="body2"
-                                        sx={{
-                                          color: PRIMARY_SLATE,
-                                          fontWeight: 700,
-                                        }}
-                                      >
-                                        {task.title}
-                                      </Typography>
-                                      {(task.dueDate || task.duedate) && (
-                                        <Typography
-                                          variant="caption"
-                                          sx={{
-                                            color: "#10b981",
-                                            display: "block",
-                                            mt: 1,
-                                            fontSize: "0.6rem",
-                                            fontWeight: 800,
-                                          }}
-                                        >
-                                          Due:{" "}
-                                          {new Date(
-                                            task.dueDate || task.duedate,
-                                          ).toLocaleDateString()}
-                                        </Typography>
-                                      )}
-                                    </Paper>
-                                  );
-
-                                  if (snapshot.isDragging) {
-                                    return ReactDOM.createPortal(
-                                      child,
-                                      document.body,
-                                    );
-                                  }
-                                  return child;
-                                }}
-                              </Draggable>
-                            ))}
-                            {provided.placeholder}
-                            {specialist.assignedTasks.length === 0 &&
-                              !snapshot.isDraggingOver && (
-                                <Typography
-                                  variant="caption"
+                                <Avatar
                                   sx={{
-                                    color: SECONDARY_SLATE,
-                                    display: "block",
-                                    textAlign: "center",
-                                    mt: 4,
-                                    fontWeight: 600
+                                    width: 34,
+                                    height: 34,
+                                    background: "rgba(0, 0, 0, 0.05)",
+                                    color: "rgba(0, 0, 0, 0.8)",
+                                    borderRadius: "10px",
+                                    border: "1px solid rgba(0, 0, 0, 0.05)",
+                                    fontSize: "0.9rem",
+                                    fontWeight: 1000
                                   }}
                                 >
-                                  Drop tasks here
-                                </Typography>
-                              )}
-                          </Box>
-                        )}
-                      </Droppable>
-                    </Box>
-                  ))}
+                                  {specialist.name?.charAt(0)}
+                                </Avatar>
+                                <Box>
+                                  <Typography
+                                    variant="subtitle2"
+                                    sx={{ color: PRIMARY_SLATE, fontWeight: 800 }}
+                                  >
+                                    {specialist.name}
+                                  </Typography>
+                                  <Typography
+                                    variant="caption"
+                                    sx={{ color: SECONDARY_SLATE, fontWeight: 600, textTransform: "uppercase", fontSize: "0.65rem" }}
+                                  >
+                                    {specialist.role || "Specialist"}
+                                  </Typography>
+                                </Box>
+                              </Box>
+
+                              {/* Assigned Tasks */}
+                              {specialist.assignedTasks.map((task, index) => (
+                                <Draggable
+                                  key={task._id}
+                                  draggableId={task._id}
+                                  index={index}
+                                >
+                                  {(provided, snapshot) => {
+                                    const child = (
+                                      <Paper
+                                        ref={provided.innerRef}
+                                        {...provided.draggableProps}
+                                        {...provided.dragHandleProps}
+                                        sx={{
+                                          p: 1.5,
+                                          mb: 1.5,
+                                          background: "#ffffff",
+                                          border: `1px solid ${snapshot.isDragging ? "rgba(0, 0, 0, 0.15)" : "rgba(0,0,0,0.06)"}`,
+                                          borderRadius: "12px",
+                                          boxShadow: snapshot.isDragging
+                                            ? "0 20px 40px rgba(0, 0, 0, 0.12)"
+                                            : "0 2px 6px rgba(0, 0, 0, 0.01)",
+                                          width: snapshot.isDragging
+                                            ? "220px"
+                                            : "auto",
+                                          zIndex: 9999,
+                                          transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                                          "&:hover": {
+                                            borderColor: "rgba(0, 0, 0, 0.12)",
+                                            transform: "translateY(-1px)",
+                                          },
+                                        }}
+                                      >
+                                        <Typography
+                                          variant="body2"
+                                          sx={{
+                                            color: PRIMARY_SLATE,
+                                            fontWeight: 700,
+                                          }}
+                                        >
+                                          {task.title}
+                                        </Typography>
+                                        {(task.dueDate || task.duedate) && (
+                                          <Typography
+                                            variant="caption"
+                                            sx={{
+                                              color: "#10b981",
+                                              display: "block",
+                                              mt: 1,
+                                              fontSize: "0.6rem",
+                                              fontWeight: 800,
+                                            }}
+                                          >
+                                            Due:{" "}
+                                            {new Date(
+                                              task.dueDate || task.duedate,
+                                            ).toLocaleDateString()}
+                                          </Typography>
+                                        )}
+                                      </Paper>
+                                    );
+
+                                    if (snapshot.isDragging) {
+                                      return ReactDOM.createPortal(
+                                        child,
+                                        document.body,
+                                      );
+                                    }
+                                    return child;
+                                  }}
+                                </Draggable>
+                              ))}
+                              {provided.placeholder}
+                              {specialist.assignedTasks.length === 0 &&
+                                !snapshot.isDraggingOver && (
+                                  <Typography
+                                    variant="caption"
+                                    sx={{
+                                      color: SECONDARY_SLATE,
+                                      display: "block",
+                                      textAlign: "center",
+                                      mt: 4,
+                                      fontWeight: 600
+                                    }}
+                                  >
+                                    Drop tasks here
+                                  </Typography>
+                                )}
+                            </Box>
+                          )}
+                        </Droppable>
+                      </Box>
+                    ))}
+                  </Box>
                 </Box>
               </Box>
             </Box>
-          </Box>
-        </DragDropContext>
-
-        {/* Footer Actions */}
-        <Box
-          sx={{ mt: 6, display: "flex", justifyContent: "flex-end", gap: 2 }}
-        >
-          <Button
-            onClick={onClose}
-            sx={{
-              color: SECONDARY_SLATE,
-              fontWeight: 800,
-              textTransform: "uppercase",
-              letterSpacing: 1,
-              "&:hover": { background: "rgba(15, 23, 42, 0.05)" }
-            }}
-          >
-            Cancel
-          </Button>
-          <Button
-            variant="contained"
-            startIcon={<SendIcon />}
-            onClick={handleSave}
-            disabled={specialists.every((s) => s.assignedTasks.length === 0)}
-            sx={{
-              background: "linear-gradient(135deg, #0f172a 0%, #334155 100%)",
-              color: "#fff",
-              fontWeight: 900,
-              px: 4,
-              py: 1.5,
-              borderRadius: "14px",
-              boxShadow: "0 10px 20px -5px rgba(10, 15, 25, 0.25)",
-              textTransform: "none",
-              fontSize: "1rem",
-              transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-              "&:hover": {
-                transform: "translateY(-2px)",
-                boxShadow: "0 15px 30px -5px rgba(10, 15, 25, 0.35)",
-              },
-              "&:disabled": {
-                opacity: 0.2,
-                background: "#94a3b8",
-                color: "#fff"
-              },
-            }}
-          >
-            Deploy Intelligence
-          </Button>
+          </DragDropContext>
         </Box>
       </DialogContent>
+
+      <DialogActions
+        sx={{
+          p: { xs: 2, sm: 3, md: 4 },
+          borderTop: `1px solid ${GLASS_BORDER}`,
+          background: "#ffffff",
+          gap: 2,
+          justifyContent: "flex-end",
+          zIndex: 10,
+          position: "sticky",
+          bottom: 0
+        }}
+      >
+        <Button
+          onClick={onClose}
+          sx={{
+            color: SECONDARY_SLATE,
+            fontWeight: 800,
+            textTransform: "uppercase",
+            letterSpacing: 1,
+            "&:hover": { background: "rgba(0, 0, 0, 0.05)" }
+          }}
+        >
+          Cancel
+        </Button>
+        <Button
+          variant="contained"
+          startIcon={<SendIcon />}
+          onClick={handleSave}
+          disabled={specialists.every((s) => s.assignedTasks.length === 0)}
+          sx={{
+            background: "rgba(0, 0, 0, 0.9)",
+            color: "#fff",
+            fontWeight: 900,
+            px: 4,
+            py: 1.2,
+            borderRadius: "14px",
+            boxShadow: "0 10px 20px -5px rgba(0, 0, 0, 0.15)",
+            textTransform: "none",
+            fontSize: "0.95rem",
+            transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+            "&:hover": {
+              background: "#000",
+              transform: "translateY(-2px)",
+              boxShadow: "0 15px 30px -5px rgba(0, 0, 0, 0.25)",
+            },
+            "&:disabled": {
+              opacity: 0.2,
+              background: "#94a3b8",
+              color: "#fff"
+            },
+          }}
+        >
+          Deploy Intelligence
+        </Button>
+      </DialogActions>
     </Dialog>
   );
 };

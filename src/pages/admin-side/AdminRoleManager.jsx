@@ -117,6 +117,7 @@ const AdminRoleManager = () => {
         const position = res.data.position.toLowerCase().trim();
         let token = res.data.token;
         localStorage.setItem("token", token);
+        localStorage.setItem("adminRole", position);
 
         const matchedRole = roles.find(
           (role) => role.title.toLowerCase() === position

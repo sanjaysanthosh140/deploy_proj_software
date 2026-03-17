@@ -26,7 +26,6 @@ import {
   Groups as TeamIcon,
   TrendingUp as TrendingUpIcon,
   CheckCircle as CheckCircleIcon,
-  Menu as MenuIcon,
 } from "@mui/icons-material";
 
 /* ─── Design Tokens (Glass Mirror System) ─── */
@@ -242,7 +241,7 @@ const Navbar = () => {
                 fontSize: "1.1rem",
               }}
             >
-              Project Management
+              Project Management Alkor
             </Typography>
           </Stack>
 
@@ -281,11 +280,7 @@ const Navbar = () => {
               Login
             </Button>
 
-            <IconButton
-              sx={{ display: { xs: "block", md: "none" }, color: TEXT_PRIMARY }}
-            >
-              <MenuIcon />
-            </IconButton>
+
           </Stack>
         </Stack>
       </Container>
@@ -349,6 +344,7 @@ const Landing = () => {
         minHeight: "100vh",
         color: TEXT_PRIMARY,
         overflowX: "hidden",
+        overflowY: "auto",
         position: "relative",
         fontFamily: "'Inter', sans-serif",
       }}
@@ -443,7 +439,7 @@ const Landing = () => {
                 color: TEXT_PRIMARY,
               }}
             >
-              Master Your Projects
+              Manage Your Projects
               <br />
               <motion.span
                 style={{
@@ -457,7 +453,7 @@ const Landing = () => {
                 animate={{ backgroundPosition: ["0% center", "200% center"] }}
                 transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
               >
-                with Infinite Precision
+                seamlessly
               </motion.span>
             </Typography>
           </FadeIn>
@@ -474,8 +470,8 @@ const Landing = () => {
                 letterSpacing: "-0.01em",
               }}
             >
-              The definitive platform for high-output engineering teams. Orchestrate
-              complex projects, automate friction, and achieve pure velocity.
+              A comprehensive platform for engineering teams. Orchestrate
+              projects, automate workflows, and improve team productivity.
             </Typography>
           </FadeIn>
 
@@ -514,41 +510,7 @@ const Landing = () => {
                 </Button>
               </motion.div>
 
-              {/* Secondary CTA — glass outlined */}
-              <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
-                <Button
-                  variant="outlined"
-                  size="large"
-                  endIcon={<ArrowForwardIcon />}
-                  sx={{
-                    borderColor: GLASS_BORDER_DARK,
-                    border: `1.5px solid ${GLASS_BORDER_DARK}`,
-                    color: TEXT_PRIMARY,
-                    fontSize: "1rem",
-                    fontWeight: 700,
-                    px: 5,
-                    py: 1.8,
-                    borderRadius: "18px",
-                    textTransform: "none",
-                    letterSpacing: 0.2,
-                    background: GLASS_SURFACE,
-                    backdropFilter: "blur(16px)",
-                    WebkitBackdropFilter: "blur(16px)",
-                    boxShadow:
-                      "0 4px 16px rgba(0,0,0,0.04), inset 0 1px 0 rgba(255,255,255,0.9)",
-                    transition: "all 0.3s ease",
-                    "&:hover": {
-                      borderColor: alpha(ACCENT, 0.3),
-                      background: "rgba(255,255,255,0.85)",
-                      boxShadow:
-                        "0 8px 28px rgba(0,0,0,0.07), inset 0 1px 0 rgba(255,255,255,1)",
-                      transform: "translateY(-2px)",
-                    },
-                  }}
-                >
-                  View Demo
-                </Button>
-              </motion.div>
+
             </Stack>
           </FadeIn>
         </Stack>
@@ -859,7 +821,7 @@ const Landing = () => {
                   fontSize: { xs: "2rem", md: "3rem" },
                 }}
               >
-                Ready to Accelerate?
+                Ready to Get Started?
               </Typography>
               <Typography
                 variant="h6"
@@ -873,8 +835,8 @@ const Landing = () => {
                   fontSize: "1.05rem",
                 }}
               >
-                Join thousands of high-velocity teams orchestrating their projects
-                with clarity and precision on Project Management.
+                Join the teams streamlining their projects
+                with clarity and precision on Project Management Alkor.
               </Typography>
 
               <Stack direction={{ xs: "column", sm: "row" }} spacing={2} justifyContent="center">
@@ -947,7 +909,7 @@ const Landing = () => {
                     fontSize: "1rem",
                   }}
                 >
-                  Project Management
+                  Project Management Alkor
                 </Typography>
               </Stack>
               <Typography
@@ -959,58 +921,12 @@ const Landing = () => {
                   fontWeight: 500,
                 }}
               >
-                The definitive platform for high-output engineering teams.
-                Orchestrate your future with cinematic precision.
+                A comprehensive platform for engineering teams.
+                Orchestrate your projects with efficiency.
               </Typography>
             </Grid>
 
-            {[
-              {
-                title: "Product",
-                links: ["Features", "Analytics", "Security", "Integrations"],
-              },
-              {
-                title: "Organization",
-                links: ["About", "Careers", "Documentation", "Contact"],
-              },
-              {
-                title: "Resources",
-                links: ["Blog", "Release Notes", "Status", "Support"],
-              },
-            ].map((col, i) => (
-              <Grid item xs={6} md={2} key={i}>
-                <Typography
-                  variant="subtitle2"
-                  sx={{
-                    color: TEXT_PRIMARY,
-                    fontWeight: 900,
-                    mb: 3,
-                    textTransform: "uppercase",
-                    letterSpacing: 1,
-                    fontSize: "0.75rem",
-                  }}
-                >
-                  {col.title}
-                </Typography>
-                <Stack spacing={2}>
-                  {col.links.map((link) => (
-                    <Typography
-                      key={link}
-                      variant="body2"
-                      sx={{
-                        color: TEXT_SECONDARY,
-                        fontWeight: 600,
-                        cursor: "pointer",
-                        transition: "color 0.2s ease",
-                        "&:hover": { color: ACCENT },
-                      }}
-                    >
-                      {link}
-                    </Typography>
-                  ))}
-                </Stack>
-              </Grid>
-            ))}
+
           </Grid>
 
           <Box
@@ -1029,7 +945,7 @@ const Landing = () => {
               variant="caption"
               sx={{ color: alpha(TEXT_SECONDARY, 0.55), fontWeight: 600 }}
             >
-              © 2026 Project Management. All rights reserved.
+              © 2026 Project Management Alkor. All rights reserved.
             </Typography>
             <Stack direction="row" spacing={4}>
               {["Privacy", "Terms", "Security", "Status"].map((link) => (

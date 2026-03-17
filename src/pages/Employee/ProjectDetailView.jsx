@@ -278,13 +278,13 @@ const ProjectDetailView = () => {
     <Box
       sx={{
         width: "100%",
-        height: "100vh",
-        background: `linear-gradient(135deg, ${PRIMARY_BG} 0%, ${SECONDARY_BG} 50%, ${TERTIARY_BG} 100%)`,
-        p: { xs: 2, md: 3 },
+        minHeight: "100vh",
+        bgcolor: "rgb(255, 255, 255)",
+        p: { xs: 1.5, sm: 2, md: 3 },
         position: "relative",
         overflowX: "hidden",
         overflowY: "auto",
-        "&::-webkit-scrollbar": { width: "10px" },
+        "&::-webkit-scrollbar": { width: "6px" },
         "&::-webkit-scrollbar-track": { background: "transparent" },
         "&::-webkit-scrollbar-thumb": {
           background: "rgba(0,0,0,0.25)",
@@ -294,44 +294,79 @@ const ProjectDetailView = () => {
       }}
     >
       <Fade in={true} timeout={500}>
-        <Stack spacing={3}>
+        <Stack spacing={{ xs: 2, sm: 3 }}>
           {/* Project Header Panel */}
-          <Box sx={{ ...glassEffect, p: 3, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 3 }}>
-              <IconButton onClick={() => navigate("/app/projects")} sx={{ bgcolor: "rgba(0,0,0,0.05)", "&:hover": { bgcolor: "rgba(0,0,0,0.1)" } }}>
+          <Box sx={{
+            ...glassEffect,
+            p: { xs: 2, sm: 3 },
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: { xs: "flex-start", sm: "center" },
+            flexWrap: "wrap",
+            gap: 2,
+          }}>
+            <Box sx={{ display: "flex", alignItems: "center", gap: { xs: 1.5, sm: 2 }, flex: 1, minWidth: 0 }}>
+              <IconButton
+                onClick={() => navigate("/employee/cockpit/IT")}
+                size="small"
+                sx={{ bgcolor: "rgba(0,0,0,0.05)", flexShrink: 0, "&:hover": { bgcolor: "rgba(0,0,0,0.1)" } }}
+              >
                 <ArrowBackIcon fontSize="small" sx={{ color: "rgba(0,0,0,0.6)" }} />
               </IconButton>
-              <Box>
-                <Typography variant="h3" sx={{ fontWeight: 900, color: "rgba(0,0,0,0.8)", letterSpacing: "-0.5px", mb: 0.5 }}>
+              <Box sx={{ minWidth: 0 }}>
+                <Typography
+                  variant="h5"
+                  noWrap
+                  sx={{
+                    fontWeight: 900,
+                    color: "rgba(0,0,0,0.8)",
+                    letterSpacing: "-0.3px",
+                    mb: 0.5,
+                    fontSize: { xs: "1.1rem", sm: "1.3rem", md: "1.5rem" },
+                  }}
+                >
                   {project.title}
                 </Typography>
-                <Typography variant="body1" sx={{ color: "rgba(0,0,0,0.5)", fontWeight: 650 }}>
+                <Typography
+                  variant="body2"
+                  sx={{ color: "rgba(0,0,0,0.5)", fontWeight: 600, fontSize: { xs: "0.78rem", sm: "0.875rem" } }}
+                >
                   Operation Protocol System
                 </Typography>
               </Box>
             </Box>
 
-            <Box sx={{ textAlign: "right" }}>
-              <Typography variant="h3" sx={{ color: daysRemaining <= 7 ? "#ff5b5b" : "#00d4ff", fontWeight: 950, lineHeight: 0.9 }}>
+            <Box sx={{ textAlign: "right", flexShrink: 0 }}>
+              <Typography
+                sx={{
+                  color: daysRemaining <= 7 ? "#ff5b5b" : "#00d4ff",
+                  fontWeight: 900,
+                  lineHeight: 0.9,
+                  fontSize: { xs: "1.8rem", sm: "2.2rem", md: "2.6rem" },
+                }}
+              >
                 {daysRemaining}
               </Typography>
-              <Typography variant="caption" sx={{ color: "rgba(0,0,0,0.4)", fontWeight: 800, textTransform: "uppercase", letterSpacing: "1px" }}>
+              <Typography
+                variant="caption"
+                sx={{ color: "rgba(0,0,0,0.4)", fontWeight: 800, textTransform: "uppercase", letterSpacing: "1px", fontSize: { xs: "0.65rem", sm: "0.7rem" } }}
+              >
                 Days Remaining
               </Typography>
             </Box>
           </Box>
 
           {/* Operation Velocity (Progress Dashboard) */}
-          <Box sx={{ ...glassEffect, p: 4, bgcolor: "rgba(255,255,255,0.4)" }}>
-            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", mb: 3 }}>
-              <Box>
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 1.5 }}>
-                  <TrendingUpIcon sx={{ color: getPriorityColor(project.priority), fontSize: 32 }} />
-                  <Typography variant="h4" sx={{ fontWeight: 900, color: "rgba(0,0,0,0.75)" }}>Operation Velocity</Typography>
+          <Box sx={{ ...glassEffect, p: { xs: 2, sm: 3, md: 4 }, bgcolor: "rgba(255,255,255,0.4)" }}>
+            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 1.5, mb: { xs: 2, sm: 3 } }}>
+              <Box sx={{ flex: 1, minWidth: 0 }}>
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
+                  <TrendingUpIcon sx={{ color: getPriorityColor(project.priority), fontSize: { xs: 22, sm: 28, md: 32 } }} />
+                  <Typography sx={{ fontWeight: 900, color: "rgba(0,0,0,0.75)", fontSize: { xs: "1rem", sm: "1.2rem", md: "1.4rem" } }}>Operation Velocity</Typography>
                 </Box>
-                <Typography variant="body1" sx={{ color: "rgba(0,0,0,0.45)", fontWeight: 700 }}>Synchronized with active protocol sequences</Typography>
+                <Typography variant="body2" sx={{ color: "rgba(0,0,0,0.45)", fontWeight: 600, fontSize: { xs: "0.78rem", sm: "0.875rem" } }}>Synchronized with active protocol sequences</Typography>
               </Box>
-              <Typography variant="h2" sx={{ fontWeight: 1000, color: getPriorityColor(project.priority), lineHeight: 0.8 }}>
+              <Typography sx={{ fontWeight: 900, color: getPriorityColor(project.priority), lineHeight: 0.9, fontSize: { xs: "1.8rem", sm: "2.2rem", md: "2.6rem" } }}>
                 {calculatedProgress}%
               </Typography>
             </Box>
@@ -403,42 +438,44 @@ const ProjectDetailView = () => {
               <AnimatePresence>
                 {project.todos?.map((todo, index) => (
                   <motion.div key={todo._id} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: index * 0.05 }}>
-                    <Box sx={{ p: 2, borderRadius: "20px", bgcolor: todo.status === "completed" ? "rgba(0, 230, 118, 0.04)" : "rgba(255,255,255,0.2)", border: "1px solid rgba(255,255,255,0.5)", transition: "all 0.3s ease" }}>
-                      <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                    <Box sx={{ p: { xs: 1.5, sm: 2 }, borderRadius: "16px", bgcolor: todo.status === "completed" ? "rgba(0, 230, 118, 0.04)" : "rgba(255,255,255,0.2)", border: "1px solid rgba(255,255,255,0.5)", transition: "all 0.3s ease" }}>
+                      <Box sx={{ display: "flex", alignItems: "flex-start", gap: { xs: 1, sm: 2 } }}>
                         <Checkbox
                           checked={todo.status === "completed"}
                           onChange={() => handleToggleTodo(todo._id)}
-                          icon={<RadioButtonUncheckedIcon sx={{ fontSize: 28 }} />}
-                          checkedIcon={<CheckCircleIcon sx={{ fontSize: 28 }} />}
-                          sx={{ p: 0.5, color: "rgba(0,0,0,0.15)", "&.Mui-checked": { color: "#00e676" } }}
+                          icon={<RadioButtonUncheckedIcon sx={{ fontSize: { xs: 22, sm: 26 } }} />}
+                          checkedIcon={<CheckCircleIcon sx={{ fontSize: { xs: 22, sm: 26 } }} />}
+                          sx={{ p: 0.5, flexShrink: 0, color: "rgba(0,0,0,0.15)", "&.Mui-checked": { color: "#00e676" } }}
                         />
-                        <Box sx={{ flex: 1 }}>
-                          <Typography variant="h5" sx={{ fontWeight: 800, color: todo.status === "completed" ? "rgba(0,0,0,0.3)" : "rgba(0,0,0,0.85)", textDecoration: todo.status === "completed" ? "line-through" : "none", lineHeight: 1.2, fontSize: { xs: "1.3rem", sm: "1.5rem", md: "1.7rem" } }}>
+                        <Box sx={{ flex: 1, minWidth: 0 }}>
+                          <Typography sx={{ fontWeight: 800, color: todo.status === "completed" ? "rgba(0,0,0,0.3)" : "rgba(0,0,0,0.85)", textDecoration: todo.status === "completed" ? "line-through" : "none", lineHeight: 1.3, fontSize: { xs: "0.95rem", sm: "1.1rem", md: "1.25rem" }, wordBreak: "break-word" }}>
                             {todo.title}
                           </Typography>
-                          <Box sx={{ display: "flex", gap: 3, mt: 1.5 }}>
-                            <Box sx={{ display: "flex", alignItems: "center", gap: 1.2 }}>
-                              <PersonIcon sx={{ fontSize: 22, color: "rgba(0,0,0,0.35)" }} />
-                              <Typography variant="body1" sx={{ color: "rgba(0,0,0,0.4)", fontWeight: 750, fontSize: { xs: "0.95rem", sm: "1.1rem" } }}>{todo.employee === "You" ? "Primary Operator" : "Assigned Unit"}</Typography>
+                          <Box sx={{ display: "flex", flexWrap: "wrap", gap: { xs: 1, sm: 2 }, mt: 1 }}>
+                            <Box sx={{ display: "flex", alignItems: "center", gap: 0.8 }}>
+                              <PersonIcon sx={{ fontSize: { xs: 16, sm: 18 }, color: "rgba(0,0,0,0.35)" }} />
+                              <Typography variant="caption" sx={{ color: "rgba(0,0,0,0.4)", fontWeight: 700, fontSize: { xs: "0.72rem", sm: "0.8rem" } }}>{todo.employee === "You" ? "Primary Operator" : "Assigned Unit"}</Typography>
                             </Box>
-                            <Box sx={{ display: "flex", alignItems: "center", gap: 1.2 }}>
-                              <AccessTimeIcon sx={{ fontSize: 22, color: "rgba(0,0,0,0.35)" }} />
-                              <Typography variant="body1" sx={{ color: "rgba(0,0,0,0.4)", fontWeight: 750, fontSize: { xs: "0.95rem", sm: "1.1rem" } }}>Due {new Date(todo.duedate).toLocaleDateString()}</Typography>
+                            <Box sx={{ display: "flex", alignItems: "center", gap: 0.8 }}>
+                              <AccessTimeIcon sx={{ fontSize: { xs: 16, sm: 18 }, color: "rgba(0,0,0,0.35)" }} />
+                              <Typography variant="caption" sx={{ color: "rgba(0,0,0,0.4)", fontWeight: 700, fontSize: { xs: "0.72rem", sm: "0.8rem" } }}>Due {new Date(todo.duedate).toLocaleDateString()}</Typography>
                             </Box>
                           </Box>
                         </Box>
-                        <Chip label={todo.priority} size="medium" sx={{ fontWeight: 850, fontSize: "0.95rem", bgcolor: `${getPriorityColor(todo.priority)}15`, color: getPriorityColor(todo.priority), height: 36, padding: "8px 12px", border: `1px solid ${getPriorityColor(todo.priority)}30` }} />
-                        <IconButton size="large" onClick={() => handleToggleExpand(todo._id)} sx={{ bgcolor: "rgba(0,0,0,0.03)", width: 50, height: 50 }}>
-                          {expandedTasks[todo._id] ? <KeyboardArrowUpIcon sx={{ fontSize: 32 }} /> : <KeyboardArrowDownIcon sx={{ fontSize: 32 }} />}
-                        </IconButton>
+                        <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, alignItems: "flex-end", gap: 0.5, flexShrink: 0 }}>
+                          <Chip label={todo.priority} size="small" sx={{ fontWeight: 800, fontSize: { xs: "0.7rem", sm: "0.8rem" }, bgcolor: `${getPriorityColor(todo.priority)}15`, color: getPriorityColor(todo.priority), border: `1px solid ${getPriorityColor(todo.priority)}30` }} />
+                          <IconButton size="small" onClick={() => handleToggleExpand(todo._id)} sx={{ bgcolor: "rgba(0,0,0,0.03)", width: { xs: 34, sm: 40 }, height: { xs: 34, sm: 40 } }}>
+                            {expandedTasks[todo._id] ? <KeyboardArrowUpIcon sx={{ fontSize: { xs: 20, sm: 24 } }} /> : <KeyboardArrowDownIcon sx={{ fontSize: { xs: 20, sm: 24 } }} />}
+                          </IconButton>
+                        </Box>
                       </Box>
 
                       <Collapse in={expandedTasks[todo._id]}>
                         <Box sx={{ pt: 2.5, mt: 2, borderTop: "1px solid rgba(0,0,0,0.05)" }}>
-                          <Box sx={{ mb: 2.5 }}>
-                            <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1.5, alignItems: "center" }}>
-                              <Typography variant="body1" sx={{ fontWeight: 900, color: "rgba(0,0,0,0.45)", textTransform: "uppercase", letterSpacing: "0.5px", fontSize: { xs: "0.9rem", sm: "1.05rem" } }}>Sequence Integrity</Typography>
-                              <Typography variant="h5" sx={{ fontWeight: 1000, color: getPriorityColor(todo.priority), fontSize: { xs: "1.4rem", sm: "1.6rem" } }}>
+                          <Box sx={{ mb: 2 }}>
+                            <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1, alignItems: "center" }}>
+                              <Typography sx={{ fontWeight: 800, color: "rgba(0,0,0,0.45)", textTransform: "uppercase", letterSpacing: "0.5px", fontSize: { xs: "0.72rem", sm: "0.8rem" } }}>Sequence Integrity</Typography>
+                              <Typography sx={{ fontWeight: 900, color: getPriorityColor(todo.priority), fontSize: { xs: "1.1rem", sm: "1.3rem" } }}>
                                 {todo.subTasks?.length > 0 ? Math.round((todo.subTasks.filter(s => s.status === "completed").length / todo.subTasks.length) * 100) : 0}%
                               </Typography>
                             </Box>
@@ -469,7 +506,7 @@ const ProjectDetailView = () => {
                                     onChange={() => handleToggleSubTaskStatus(todo._id, subTask.todo_id)}
                                     sx={{ p: 0.5, "&.Mui-checked": { color: "#00d4ff" } }}
                                   />
-                                  <Typography variant="body1" sx={{ fontWeight: 700, color: subTask.status === "completed" ? "rgba(0,0,0,0.4)" : "rgba(0,0,0,0.75)", textDecoration: subTask.status === "completed" ? "line-through" : "none", fontSize: { xs: "1rem", sm: "1.15rem" } }}>
+                                  <Typography sx={{ fontWeight: 700, color: subTask.status === "completed" ? "rgba(0,0,0,0.4)" : "rgba(0,0,0,0.75)", textDecoration: subTask.status === "completed" ? "line-through" : "none", fontSize: { xs: "0.85rem", sm: "0.95rem" }, wordBreak: "break-word" }}>
                                     {subTask.title}
                                   </Typography>
                                   {subTask.isNew && <Chip label="Unsynchronized" size="small" sx={{ height: 24, fontSize: "0.8rem", bgcolor: "rgba(255, 171, 0, 0.12)", color: "#ffab00", fontWeight: 900 }} />}

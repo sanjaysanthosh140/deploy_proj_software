@@ -18,7 +18,7 @@ const UserProfile = () => {
                         <Button variant="contained" color="primary">Share Profile</Button>
                     </Box>
                 </Box>
-                        </Box>
+            </Box>
 
             <Typography variant="h6" sx={{ color: '#fff', mb: 2, borderBottom: '1px solid rgba(255,255,255,0.1)', pb: 1 }}>About Me</Typography>
             <GlassContainer sx={{ mb: 4 }}>

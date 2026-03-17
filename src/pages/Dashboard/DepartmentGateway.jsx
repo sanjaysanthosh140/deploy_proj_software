@@ -1,8 +1,3 @@
-/**
- * DepartmentGateway — iOS Liquid Glass UI
- * Inspired by iPhone Control Center aesthetic
- * Soft blurred gradient background + floating liquid glass panels
- */
 import React, { useState, useEffect } from "react";
 import {
   Box,
@@ -28,8 +23,11 @@ import {
   Bolt as BoltIcon,
 } from "@mui/icons-material";
 
-/* ─── iOS Liquid Glass Tokens ─── */
-const CARD_H = 420;
+/* ─── Standard White Theme Tokens ─── */
+const CARD_H = 440;
+const PRIMARY_BG = "#fcfcfc";
+const SECONDARY_BG = "#ffffff";
+const TERTIARY_BG = "#f5f5f5";
 
 /* ─── Department accent map ─── */
 const getDeptConfig = (id = "") => {
@@ -84,19 +82,17 @@ const SkeletonCard = () => (
   <Box
     sx={{
       height: CARD_H,
-      borderRadius: "22px",
-      background: "rgba(255,255,255,0.22)",
-      backdropFilter: "blur(30px)",
-      WebkitBackdropFilter: "blur(30px)",
-      border: "1px solid rgba(255,255,255,0.4)",
-      boxShadow: "0 8px 30px rgba(0,0,0,0.1)",
+      borderRadius: "20px",
+      background: "#ffffff",
+      border: "1px solid #eaeaea",
+      boxShadow: "0 8px 30px rgba(0,0,0,0.05)",
       p: 3,
     }}
   >
-    <Skeleton variant="rounded" width={70} height={70} sx={{ borderRadius: "18px", mb: 3, bgcolor: "rgba(255,255,255,0.35)" }} />
-    <Skeleton variant="text" width="55%" height={32} sx={{ mb: 1.5, bgcolor: "rgba(255,255,255,0.3)" }} />
-    <Skeleton variant="text" width="90%" height={20} sx={{ mb: 1, bgcolor: "rgba(255,255,255,0.25)" }} />
-    <Skeleton variant="text" width="72%" height={20} sx={{ bgcolor: "rgba(255,255,255,0.2)" }} />
+    <Skeleton variant="rounded" width={70} height={70} sx={{ borderRadius: "16px", mb: 3 }} />
+    <Skeleton variant="text" width="55%" height={32} sx={{ mb: 1.5 }} />
+    <Skeleton variant="text" width="90%" height={20} sx={{ mb: 1 }} />
+    <Skeleton variant="text" width="72%" height={20} />
   </Box>
 );
 
@@ -111,138 +107,83 @@ const DeptCard = ({ dept, onClick, index }) => {
       transition={{ duration: 0.45, delay: index * 0.07, ease: [0.22, 1, 0.36, 1] }}
       whileHover={{ y: -7, scale: 1.02 }}
       whileTap={{ scale: 0.97 }}
-      style={{ height: "100%" }}
+      style={{ height: "100%", width: "100%" }}
     >
       <Box
         onClick={onClick}
         sx={{
           height: CARD_H,
-          borderRadius: "22px",
+          width: "100%",
+          borderRadius: "20px",
           overflow: "hidden",
           cursor: "pointer",
           position: "relative",
-
-          /* ── iOS liquid glass panel ── */
-          background: "rgba(255,255,255,0.22)",
-          backdropFilter: "blur(40px) saturate(160%)",
-          WebkitBackdropFilter: "blur(40px) saturate(160%)",
-          border: "1px solid rgba(255,255,255,0.45)",
-
-          /* Layered shadow: ambient + glow ring */
-          boxShadow: [
-            "0 8px 32px rgba(0,0,0,0.10)",
-            "0 2px 8px rgba(0,0,0,0.06)",
-            "inset 0 1px 0 rgba(255,255,255,0.7)",    // top inner edge highlight
-            "inset 0 -1px 0 rgba(255,255,255,0.2)",   // bottom inner
-          ].join(", "),
-
+          bgcolor: "#ffffff",
+          border: "1px solid #eaeaea",
+          boxShadow: "0 15px 35px rgba(0,0,0,0.04)",
           display: "flex",
           flexDirection: "column",
-          justifyContent: "space-between",
-          p: "22px 22px 18px 22px",
-          transition: "all 0.3s cubic-bezier(0.4,0,0.2,1)",
+          justifyContent: "center",
+          alignItems: "center",
+          textAlign: "center",
+          p: { xs: 4, md: 5 },
+          transition: "all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
 
           "&:hover": {
-            background: "rgba(255,255,255,0.35)",
-            border: `1px solid rgba(255,255,255,0.65)`,
-            boxShadow: [
-              `0 20px 50px rgba(0,0,0,0.13)`,
-              `0 0 0 1px ${alpha(cfg.color, 0.18)}`,
-              `0 0 28px ${cfg.glow}`,
-              "inset 0 1px 0 rgba(255,255,255,0.85)",
-            ].join(", "),
+            transform: "translateY(-10px)",
+            boxShadow: `0 30px 60px rgba(0,0,0,0.08)`,
+            borderColor: cfg.color,
             "& .liq-icon": {
-              background: cfg.gradient,
-              boxShadow: `0 6px 20px ${cfg.glow}`,
-              "& svg": { color: "#fff !important" },
+              background: cfg.color,
+              color: "#fff",
+              boxShadow: `0 8px 20px ${alpha(cfg.color, 0.3)}`,
             },
             "& .liq-arrow": {
-              background: cfg.gradient,
-              "& svg": { color: "#fff !important", transform: "translateX(2px)" },
+              background: "#1a1a1a",
+              color: "#fff",
+              borderColor: "#1a1a1a",
+              "& svg": { color: "#fff", transform: "translateX(3px)" },
             },
-            "& .liq-enter": { color: `${cfg.color} !important` },
+            "& .liq-enter": { color: "#1a1a1a" },
           },
         }}
       >
-        {/* ── Inner diagonal glass sheen ── */}
-        <Box
-          sx={{
-            position: "absolute",
-            inset: 0,
-            borderRadius: "21px",
-            background:
-              "linear-gradient(135deg, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0.1) 40%, rgba(255,255,255,0.03) 100%)",
-            pointerEvents: "none",
-            zIndex: 0,
-          }}
-        />
-        {/* ── Corner light refraction (top-right) ── */}
-        <Box
-          sx={{
-            position: "absolute",
-            top: 0,
-            right: 0,
-            width: 80,
-            height: 80,
-            background:
-              "radial-gradient(circle at top right, rgba(255,255,255,0.6) 0%, transparent 65%)",
-            borderRadius: "0 22px 0 0",
-            pointerEvents: "none",
-            zIndex: 0,
-          }}
-        />
-        {/* ── Bottom-left ambient reflection ── */}
-        <Box
-          sx={{
-            position: "absolute",
-            bottom: 0,
-            left: 0,
-            width: 65,
-            height: 65,
-            background:
-              "radial-gradient(circle at bottom left, rgba(255,255,255,0.35) 0%, transparent 65%)",
-            borderRadius: "0 0 0 22px",
-            pointerEvents: "none",
-            zIndex: 0,
-          }}
-        />
 
         {/* ── Card content ── */}
         <Box sx={{ position: "relative", zIndex: 1 }}>
-          <Stack direction="row" alignItems="flex-start" justifyContent="space-between" sx={{ mb: 3 }}>
+          <Stack direction="column" alignItems="center" justifyContent="center" sx={{ mb: 4 }}>
             {/* Icon */}
             <Box
               className="liq-icon"
               sx={{
-                width: 70,
-                height: 70,
-                borderRadius: "18px",
-                background: alpha(cfg.color, 0.14),
-                border: `1px solid ${alpha(cfg.color, 0.22)}`,
+                width: 85,
+                height: 85,
+                borderRadius: "22px",
+                background: alpha(cfg.color, 0.08),
+                border: `1px solid ${alpha(cfg.color, 0.15)}`,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 color: cfg.color,
                 transition: "all 0.3s ease",
-                boxShadow: `0 4px 12px rgba(0,0,0,0.06)`,
+                boxShadow: `0 8px 20px rgba(0,0,0,0.04)`,
                 flexShrink: 0,
+                mb: 3,
               }}
             >
-              <Box sx={{ fontSize: 40, display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <Box sx={{ fontSize: 45, display: "flex", alignItems: "center", justifyContent: "center" }}>
                 {cfg.icon}
               </Box>
             </Box>
 
-            {/* Glass label chip */}
+            {/* Label chip */}
             <Box
               sx={{
-                px: 2,
-                py: 0.75,
+                px: 2.5,
+                py: 0.8,
                 borderRadius: "30px",
-                background: "rgba(255,255,255,0.35)",
-                border: "1px solid rgba(255,255,255,0.6)",
-                backdropFilter: "blur(12px)",
-                boxShadow: "inset 0 1px 0 rgba(255,255,255,0.8)",
+                background: "#f8f9fa",
+                border: "1px solid #efefef",
               }}
             >
               <Typography
@@ -250,7 +191,7 @@ const DeptCard = ({ dept, onClick, index }) => {
                   fontSize: "0.85rem",
                   fontWeight: 900,
                   letterSpacing: 2.2,
-                  color: "rgba(30,40,60,0.55)",
+                  color: "#757575",
                   textTransform: "uppercase",
                 }}
               >
@@ -274,10 +215,12 @@ const DeptCard = ({ dept, onClick, index }) => {
 
           <Typography
             sx={{
-              color: "rgba(30,40,70,0.5)",
-              fontSize: { xs: "0.95rem", sm: "1.05rem", md: "1.15rem" },
-              lineHeight: 1.7,
+              color: "#6b7280",
+              fontSize: { xs: "0.95rem", sm: "1rem" },
+              lineHeight: 1.6,
               fontWeight: 500,
+              maxWidth: "90%",
+              mx: "auto",
               display: "-webkit-box",
               WebkitLineClamp: 3,
               WebkitBoxOrient: "vertical",
@@ -289,16 +232,17 @@ const DeptCard = ({ dept, onClick, index }) => {
           </Typography>
         </Box>
 
-        {/* ── Footer action ── */}
+        {/* ── Footer Action (Centered) ── */}
         <Box
           sx={{
             position: "relative",
             zIndex: 1,
-            pt: 1.8,
-            borderTop: "1px solid rgba(255,255,255,0.5)",
+            pt: 3,
+            borderTop: "1px solid #f0f0f0",
             display: "flex",
+            flexDirection: "column",
             alignItems: "center",
-            justifyContent: "space-between",
+            gap: 2,
           }}
         >
           <Typography
@@ -308,30 +252,29 @@ const DeptCard = ({ dept, onClick, index }) => {
               fontWeight: 900,
               letterSpacing: 1.8,
               textTransform: "uppercase",
-              color: "rgba(30,40,70,0.4)",
+              color: "#9e9e9e",
               transition: "color 0.3s ease",
             }}
           >
             Enter Department
           </Typography>
 
-          <Box
-            className="liq-arrow"
-            sx={{
-              width: 42,
-              height: 42,
-              borderRadius: "11px",
-              background: "rgba(255,255,255,0.4)",
-              border: "1px solid rgba(255,255,255,0.7)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              transition: "all 0.3s ease",
-              boxShadow: "inset 0 1px 0 rgba(255,255,255,0.9), 0 2px 6px rgba(0,0,0,0.06)",
-            }}
-          >
-            <ArrowIcon sx={{ fontSize: 22, color: "rgba(30,40,70,0.4)", transition: "all 0.3s ease" }} />
-          </Box>
+            <Box
+              className="liq-arrow"
+              sx={{
+                width: 42,
+                height: 42,
+                borderRadius: "12px",
+                background: "#f5f5f5",
+                border: "1px solid #eaeaea",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                transition: "all 0.3s ease",
+              }}
+            >
+              <ArrowIcon sx={{ fontSize: 22, color: "#9e9e9e", transition: "all 0.3s ease" }} />
+            </Box>
         </Box>
       </Box>
     </motion.div>
@@ -399,66 +342,18 @@ const DepartmentGateway = () => {
         pt: { xs: 8, md: 10 },
         pb: 10,
 
-        /* ── iOS-style soft gradient background ── */
-        background: "linear-gradient(160deg, #dde6f0 0%, #cfd9e8 35%, #c8d5e6 60%, #d4dff0 100%)",
+        /* ── Modern Slate Background ── */
+        bgcolor: "#fcfcfc",
         "&::-webkit-scrollbar": { width: "10px" },
         "&::-webkit-scrollbar-track": { background: "transparent" },
         "&::-webkit-scrollbar-thumb": {
-          background: "rgba(0,0,0,0.2)",
+          background: "rgba(0,0,0,0.1)",
           borderRadius: "5px",
         },
-        "&::-webkit-scrollbar-thumb:hover": { background: "rgba(0,0,0,0.35)" },
+        "&::-webkit-scrollbar-thumb:hover": { background: "rgba(0,0,0,0.2)" },
       }}
     >
       {/* ── Blurred color orbs — depth behind panels ── */}
-      <Box sx={{ position: "absolute", inset: 0, zIndex: 0, pointerEvents: "none", overflow: "hidden" }}>
-        {/* Primary orb — top left, blue */}
-        <Box
-          sx={{
-            position: "absolute",
-            top: "-8%",
-            left: "-5%",
-            width: "55vw",
-            height: "55vw",
-            background: "radial-gradient(circle, rgba(160,185,230,0.55) 0%, transparent 65%)",
-            filter: "blur(70px)",
-          }}
-        />
-        {/* Secondary orb — bottom right, cool lavender */}
-        <Box
-          sx={{
-            position: "absolute",
-            bottom: "-5%",
-            right: "-5%",
-            width: "50vw",
-            height: "50vw",
-            background: "radial-gradient(circle, rgba(180,195,235,0.5) 0%, transparent 65%)",
-            filter: "blur(80px)",
-          }}
-        />
-        {/* Centre large soft glow */}
-        <Box
-          sx={{
-            position: "absolute",
-            top: "30%",
-            left: "30%",
-            width: "45vw",
-            height: "45vw",
-            background: "radial-gradient(circle, rgba(200,215,245,0.35) 0%, transparent 65%)",
-            filter: "blur(90px)",
-          }}
-        />
-        {/* ── Very subtle noise texture ── */}
-        <Box
-          sx={{
-            position: "absolute",
-            inset: 0,
-            backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E\")",
-            backgroundSize: "256px 256px",
-            opacity: 0.4,
-          }}
-        />
-      </Box>
 
       <Container maxWidth="lg" sx={{ position: "relative", zIndex: 1 }}>
 
@@ -479,21 +374,18 @@ const DepartmentGateway = () => {
                 px: 3,
                 py: 1.2,
                 borderRadius: "30px",
-                background: "rgba(255,255,255,0.3)",
-                border: "1px solid rgba(255,255,255,0.55)",
-                backdropFilter: "blur(20px)",
-                WebkitBackdropFilter: "blur(20px)",
-                boxShadow:
-                  "0 4px 16px rgba(0,0,0,0.07), inset 0 1px 0 rgba(255,255,255,0.7)",
+                background: "#ffffff",
+                border: "1px solid #eaeaea",
+                boxShadow: "0 4px 16px rgba(0,0,0,0.03)",
               }}
             >
               <BoltIcon sx={{ fontSize: 16, color: "rgba(30,50,100,0.5)" }} />
               <Typography
                 sx={{
-                  fontSize: "0.8rem",
-                  fontWeight: 900,
-                  letterSpacing: 3,
-                  color: "rgba(30,50,100,0.5)",
+                  fontSize: "0.85rem",
+                  fontWeight: 700,
+                  letterSpacing: 2,
+                  color: "#9e9e9e",
                   textTransform: "uppercase",
                 }}
               >
@@ -505,12 +397,11 @@ const DepartmentGateway = () => {
               variant="h2"
               sx={{
                 fontWeight: 900,
-                color: "rgba(12,20,50,0.85)",
-                letterSpacing: "-0.04em",
-                lineHeight: 1.1,
+                color: "#1a1a1a",
+                letterSpacing: "-0.03em",
+                lineHeight: 1.15,
                 mb: 2.5,
-                fontSize: { xs: "2.2rem", sm: "2.5rem", md: "3rem" },
-                textShadow: "0 1px 2px rgba(255,255,255,0.4)",
+                fontSize: { xs: "2.4rem", sm: "2.8rem", md: "3.2rem" },
               }}
             >
               Choose Your Division
@@ -518,12 +409,12 @@ const DepartmentGateway = () => {
 
             <Typography
               sx={{
-                color: "rgba(30,50,90,0.55)",
+                color: "#6b7280",
                 maxWidth: 520,
                 mx: "auto",
-                lineHeight: 1.8,
+                lineHeight: 1.6,
                 fontWeight: 500,
-                fontSize: { xs: "1rem", sm: "1.05rem", md: "1.1rem" },
+                fontSize: { xs: "1rem", sm: "1.05rem" },
               }}
             >
               Select your department to access your workspace, track tasks,
@@ -541,7 +432,7 @@ const DepartmentGateway = () => {
               </Grid>
             ))
             : departments.map((dept, i) => (
-              <Grid item xs={12} sm={6} md={4} lg={4} key={dept.id}>
+              <Grid item xs={12} sm={6} md={6} lg={4} key={dept.id} sx={{ display: "flex" }}>
                 <DeptCard dept={dept} onClick={() => handleEnter(dept.Dep_id)} index={i} />
               </Grid>
             ))}
@@ -551,22 +442,22 @@ const DepartmentGateway = () => {
               <Box
                 sx={{
                   height: CARD_H,
-                  borderRadius: "22px",
-                  background: "rgba(255,255,255,0.22)",
-                  backdropFilter: "blur(30px)",
-                  border: "1px solid rgba(255,255,255,0.4)",
-                  boxShadow: "0 8px 30px rgba(0,0,0,0.08)",
+                  width: "100%",
+                  borderRadius: "20px",
+                  background: "#ffffff",
+                  border: "1px solid #eaeaea",
+                  boxShadow: "0 8px 30px rgba(0,0,0,0.05)",
                   display: "flex",
                   flexDirection: "column",
                   alignItems: "center",
                   justifyContent: "center",
-                  gap: 1.5,
+                  gap: 2,
                   maxWidth: 420,
                   mx: "auto",
                 }}
               >
-                <GeneralIcon sx={{ fontSize: 48, color: "rgba(30,50,100,0.2)" }} />
-                <Typography sx={{ color: "rgba(30,50,100,0.4)", fontWeight: 700, fontSize: "1rem" }}>
+                <GeneralIcon sx={{ fontSize: 48, color: "#9e9e9e", opacity: 0.5 }} />
+                <Typography sx={{ color: "#9e9e9e", fontWeight: 700, fontSize: "1rem" }}>
                   No departments available
                 </Typography>
               </Box>
