@@ -36,6 +36,7 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EmailIcon from "@mui/icons-material/Email";
 import BusinessCenterIcon from "@mui/icons-material/BusinessCenter";
+import VpnKeyIcon from "@mui/icons-material/VpnKey";
 import { iPhoneGlassButton, GLASS_BORDER, whiteCard } from "./SharedStyles";
 
 const EmployeeManager = ({
@@ -48,8 +49,9 @@ const EmployeeManager = ({
   onAddEmployee,
   onAddResponsible,
   onEditUser,
-  onToggleUserStatus,
+  onEditPassword,
   onDeleteUser,
+  isAdminView = false,
 }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
@@ -62,9 +64,12 @@ const EmployeeManager = ({
       user.email?.toLowerCase().includes(searchQuery.toLowerCase());
 
     const matchesDept =
-      departmentFilter === "ALL" || user.department === departmentFilter;
+      isAdminView || departmentFilter === "ALL" || user.department === departmentFilter;
 
-    return matchesSearch && matchesDept;
+    const matchesRole =
+      !isAdminView || departmentFilter === "ALL" || user.role === departmentFilter;
+
+    return matchesSearch && matchesDept && matchesRole;
   });
 
   return (
@@ -86,10 +91,10 @@ const EmployeeManager = ({
               variant={isMobile ? "h5" : "h4"}
               sx={{ fontWeight: 1000, color: "rgba(0,0,0,0.85)", letterSpacing: "-0.025em" }}
             >
-              User Directory
+              {isAdminView ? "Responsible Directory" : "User Directory"}
             </Typography>
             <Typography variant="caption" sx={{ color: "#64748b", fontWeight: 700, textTransform: "uppercase", letterSpacing: "1px" }}>
-              Managing {filteredUsers.length} Active Nodes
+              Managing {filteredUsers.length} {isAdminView ? "Admin Nodes" : "Active Nodes"}
             </Typography>
           </Box>
 
@@ -114,15 +119,15 @@ const EmployeeManager = ({
                 "& .MuiInputLabel-root": { fontWeight: 800, color: "rgba(0,0,0,0.4)" },
               }}
             >
-              <InputLabel>Department</InputLabel>
+              <InputLabel>{isAdminView ? "Role" : "Department"}</InputLabel>
               <Select
                 value={departmentFilter}
-                label="Department"
+                label={isAdminView ? "Role" : "Department"}
                 onChange={(e) => setDepartmentFilter(e.target.value)}
               >
-                <MenuItem value="ALL">All Departments</MenuItem>
-                {departmentsList.map((dept) => (
-                  <MenuItem key={dept} value={dept}>{dept}</MenuItem>
+                <MenuItem value="ALL">{isAdminView ? "All Roles" : "All Departments"}</MenuItem>
+                {departmentsList.map((item) => (
+                  <MenuItem key={item} value={item}>{item}</MenuItem>
                 ))}
               </Select>
             </FormControl>
@@ -228,16 +233,6 @@ const EmployeeManager = ({
                           </Typography>
                         </Stack>
                       </Box>
-                      <Chip
-                        label={user.active ? "ON" : "OFF"}
-                        size="small"
-                        sx={{
-                          background: user.active ? "rgba(16, 185, 129, 0.1)" : "rgba(225, 29, 72, 0.1)",
-                          color: user.active ? "#10b981" : "#e11d48",
-                          fontWeight: 1000,
-                          fontSize: "0.6rem",
-                        }}
-                      />
                     </Box>
 
                     <Stack spacing={1}>
@@ -247,7 +242,9 @@ const EmployeeManager = ({
                       </Box>
                       <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
                         <BusinessCenterIcon sx={{ fontSize: 16, color: "#94a3b8" }} />
-                        <Typography variant="body2" sx={{ fontWeight: 700, color: "#64748b" }}>{user.department || "General"}</Typography>
+                        <Typography variant="body2" sx={{ fontWeight: 700, color: "#64748b" }}>
+                          {isAdminView ? (user.role || "Admin") : (user.department || "General")}
+                        </Typography>
                       </Box>
                     </Stack>
 
@@ -256,8 +253,8 @@ const EmployeeManager = ({
                         <IconButton size="small" onClick={() => onEditUser(user)} sx={{ background: "rgba(56, 189, 248, 0.1)", color: "#38bdf8" }}>
                           <EditIcon fontSize="small" />
                         </IconButton>
-                        <IconButton size="small" onClick={() => onToggleUserStatus(user._id || user.id, user.active)} sx={{ background: user.active ? "rgba(225, 29, 72, 0.05)" : "rgba(16, 185, 129, 0.05)", color: user.active ? "#ef4444" : "#10b981" }}>
-                          {user.active ? <BlockIcon fontSize="small" /> : <CheckCircleIcon fontSize="small" />}
+                        <IconButton size="small" onClick={() => onEditPassword(user)} sx={{ background: "rgba(129, 140, 248, 0.1)", color: "#1d4ed8" }}>
+                          <VpnKeyIcon fontSize="small" />
                         </IconButton>
                       </Stack>
                       <IconButton size="small" onClick={() => onDeleteUser(user)} sx={{ background: "rgba(225, 29, 72, 0.1)", color: "#e11d48" }}>
@@ -284,7 +281,7 @@ const EmployeeManager = ({
               <Table stickyHeader>
                 <TableHead>
                   <TableRow>
-                    {["Employee Details", "Role & Department", "Access Status", "Operations"].map((head) => (
+                    {["Member Details", isAdminView ? "Role Access" : "Unit & Stream", "Operations"].map((head) => (
                       <TableCell
                         key={head}
                         sx={{
@@ -336,31 +333,23 @@ const EmployeeManager = ({
                       <TableCell sx={{ borderBottom: "1px solid rgba(0,0,0,0.03)" }}>
                         <Stack direction="row" spacing={1}>
                           <Chip
-                            label={user.department || "General"}
+                            label={isAdminView ? (user.role || "Admin") : (user.department || "General")}
                             size="small"
-                            sx={{ background: "rgba(56, 189, 248, 0.08)", color: "#0ea5e9", fontWeight: 900, borderRadius: "8px" }}
+                            sx={{
+                              background: isAdminView ? "rgba(129, 140, 248, 0.08)" : "rgba(56, 189, 248, 0.08)",
+                              color: isAdminView ? "#4f46e5" : "#0ea5e9",
+                              fontWeight: 900,
+                              borderRadius: "8px"
+                            }}
                           />
-                          <Chip
-                            label={user.role || "Staff"}
-                            size="small"
-                            sx={{ background: "rgba(129, 140, 248, 0.08)", color: "#4f46e5", fontWeight: 900, borderRadius: "8px" }}
-                          />
+                          {!isAdminView && (
+                            <Chip
+                              label={user.role || "Staff"}
+                              size="small"
+                              sx={{ background: "rgba(129, 140, 248, 0.08)", color: "#4f46e5", fontWeight: 900, borderRadius: "8px" }}
+                            />
+                          )}
                         </Stack>
-                      </TableCell>
-                      <TableCell sx={{ borderBottom: "1px solid rgba(0,0,0,0.03)" }}>
-                        <Chip
-                          icon={user.active ? <CheckCircleIcon style={{ color: "inherit", fontSize: 14 }} /> : <BlockIcon style={{ color: "inherit", fontSize: 14 }} />}
-                          label={user.active ? "Authorized" : "Deauthorized"}
-                          size="small"
-                          sx={{
-                            background: user.active ? "rgba(16, 185, 129, 0.1)" : "rgba(225, 29, 72, 0.1)",
-                            color: user.active ? "#10b981" : "#e11d48",
-                            fontWeight: 1000,
-                            fontSize: "0.65rem",
-                            textTransform: "uppercase",
-                            letterSpacing: "0.5px",
-                          }}
-                        />
                       </TableCell>
                       <TableCell sx={{ borderBottom: "1px solid rgba(0,0,0,0.03)" }}>
                         <Stack direction="row" spacing={1.5}>
@@ -369,9 +358,9 @@ const EmployeeManager = ({
                               <EditIcon fontSize="small" />
                             </IconButton>
                           </Tooltip>
-                          <Tooltip title={user.active ? "Revoke Access" : "Grant Access"}>
-                            <IconButton size="small" onClick={() => onToggleUserStatus(user._id || user.id, user.active)} sx={{ color: user.active ? "#f43f5e" : "#10b981", "&:hover": { background: user.active ? "rgba(244, 63, 94, 0.1)" : "rgba(16, 185, 129, 0.1)" } }}>
-                              {user.active ? <BlockIcon fontSize="small" /> : <CheckCircleIcon fontSize="small" />}
+                          <Tooltip title="Update Password">
+                            <IconButton size="small" onClick={() => onEditPassword(user)} sx={{ color: "#4f46e5", "&:hover": { background: "rgba(79, 70, 229, 0.1)" } }}>
+                              <VpnKeyIcon fontSize="small" />
                             </IconButton>
                           </Tooltip>
                           <Tooltip title="Purge Data">

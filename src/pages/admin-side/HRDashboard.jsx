@@ -36,14 +36,24 @@ import {
   getDeptColor,
 } from "./components/SharedStyles";
 
+const toLocalISO = (date) => {
+  const d = new Date(date);
+  if (isNaN(d.getTime())) return "";
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
 const HRDashboard = () => {
   const navigate = useNavigate();
-  
+
   // Tab State
   const [tabValue, setTabValue] = useState(0);
-  
+
   // Data State
   const [users, setUsers] = useState([]);
+  const [admins, setAdmins] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [reports, setReports] = useState([]);
   const [logs, setLogs] = useState([]);
@@ -54,10 +64,14 @@ const HRDashboard = () => {
   const [openDeptDialog, setOpenDeptDialog] = useState(false);
   const [openResponsibleDialog, setOpenResponsibleDialog] = useState(false);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
-  
+  const [openPasswordDialog, setOpenPasswordDialog] = useState(false);
+
   // Selection/Editing States
   const [userToDelete, setUserToDelete] = useState(null);
+  const [adminToDelete, setAdminToDelete] = useState(null);
   const [editingUser, setEditingUser] = useState(null);
+  const [editingAdmin, setEditingAdmin] = useState(null);
+  const [userForPassword, setUserForPassword] = useState(null);
   const [editingDept, setEditingDept] = useState(null);
 
   // Form States
@@ -74,6 +88,11 @@ const HRDashboard = () => {
     post: "",
     department: "",
     password: "",
+  });
+  const [passwordForm, setPasswordForm] = useState({
+    email: "",
+    newPassword: "",
+    accountType: "employee", // "employee" or "admin"
   });
   const [deptForm, setDeptForm] = useState({
     id: "",
@@ -97,7 +116,7 @@ const HRDashboard = () => {
     const loadData = async () => {
       const token = localStorage.getItem("token");
       const role = localStorage.getItem("adminRole");
-      
+
       if (!token || role !== "hr") {
         navigate("/admin");
         return;
@@ -106,6 +125,7 @@ const HRDashboard = () => {
       setLoading(true);
       await Promise.all([
         fetchUsers(),
+        fetchAdmins(),
         fetchDepartments(),
         fetchReports(),
         fetchLogs(),
@@ -121,6 +141,15 @@ const HRDashboard = () => {
       setUsers(res.data);
     } catch (err) {
       console.error("Error fetching users:", err);
+    }
+  };
+
+  const fetchAdmins = async () => {
+    try {
+      const res = await axios.get("http://localhost:8080/admin/get_admins");
+      setAdmins(res.data);
+    } catch (err) {
+      console.error("Error fetching admins:", err);
     }
   };
 
@@ -173,6 +202,26 @@ const HRDashboard = () => {
     setOpenUserDialog(true);
   };
 
+  const handlePasswordDialogOpen = (user, type = "employee") => {
+    setUserForPassword(user);
+    setPasswordForm({
+      email: user.email,
+      newPassword: "",
+      accountType: type,
+    });
+    setOpenPasswordDialog(true);
+  };
+
+  const handleAdminDialogOpen = (admin = null) => {
+    setEditingAdmin(admin);
+    setResponsibleForm(
+      admin
+        ? { ...admin, post: admin.role || "" }
+        : { name: "", email: "", post: "", department: "", password: "" }
+    );
+    setOpenResponsibleDialog(true);
+  };
+
   const handleUserSubmit = async () => {
     try {
       if (editingUser) {
@@ -190,15 +239,42 @@ const HRDashboard = () => {
     }
   };
 
+  const handlePasswordSubmit = async () => {
+    try {
+      if (passwordForm.accountType === "admin") {
+        await axios.put("http://localhost:8080/admin/updatePassword_admin", passwordForm);
+      } else {
+        await axios.post("http://localhost:8080/admin/updatePassword", passwordForm);
+      }
+      setAlertMessage(`Password updated for ${passwordForm.email}`);
+      setAlertOpen(true);
+      setOpenPasswordDialog(false);
+    } catch (err) {
+      console.error("Error updating password:", err);
+    }
+  };
+
   const handleResponsibleSubmit = async () => {
     try {
       const payload = { ...responsibleForm, role: responsibleForm.post, active: true };
       delete payload.post;
-      await axios.post("http://localhost:8080/admin/add_admins", payload);
-      setAlertMessage(`Responsible User ${responsibleForm.name} added successfully`);
+      if (editingAdmin) {
+        await axios.put(`http://localhost:8080/admin/update_admin/${editingAdmin._id}`, payload);
+        setAlertMessage(`Responsible User ${responsibleForm.name} updated successfully`);
+      } else {
+        await axios.post("http://localhost:8080/admin/add_admins", payload);
+        setAlertMessage(`Responsible User ${responsibleForm.name} added successfully`);
+      }
       setAlertOpen(true);
-      fetchUsers();
+      fetchAdmins();
       setOpenResponsibleDialog(false);
+      setResponsibleForm({
+        name: "",
+        email: "",
+        post: "",
+        department: "",
+        password: "",
+      });
     } catch (err) {
       console.error("Error adding responsible:", err);
     }
@@ -218,14 +294,6 @@ const HRDashboard = () => {
     }
   };
 
-  const handleToggleUserStatus = async (userId, currentStatus) => {
-    try {
-      await axios.put(`http://localhost:8080/hr/users/${userId}`, { active: !currentStatus });
-      fetchUsers();
-    } catch (err) {
-      console.error("Error toggling status:", err);
-    }
-  };
 
   const confirmDeleteUser = async () => {
     if (!userToDelete) return;
@@ -241,6 +309,21 @@ const HRDashboard = () => {
     setOpenDeleteDialog(false);
   };
 
+  const confirmDeleteAdmin = async () => {
+    if (!adminToDelete) return;
+    try {
+      let id = adminToDelete._id;
+      await axios.delete(`http://localhost:8080/admin/delete_admin/${id}`);
+      fetchAdmins();
+      setAlertMessage(`Responsible User deleted successfully`);
+      setAlertOpen(true);
+      setTimeout(() => setAlertOpen(false), 3000);
+    } catch (err) {
+      console.error("Error deleting admin:", err);
+    }
+    setOpenDeleteDialog(false);
+  };
+
   const handleDeleteDept = async (deptId) => {
     try {
       await axios.delete(`http://localhost:8080/admin/deleteDept/${deptId}`);
@@ -251,12 +334,12 @@ const HRDashboard = () => {
   };
 
   // --- Stats Calculation ---
-  const today = new Date().toISOString().split("T")[0];
+  const today = toLocalISO(new Date());
   const uniqueSubmittersToday = new Set(
     reports
       .filter((r) => {
         try {
-          return new Date(r.date).toISOString().split("T")[0] === today;
+          return toLocalISO(r.date) === today;
         } catch (e) {
           return false;
         }
@@ -268,7 +351,7 @@ const HRDashboard = () => {
 
   const stats = [
     { title: "Total Employees", value: users.length, icon: PeopleIcon, color: "#38bdf8" },
-    { title: "Active Now", value: users.filter((u) => u.active).length, icon: CheckCircleIcon, color: "#4ade80" },
+    { title: "Active Nodes", value: users.length, icon: CheckCircleIcon, color: "#4ade80" },
     { title: "Departments", value: departments.length, icon: FolderIcon, color: "#f472b6" },
     { title: "Pending Reports", value: pendingReportsCount, icon: AssessmentIcon, color: "#fbbf24" },
   ];
@@ -334,6 +417,7 @@ const HRDashboard = () => {
             <Tab label="Work Reports" />
             <Tab label="Attendance" />
             <Tab label="Intelligence" />
+            <Tab label="Responsibles" />
           </Tabs>
         </Box>
 
@@ -350,10 +434,36 @@ const HRDashboard = () => {
                 setDepartmentFilter={setDepartmentFilter}
                 departmentsList={DEPARTMENTS}
                 onAddEmployee={() => handleUserDialogOpen()}
-                onAddResponsible={() => setOpenResponsibleDialog(true)}
+                onAddResponsible={() => {
+                  setResponsibleForm({
+                    name: "",
+                    email: "",
+                    post: "",
+                    department: "",
+                    password: "",
+                  });
+                  setOpenResponsibleDialog(true);
+                }}
                 onEditUser={handleUserDialogOpen}
-                onToggleUserStatus={handleToggleUserStatus}
-                onDeleteUser={(user) => { setUserToDelete(user); setOpenDeleteDialog(true); }}
+                onEditPassword={(user) => handlePasswordDialogOpen(user, "employee")}
+                onDeleteUser={(user) => { setUserToDelete(user); setAdminToDelete(null); setOpenDeleteDialog(true); }}
+              />
+            )}
+            {tabValue === 5 && (
+              <EmployeeManager
+                key="responsibles"
+                users={admins}
+                isAdminView={true}
+                searchQuery={searchQuery}
+                setSearchQuery={setSearchQuery}
+                departmentFilter={departmentFilter}
+                setDepartmentFilter={setDepartmentFilter}
+                departmentsList={POSTS}
+                onAddEmployee={() => handleUserDialogOpen()}
+                onAddResponsible={() => handleAdminDialogOpen()}
+                onEditUser={handleAdminDialogOpen}
+                onEditPassword={(admin) => handlePasswordDialogOpen(admin, "admin")}
+                onDeleteUser={(admin) => { setAdminToDelete(admin); setUserToDelete(null); setOpenDeleteDialog(true); }}
               />
             )}
             {tabValue === 1 && (
@@ -419,8 +529,13 @@ const HRDashboard = () => {
         handleDeptSubmit={handleDeptSubmit}
         openDeleteDialog={openDeleteDialog}
         cancelDeleteUser={() => setOpenDeleteDialog(false)}
-        userToDelete={userToDelete}
-        confirmDeleteUser={confirmDeleteUser}
+        userToDelete={userToDelete || adminToDelete}
+        confirmDeleteUser={adminToDelete ? confirmDeleteAdmin : confirmDeleteUser}
+        openPasswordDialog={openPasswordDialog}
+        handlePasswordDialogClose={() => setOpenPasswordDialog(false)}
+        passwordForm={passwordForm}
+        setPasswordForm={setPasswordForm}
+        handlePasswordSubmit={handlePasswordSubmit}
       />
 
       {/* Snackbar Alert */}

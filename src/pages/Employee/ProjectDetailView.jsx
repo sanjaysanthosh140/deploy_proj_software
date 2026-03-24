@@ -21,6 +21,8 @@ import {
   TextField,
   Collapse,
   Stack,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import { motion, AnimatePresence } from "framer-motion";
 import { useParams, useNavigate } from "react-router-dom";
@@ -90,12 +92,14 @@ const ProjectDetailView = () => {
   const [expandedTasks, setExpandedTasks] = useState({});
   const [newSubTaskInputs, setNewSubTaskInputs] = useState({});
   const [modifiedTasks, setModifiedTasks] = useState({});
+  const [alertOpen, setAlertOpen] = useState(false);
+  const [alertMsg, setAlertMsg] = useState("");
   const token = localStorage.getItem("token");
 
   // --- LOGIC PRESERVATION (FROM USER SNIPPET) ---
-  const fetchProjectDetails = async () => {
+  const fetchProjectDetails = async (isSilent = false) => {
     try {
-      setLoading(true);
+      if (!isSilent) setLoading(true);
       const headers = { Authorization: `${token}`, "Content-Type": "application/json" };
       const [projectsRes, tasksRes, todosRes] = await Promise.all([
         axios.get("http://localhost:8080/employee_included_proj", { headers }),
@@ -217,13 +221,18 @@ const ProjectDetailView = () => {
       const payload = {
         user_id: todo.user_id, task_id: todo.task_id, project_id: projectId, user_subTaks: subTaskList, todolist: subTaskList,
       };
-      await axios.post("http://localhost:8080/add_multiple_todos", payload, { headers });
+      let res_msg = await axios.post("http://localhost:8080/add_multiple_todos", payload, { headers });
+      const successMsg = typeof res_msg.data.message === "string"
+        ? res_msg.data.message
+        : "Todo updated successfully";
+      setAlertMsg(successMsg);
+      setAlertOpen(true);
       setModifiedTasks((prev) => {
         const next = { ...prev };
         delete next[taskId];
         return next;
       });
-      await fetchProjectDetails();
+      await fetchProjectDetails(true);
     } catch (error) { console.error("Failed to save subtasks", error); }
   };
 
@@ -307,7 +316,7 @@ const ProjectDetailView = () => {
           }}>
             <Box sx={{ display: "flex", alignItems: "center", gap: { xs: 1.5, sm: 2 }, flex: 1, minWidth: 0 }}>
               <IconButton
-                onClick={() => navigate("/employee/cockpit/IT")}
+                onClick={() => navigate(-1)}
                 size="small"
                 sx={{ bgcolor: "rgba(0,0,0,0.05)", flexShrink: 0, "&:hover": { bgcolor: "rgba(0,0,0,0.1)" } }}
               >
@@ -555,6 +564,27 @@ const ProjectDetailView = () => {
           </Box>
         </Stack>
       </Fade>
+      <Snackbar
+        open={alertOpen}
+        autoHideDuration={4000}
+        onClose={() => setAlertOpen(false)}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      >
+        <Alert
+          onClose={() => setAlertOpen(false)}
+          severity="success"
+          variant="filled"
+          sx={{
+            width: "100%",
+            borderRadius: "12px",
+            fontWeight: 700,
+            bgcolor: "#00e676",
+            boxShadow: "0 8px 24px rgba(0, 230, 118, 0.3)"
+          }}
+        >
+          {alertMsg}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };

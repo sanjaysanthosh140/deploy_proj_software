@@ -1,4 +1,3 @@
-
 import {
   Box,
   Typography,
@@ -8,7 +7,7 @@ import {
   CircularProgress,
   alpha,
 } from "@mui/material";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import SendIcon from "@mui/icons-material/Send";
 import axios from "axios";
 import { useToast } from "../../context/ToastContext";
@@ -19,9 +18,21 @@ const INDIGO_ACCENT = "#4f46e5";
 const GLASS_BG = "rgba(255, 255, 255, 0.75)";
 const GLASS_BORDER = "rgba(10, 15, 25, 0.08)";
 
-const WorkReportForm = ({ deptId }) => {
+const toLocalISO = (date) => {
+  const d = new Date(date);
+  if (isNaN(d.getTime())) return "";
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
+const WorkReportForm = ({ deptId, profile, onReportSubmitted }) => {
   const [report, setReport] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const username = profile?.name || "";
+  const userId = profile?._id || profile?.id || "";
   // Safe toast usage
   let showToast = (msg, type) => console.log(msg, type);
   try {
@@ -39,23 +50,33 @@ const WorkReportForm = ({ deptId }) => {
     try {
       // Modified endpoint as per requirements: /admin/add_task (modified for reports)
       // Assuming structure matches what the backend expects
+      let token = localStorage.getItem("token");
       if (report && deptId) {
         let reportData = {
-          title: "Daily Work Report",
+          userID: userId,
+          username: username,
           desc: report,
           deptId: deptId,
           type: "report",
-          date: new Date().toISOString().split("T")[0],
+          date: toLocalISO(new Date()),
         };
 
-        await axios.post("http://localhost:8080/admin/Daily_reports", {
-          ...reportData,
-        });
+        await axios.post(
+          "http://localhost:8080/admin/Daily_reports",
+          reportData,
+          {
+            headers: {
+              Authorization: `${token}`,
+              "Content-Type": "application/json"
+            },
+          },
+        );
 
         console.log(reportData);
       }
       showToast("Report submitted successfully", "success");
       setReport("");
+      if (onReportSubmitted) onReportSubmitted();
     } catch (error) {
       console.error("Failed to submit report", error);
       showToast("Failed to submit report", "error");
@@ -77,9 +98,31 @@ const WorkReportForm = ({ deptId }) => {
         boxShadow: "0 6px 20px -4px rgba(10,15,25,0.06)",
       }}
     >
-      <Box sx={{ display: "flex", alignItems: "center", gap: 0.8, mb: { xs: 1.5, sm: 2 } }}>
-        <Box sx={{ width: 3, height: 16, borderRadius: 1, bgcolor: INDIGO_ACCENT, flexShrink: 0 }} />
-        <Typography sx={{ fontWeight: 800, color: PRIMARY_SLATE, fontSize: { xs: "0.9rem", sm: "0.95rem" }, letterSpacing: "-0.01em" }}>
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          gap: 0.8,
+          mb: { xs: 1.5, sm: 2 },
+        }}
+      >
+        <Box
+          sx={{
+            width: 3,
+            height: 16,
+            borderRadius: 1,
+            bgcolor: INDIGO_ACCENT,
+            flexShrink: 0,
+          }}
+        />
+        <Typography
+          sx={{
+            fontWeight: 800,
+            color: PRIMARY_SLATE,
+            fontSize: { xs: "0.9rem", sm: "0.95rem" },
+            letterSpacing: "-0.01em",
+          }}
+        >
           Daily Work Report
         </Typography>
       </Box>
@@ -113,7 +156,7 @@ const WorkReportForm = ({ deptId }) => {
             color: alpha(SECONDARY_SLATE, 0.5),
             opacity: 1,
             fontSize: { xs: "0.78rem", sm: "0.82rem" },
-          }
+          },
         }}
       />
       <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
@@ -121,7 +164,13 @@ const WorkReportForm = ({ deptId }) => {
           type="submit"
           variant="contained"
           disabled={loading}
-          endIcon={loading ? <CircularProgress size={14} color="inherit" /> : <SendIcon sx={{ fontSize: 14 }} />}
+          endIcon={
+            loading ? (
+              <CircularProgress size={14} color="inherit" />
+            ) : (
+              <SendIcon sx={{ fontSize: 14 }} />
+            )
+          }
           sx={{
             background: INDIGO_ACCENT,
             color: "#fff",

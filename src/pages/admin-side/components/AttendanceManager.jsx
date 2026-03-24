@@ -22,7 +22,27 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import { motion } from "framer-motion";
-import { iPhoneGlassButton, GLASS_BORDER } from "./SharedStyles";
+import { iPhoneGlassButton } from "./SharedStyles";
+
+const GLASS_BORDER = "rgba(10, 15, 25, 0.08)";
+
+const toLocalISO = (date) => {
+  const d = new Date(date);
+  if (isNaN(d.getTime())) return "";
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
+const formatTime = (time) => {
+  if (!time) return "";
+  const d = new Date(time);
+  if (!isNaN(d.getTime()) && (typeof time === "string" && (time.includes("T") || time.includes("Z")))) {
+    return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Kolkata" });
+  }
+  return time;
+};
 
 const AttendanceManager = ({
   logs,
@@ -39,7 +59,7 @@ const AttendanceManager = ({
   const filteredLogs = logs.filter((log) => {
     const matchesDate = !attendanceDate
       ? true
-      : (log.date ? log.date.split("T")[0] : "") === attendanceDate;
+      : toLocalISO(log.date) === attendanceDate;
 
     const deptRaw = log.users?.department || "General";
     const deptNormalized = normalizeDeptName(deptRaw);
@@ -236,7 +256,7 @@ const AttendanceManager = ({
                         </Box>
                       </TableCell>
                       <TableCell sx={{ borderBottom: `1px solid ${GLASS_BORDER}`, color: "#64748b", fontWeight: 700 }}>
-                        {log.date ? log.date.split("T")[0] : "N/A"}
+                        {toLocalISO(log.date) || "N/A"}
                       </TableCell>
                       <TableCell sx={{ borderBottom: `1px solid ${GLASS_BORDER}` }}>
                         <Chip
@@ -252,10 +272,10 @@ const AttendanceManager = ({
                         />
                       </TableCell>
                       <TableCell sx={{ borderBottom: `1px solid ${GLASS_BORDER}`, fontWeight: 700, color: "rgba(0,0,0,0.7)" }}>
-                        {log.first?.timeIn ? `${log.first.timeIn} - ${log.first.timeOut || "..."}` : "-"}
+                        {log.first?.timeIn ? `${formatTime(log.first.timeIn)} - ${formatTime(log.first.timeOut) || "..."}` : "-"}
                       </TableCell>
                       <TableCell sx={{ borderBottom: `1px solid ${GLASS_BORDER}`, fontWeight: 700, color: "rgba(0,0,0,0.7)" }}>
-                        {log.second?.timeIn ? `${log.second.timeIn} - ${log.second.timeOut || "..."}` : "-"}
+                        {log.second?.timeIn ? `${formatTime(log.second.timeIn)} - ${formatTime(log.second.timeOut) || "..."}` : "-"}
                       </TableCell>
                     </TableRow>
                   ))}

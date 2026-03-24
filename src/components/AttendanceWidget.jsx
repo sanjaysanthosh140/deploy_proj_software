@@ -114,7 +114,7 @@ const AttendanceWidget = ({ currentUserId }) => {
           <Box sx={{ textAlign: "center" }}>
             <Typography sx={{ fontWeight: 900, color: PRIMARY_SLATE, letterSpacing: "-0.04em", lineHeight: 1, fontSize: { xs: "1.8rem", sm: "2.2rem", md: "2.6rem" } }}>
               {status === "ABSENT"
-                ? currentTime.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+                ? currentTime.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Kolkata" })
                 : formatTime(elapsedSeconds)}
             </Typography>
             <Typography sx={{ color: alpha(SECONDARY_SLATE, 0.6), fontSize: { xs: "0.7rem", sm: "0.75rem" }, mt: 0.3 }}>

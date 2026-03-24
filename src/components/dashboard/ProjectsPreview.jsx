@@ -199,7 +199,6 @@ const ProjectsPreview = ({ userId }) => {
                         </Typography>
                       </Box>
                     </Box>
-
                     {/* Title */}
                     <Typography
                       sx={{

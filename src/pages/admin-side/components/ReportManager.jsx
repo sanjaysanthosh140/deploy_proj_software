@@ -20,6 +20,15 @@ import {
 } from "@mui/material";
 import { iPhoneGlassButton, whiteCard } from "./SharedStyles";
 
+const toLocalISO = (date) => {
+  const d = new Date(date);
+  if (isNaN(d.getTime())) return "";
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
 const ReportManager = ({
   reports,
   reportDate,
@@ -35,7 +44,7 @@ const ReportManager = ({
   const filteredReports = reports.filter((report) => {
     const matchesDate = !reportDate
       ? true
-      : new Date(report.date).toISOString().split("T")[0] === reportDate;
+      : toLocalISO(report.date) === reportDate;
 
     const deptRaw = report.deptId || report.departmentId || "General";
     const deptNormalized = normalizeDeptName(deptRaw);
@@ -210,11 +219,11 @@ const ReportManager = ({
                               border: `1px solid ${alpha(getDeptColor(category), 0.2)}`,
                             }}
                           >
-                            {report.author?.charAt(0) || "R"}
+                            {report.username?.charAt(0) || "R"}
                           </Avatar>
                           <Box>
                             <Typography variant="subtitle2" sx={{ fontWeight: 800, color: "rgba(0,0,0,0.8)", lineHeight: 1.2 }}>
-                              {report.author || "System Log"}
+                              {report.username || "System Log"}
                             </Typography>
                             <Typography variant="caption" sx={{ color: "#94a3b8", fontWeight: 700 }}>
                               {new Date(report.date).toLocaleDateString("en-US", {
@@ -242,30 +251,18 @@ const ReportManager = ({
 
                       {/* Content Area */}
                       <Typography
-                        variant="h6"
-                        sx={{
-                          fontWeight: 900,
-                          mb: 1.5,
-                          color: "rgba(0,0,0,0.9)",
-                          fontSize: "1.1rem",
-                          letterSpacing: "-0.02em",
-                        }}
-                      >
-                        {report.title}
-                      </Typography>
-                      
-                      <Typography
                         variant="body2"
                         sx={{
                           color: "#475569",
                           fontWeight: 600,
-                          lineHeight: 1.7,
-                          fontSize: "0.925rem",
+                          lineHeight: 1.8,
+                          fontSize: "0.95rem",
                           whiteSpace: "pre-wrap",
                           display: "-webkit-box",
-                          WebkitLineClamp: 6,
+                          WebkitLineClamp: 8,
                           WebkitBoxOrient: "vertical",
                           overflow: "hidden",
+                          mt: 1,
                         }}
                       >
                         {report.desc || report.content || "No description provided."}

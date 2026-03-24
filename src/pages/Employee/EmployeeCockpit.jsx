@@ -9,13 +9,43 @@ import { useParams } from "react-router-dom";
 import AttendanceWidget from "../../components/AttendanceWidget";
 import ProjectsPreview from "../../components/dashboard/ProjectsPreview";
 import WorkReportForm from "../../components/dashboard/WorkReportForm";
+import UserReportsList from "../../components/dashboard/UserReportsList";
 import TeamChat from "../../components/TeamChat";
+import axios from "axios";
 // import DeadlineNotifications from "../../components/dashboard/DeadlineNotifications";
 
 const EmployeeCockpit = (props) => {
   const { deptId: paramDeptId } = useParams();
   const deptId = props.deptId || paramDeptId || "it";
-  const currentUserId = localStorage.getItem("token");
+  const token = localStorage.getItem("token");
+  const [profile, setProfile] = React.useState(null);
+  const [refreshTrigger, setRefreshTrigger] = React.useState(0);
+
+  const handleReportSubmitted = () => {
+    setRefreshTrigger((prev) => prev + 1);
+  };
+
+  React.useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        if (token) {
+          const res = await axios.get("http://localhost:8080/employee_profile", {
+            headers: {
+              Authorization: `${token}`,
+              "Content-Type": "application/json",
+            },
+          });
+          const profileData = Array.isArray(res.data) ? res.data[0] : res.data;
+          setProfile(profileData);
+        }
+      } catch (error) {
+        console.error("Failed to fetch profile in Cockpit", error);
+      }
+    };
+    fetchProfile();
+  }, [token]);
+
+  const userId = profile?._id || profile?.id || token;
 
   return (
     <>
@@ -55,13 +85,16 @@ const EmployeeCockpit = (props) => {
         </Box>
 
         {/* ── Section 1: Attendance — full width ─────────── */}
-        <AttendanceWidget currentUserId={currentUserId} />
+        <AttendanceWidget currentUserId={token} />
 
         {/* ── Section 2: Projects — full width ───────────── */}
-        <ProjectsPreview userId={currentUserId} maxProjects={9} />
+        <ProjectsPreview userId={token} maxProjects={9} />
 
         {/* ── Section 3: Work Report — full width ────────── */}
-        <WorkReportForm deptId={deptId} />
+        <WorkReportForm deptId={deptId} profile={profile} onReportSubmitted={handleReportSubmitted} />
+
+        {/* ── Section 4: Submitted Reports List ───────────── */}
+        <UserReportsList userId={profile?._id || profile?.id} refreshTrigger={refreshTrigger} />
       </Box>
 
       {/* Floating chat bubble */}

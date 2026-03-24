@@ -10,6 +10,7 @@ import {
   FormControlLabel,
   Stack,
   Alert,
+  IconButton,
 } from "@mui/material";
 import EmailIcon from "@mui/icons-material/Email";
 import LockIcon from "@mui/icons-material/Lock";
@@ -19,7 +20,7 @@ import GitHubIcon from "@mui/icons-material/GitHub";
 import axios from "axios";
 import { useToast } from "../../context/ToastContext";
 import { motion } from "framer-motion";
-import { Bolt as BoltIcon } from "@mui/icons-material";
+import { Bolt as BoltIcon, Visibility, VisibilityOff } from "@mui/icons-material";
 
 /* ─── All original API logic untouched below ─── */
 const Login = () => {
@@ -28,6 +29,7 @@ const Login = () => {
   const [formData, setformData] = useState({ email: "", password: "" });
   const [alertStatus, setAlertStatus] = useState(null); // "error" or "success"
   const [alertMessage, setAlertMessage] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleChnage = (e) => {
     try {
@@ -244,7 +246,7 @@ const Login = () => {
               fullWidth
               required
               variant="outlined"
-              type="password"
+              type={showPassword ? "text" : "password"}
               placeholder="Password"
               name="password"
               value={formData.password}
@@ -256,48 +258,21 @@ const Login = () => {
                     <LockIcon />
                   </InputAdornment>
                 ),
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label="toggle password visibility"
+                      onClick={() => setShowPassword(!showPassword)}
+                      edge="end"
+                      size="small"
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
               }}
             />
 
-            {/* Remember / Forgot row */}
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                mb: 3,
-                px: 0.25,
-              }}
-            >
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    size="small"
-                    sx={{
-                      color: "rgba(30,50,100,0.25)",
-                      padding: "4px",
-                      "&.Mui-checked": { color: "rgba(80,100,200,0.7)" },
-                    }}
-                  />
-                }
-                label={
-                  <Typography variant="caption" sx={{ color: "rgba(30,50,100,0.5)", fontWeight: 600 }}>
-                    Remember me
-                  </Typography>
-                }
-              />
-              <Typography
-                variant="caption"
-                sx={{
-                  color: "rgba(60,80,200,0.65)",
-                  fontWeight: 800,
-                  cursor: "pointer",
-                  "&:hover": { color: "rgba(60,80,200,0.9)" },
-                }}
-              >
-                Forgot Password?
-              </Typography>
-            </Box>
 
             {/* Sign In Button */}
             <motion.div whileHover={{ scale: 1.015 }} whileTap={{ scale: 0.98 }}>
@@ -348,18 +323,6 @@ const Login = () => {
 
 
 
-            {/* Sign up link */}
-            <Box sx={{ mt: 3.5, textAlign: "center" }}>
-              <Typography variant="body2" sx={{ color: "#757575", fontWeight: 500, fontSize: "0.85rem" }}>
-                Don't have an account?{" "}
-                <span
-                  style={{ color: "#1a1a1a", fontWeight: 700, cursor: "pointer", textDecoration: "underline" }}
-                // onClick={() => navigate("/signup")}
-                >
-                  Sign Up
-                </span>
-              </Typography>
-            </Box>
           </Box>
         </Box>
       </motion.div>
