@@ -245,7 +245,7 @@ const TeamChat = () => {
           id: res.data._id,
           title: res.data.name,
           type: "group",
-          lastMsg: "Group created"
+          lastMsg: res.data.name || newGroupName
         }]);
         setShowCreateGroup(false);
         setNewGroupName("");
@@ -258,7 +258,7 @@ const TeamChat = () => {
 
   const fetchUsers = async () => {
     try {
-      const res = await axios.get("http://localhost:8080/users/all");
+      const res = await axios.get("http://localhost:8080/employeelists");
       setAllUsers(res.data);
     } catch (err) {
       console.error("Failed to fetch users:", err);

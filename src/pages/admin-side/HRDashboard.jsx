@@ -16,6 +16,7 @@ import FolderIcon from "@mui/icons-material/Folder";
 import AssessmentIcon from "@mui/icons-material/Assessment";
 import axios from "axios";
 import { AnimatePresence } from "framer-motion";
+import TeamChat from "../../components/TeamChat";
 
 // Components
 import GlassCard from "./components/GlassCard";
@@ -47,6 +48,11 @@ const toLocalISO = (date) => {
 
 const HRDashboard = () => {
   const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.clear();
+    navigate("/admin");
+  };
 
   // Tab State
   const [tabValue, setTabValue] = useState(0);
@@ -367,6 +373,7 @@ const HRDashboard = () => {
   }
 
   return (
+    <>
     <Box
       sx={{
         minHeight: "100vh",
@@ -378,13 +385,56 @@ const HRDashboard = () => {
     >
       {/* Header Section */}
       <Fade in={true} timeout={800}>
-        <Box sx={{ mb: 6, pl: 1 }}>
-          <Typography variant="h2" sx={{ fontWeight: 1000, color: "rgba(0,0,0,0.85)", fontSize: { xs: "2rem", md: "3.5rem" }, lineHeight: 1 }}>
-            HR Command Center
-          </Typography>
-          <Typography variant="caption" sx={{ color: alpha("#000", 0.3), fontWeight: 900, letterSpacing: "4px", textTransform: "uppercase" }}>
-            • Advanced Management Interface •
-          </Typography>
+        <Box sx={{ mb: 6, pl: 1, display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
+          <Box>
+            <Typography variant="h2" sx={{ fontWeight: 1000, color: "rgba(0,0,0,0.85)", fontSize: { xs: "2rem", md: "3.5rem" }, lineHeight: 1 }}>
+              HR Command Center
+            </Typography>
+            <Typography variant="caption" sx={{ color: alpha("#000", 0.3), fontWeight: 900, letterSpacing: "4px", textTransform: "uppercase" }}>
+              • Advanced Management Interface •
+            </Typography>
+          </Box>
+
+          {/* Logout Button */}
+          <Box
+            component="button"
+            onClick={handleLogout}
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: 1,
+              px: { xs: 2, sm: 3 },
+              py: { xs: 1, sm: 1.4 },
+              background: "rgba(255,255,255,0.55)",
+              backdropFilter: "blur(16px)",
+              border: "1.5px solid rgba(192,57,43,0.3)",
+              borderRadius: "16px",
+              boxShadow: "0 4px 20px rgba(0,0,0,0.06)",
+              color: "#c0392b",
+              fontWeight: 800,
+              fontSize: { xs: "0.78rem", sm: "0.88rem" },
+              cursor: "pointer",
+              letterSpacing: "0.5px",
+              transition: "all 0.3s ease",
+              whiteSpace: "nowrap",
+              flexShrink: 0,
+              mt: { xs: 0.5, sm: 0 },
+              "&:hover": {
+                background: "#c0392b",
+                color: "#fff",
+                borderColor: "#c0392b",
+                transform: "translateY(-2px)",
+                boxShadow: "0 10px 28px rgba(192,57,43,0.2)",
+              },
+            }}
+          >
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" y1="12" x2="9" y2="12" />
+            </svg>
+            Logout
+          </Box>
         </Box>
       </Fade>
 
@@ -545,6 +595,10 @@ const HRDashboard = () => {
         </Alert>
       )}
     </Box>
+
+      {/* Floating TeamChat Bubble */}
+      <TeamChat />
+    </>
   );
 };
 

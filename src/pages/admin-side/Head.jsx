@@ -38,6 +38,7 @@ import DashboardCustomizeIcon from "@mui/icons-material/DashboardCustomize";
 import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
 import CreateProjectDialog from "../../components/CreateProjectDialog";
+import TeamChat from "../../components/TeamChat";
 
 // --- iOS Liquid Glass Design Constants ---
 const PRIMARY_BG = "#e6edf5";
@@ -76,6 +77,11 @@ const iPhoneGlassButton = {
 
 const Head = () => {
   const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.clear();
+    navigate("/admin");
+  };
 
   // Sample tasks data
   const [tasks, setTasks] = useState([
@@ -241,6 +247,7 @@ const Head = () => {
   };
 
   return (
+    <>
     <Box
       sx={{
         height: "100%",
@@ -293,49 +300,92 @@ const Head = () => {
       {/* Header Section */}
       <Fade in={true} timeout={1000}>
         <Box sx={{ mb: 6, position: "relative", zIndex: 1 }}>
-          <Box sx={{ display: "flex", alignItems: "center", gap: { xs: 2, sm: 3 } }}>
+          <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: { xs: 2, sm: 3 } }}>
+            {/* Left: Icon + Title */}
+            <Box sx={{ display: "flex", alignItems: "center", gap: { xs: 2, sm: 3 } }}>
+              <Box
+                sx={{
+                  width: 80,
+                  height: 80,
+                  borderRadius: "22px",
+                  background: "rgba(255, 255, 255, 0.3)",
+                  backdropFilter: "blur(20px)",
+                  border: "1px solid rgba(255, 255, 255, 0.5)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  boxShadow: "0 8px 20px rgba(0,0,0,0.05)",
+                }}
+              >
+                <DashboardCustomizeIcon sx={{ fontSize: 40, color: "rgba(0,0,0,0.7)" }} />
+              </Box>
+              <Box>
+                <Typography
+                  variant="h2"
+                  sx={{
+                    fontWeight: 900,
+                    fontSize: { xs: "2.5rem", md: "3.5rem" },
+                    color: "#1a1a1a",
+                    letterSpacing: "-2px",
+                    lineHeight: 1,
+                  }}
+                >
+                  Head Operations
+                </Typography>
+                <Typography
+                  variant="body1"
+                  sx={{
+                    color: "rgba(0,0,0,0.4)",
+                    fontWeight: 800,
+                    textTransform: "uppercase",
+                    letterSpacing: "4px",
+                    fontSize: "0.9rem",
+                    mt: 1
+                  }}
+                >
+                  Command Center Intelligence Suite
+                </Typography>
+              </Box>
+            </Box>
+
+            {/* Logout Button */}
             <Box
+              component="button"
+              onClick={handleLogout}
               sx={{
-                width: 80,
-                height: 80,
-                borderRadius: "22px",
-                background: "rgba(255, 255, 255, 0.3)",
-                backdropFilter: "blur(20px)",
-                border: "1px solid rgba(255, 255, 255, 0.5)",
                 display: "flex",
                 alignItems: "center",
-                justifyContent: "center",
-                boxShadow: "0 8px 20px rgba(0,0,0,0.05)",
+                gap: 1,
+                px: { xs: 2.5, sm: 3.5 },
+                py: { xs: 1.2, sm: 1.5 },
+                background: "rgba(255, 255, 255, 0.7)",
+                backdropFilter: "blur(20px)",
+                border: "1px solid rgba(255, 255, 255, 0.8)",
+                borderRadius: "20px",
+                boxShadow: "0 8px 25px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,1)",
+                color: "#c0392b",
+                fontWeight: 800,
+                fontSize: { xs: "0.8rem", sm: "0.9rem" },
+                cursor: "pointer",
+                letterSpacing: "0.5px",
+                transition: "all 0.35s cubic-bezier(0.23,1,0.32,1)",
+                whiteSpace: "nowrap",
+                flexShrink: 0,
+                "&:hover": {
+                  background: "#c0392b",
+                  color: "#fff",
+                  borderColor: "#c0392b",
+                  transform: "translateY(-3px)",
+                  boxShadow: "0 15px 35px rgba(192,57,43,0.22)",
+                },
               }}
             >
-              <DashboardCustomizeIcon sx={{ fontSize: 40, color: "rgba(0,0,0,0.7)" }} />
-            </Box>
-            <Box>
-              <Typography
-                variant="h2"
-                sx={{
-                  fontWeight: 900,
-                  fontSize: { xs: "2.5rem", md: "3.5rem" },
-                  color: "#1a1a1a",
-                  letterSpacing: "-2px",
-                  lineHeight: 1,
-                }}
-              >
-                Head Operations
-              </Typography>
-              <Typography
-                variant="body1"
-                sx={{
-                  color: "rgba(0,0,0,0.4)",
-                  fontWeight: 800,
-                  textTransform: "uppercase",
-                  letterSpacing: "4px",
-                  fontSize: "0.9rem",
-                  mt: 1
-                }}
-              >
-                Command Center Intelligence Suite
-              </Typography>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                <polyline points="16 17 21 12 16 7" />
+                <line x1="21" y1="12" x2="9" y2="12" />
+              </svg>
+              Logout
             </Box>
           </Box>
         </Box>
@@ -659,6 +709,10 @@ const Head = () => {
         onSubmit={handleCreateProject}
       />
     </Box>
+
+      {/* Floating TeamChat Bubble */}
+      <TeamChat />
+    </>
   );
 };
 
