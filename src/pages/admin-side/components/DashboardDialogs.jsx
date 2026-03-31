@@ -173,7 +173,7 @@ const DashboardDialogs = ({
                     </InputAdornment>
                   ),
                 }}
-                sx={{
+              sx={{
                   "& .MuiOutlinedInput-root": {
                     borderRadius: "14px",
                     background: "rgba(255, 255, 255, 0.3)",
@@ -182,6 +182,8 @@ const DashboardDialogs = ({
                   "& .MuiInputBase-input": {
                     color: "#000",
                     fontWeight: 800,
+                    "&::-ms-reveal": { display: "none" },
+                    "&::-ms-clear": { display: "none" },
                   },
                 }}
               />
@@ -307,7 +309,12 @@ const DashboardDialogs = ({
                 sx={{
                   "& .MuiOutlinedInput-root": { borderRadius: "14px", background: "rgba(255, 255, 255, 0.3)" },
                   "& .MuiInputLabel-root": { color: "#000", fontWeight: 700 },
-                  "& .MuiInputBase-input": { color: "#000", fontWeight: 800 }
+                  "& .MuiInputBase-input": {
+                    color: "#000",
+                    fontWeight: 800,
+                    "&::-ms-reveal": { display: "none" },
+                    "&::-ms-clear": { display: "none" },
+                  },
                 }}
               />
             )}
@@ -548,6 +555,8 @@ const DashboardDialogs = ({
                 "& .MuiInputBase-input": {
                   color: "#000",
                   fontWeight: 800,
+                  "&::-ms-reveal": { display: "none" },
+                  "&::-ms-clear": { display: "none" },
                 },
               }}
             />

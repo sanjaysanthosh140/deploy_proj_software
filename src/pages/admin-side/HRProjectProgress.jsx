@@ -505,9 +505,9 @@ const ProjectListCard = ({ project, index, onSelect }) => {
                     {project.title}
                 </Typography>
 
-<Typography sx={{ color: "#64748b", fontSize: { xs: "1.1rem", md: "1.2rem" }, fontWeight: 600, mb: 3 }}>
-                        {project.description?.length > 80 ? `${project.description.substring(0, 80)}...` : project.description}
-                    </Typography>
+                <Typography sx={{ color: "#64748b", fontSize: { xs: "1.1rem", md: "1.2rem" }, fontWeight: 600, mb: 3 }}>
+                    {project.description?.length > 80 ? `${project.description.substring(0, 80)}...` : project.description}
+                </Typography>
 
                 {/* Progress Section */}
                 <Box sx={{ mb: 4 }}>
@@ -608,7 +608,7 @@ const LoadingSkeleton = ({ count = 3 }) => (
 
 const HRProjectProgress = () => {
     const navigate = useNavigate();
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("adminToken");
 
     const [projects, setProjects] = useState([]);
     const [projectsLoading, setProjectsLoading] = useState(true);
@@ -918,78 +918,78 @@ const HRProjectProgress = () => {
                                 </Typography>
                             </Box>
                         ) : (
-                        Object.entries(
-                            filteredProjects.reduce((acc, project) => {
-                                const departments = [
-                                    "Sales",
-                                    "Accounts",
-                                    "Graphic Design",
-                                    "Video-production",
-                                    "Content-writing",
-                                    "Editing",
-                                    "Digital marketing",
-                                    "Information Technology",
-                                    "IT"
-                                ];
-                                const desc = project.description || "";
-                                let foundDept = "General";
+                            Object.entries(
+                                filteredProjects.reduce((acc, project) => {
+                                    const departments = [
+                                        "Sales",
+                                        "Accounts",
+                                        "Graphic Design",
+                                        "Video-production",
+                                        "Content-writing",
+                                        "Editing",
+                                        "Digital marketing",
+                                        "Information Technology",
+                                        "IT"
+                                    ];
+                                    const desc = project.description || "";
+                                    let foundDept = "General";
 
-                                for (const dept of departments) {
-                                    const escapedDept = dept.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                                    const regex = new RegExp(`\\b${escapedDept}\\b`, 'i');
-                                    if (regex.test(desc)) {
-                                        foundDept = (dept.toLowerCase() === "it" || dept.toLowerCase() === "information technology")
-                                            ? "Information Technology"
-                                            : dept;
-                                        break;
+                                    for (const dept of departments) {
+                                        const escapedDept = dept.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                                        const regex = new RegExp(`\\b${escapedDept}\\b`, 'i');
+                                        if (regex.test(desc)) {
+                                            foundDept = (dept.toLowerCase() === "it" || dept.toLowerCase() === "information technology")
+                                                ? "Information Technology"
+                                                : dept;
+                                            break;
+                                        }
                                     }
-                                }
 
-                                if (!acc[foundDept]) acc[foundDept] = [];
-                                acc[foundDept].push(project);
-                                return acc;
-                            }, {})
-                        ).sort(([a], [b]) => {
-                            if (a === "General") return 1;
-                            if (b === "General") return -1;
-                            return a.localeCompare(b);
-                        }).map(([deptName, deptProjects]) => (
-                            <Box key={deptName} sx={{ mb: 10 }}>
-                                <Box sx={{ display: "flex", alignItems: "center", gap: 3, mb: 4 }}>
-                                    <Typography
-                                        variant="h3"
-                                        sx={{
-                                            fontWeight: 1000,
-                                            fontSize: { xs: "1.5rem", md: "2rem" },
-                                            letterSpacing: "-0.04em",
-                                            color: "rgba(15, 23, 42, 0.9)",
-                                            whiteSpace: "nowrap"
-                                        }}
-                                    >
-                                        {deptName}
-                                    </Typography>
-                                    <Box sx={{ height: "2px", flexGrow: 1, background: "rgba(15, 23, 42, 0.05)", borderRadius: 1 }} />
-                                    <Chip
-                                        label={`${deptProjects.length} Nodes`}
-                                        sx={{
-                                            fontWeight: 900,
-                                            borderRadius: "10px",
-                                            bgcolor: "rgba(15, 23, 42, 0.04)",
-                                            color: "rgba(15, 23, 42, 0.5)",
-                                            fontSize: "0.85rem",
-                                            px: 1
-                                        }}
-                                    />
+                                    if (!acc[foundDept]) acc[foundDept] = [];
+                                    acc[foundDept].push(project);
+                                    return acc;
+                                }, {})
+                            ).sort(([a], [b]) => {
+                                if (a === "General") return 1;
+                                if (b === "General") return -1;
+                                return a.localeCompare(b);
+                            }).map(([deptName, deptProjects]) => (
+                                <Box key={deptName} sx={{ mb: 10 }}>
+                                    <Box sx={{ display: "flex", alignItems: "center", gap: 3, mb: 4 }}>
+                                        <Typography
+                                            variant="h3"
+                                            sx={{
+                                                fontWeight: 1000,
+                                                fontSize: { xs: "1.5rem", md: "2rem" },
+                                                letterSpacing: "-0.04em",
+                                                color: "rgba(15, 23, 42, 0.9)",
+                                                whiteSpace: "nowrap"
+                                            }}
+                                        >
+                                            {deptName}
+                                        </Typography>
+                                        <Box sx={{ height: "2px", flexGrow: 1, background: "rgba(15, 23, 42, 0.05)", borderRadius: 1 }} />
+                                        <Chip
+                                            label={`${deptProjects.length} Nodes`}
+                                            sx={{
+                                                fontWeight: 900,
+                                                borderRadius: "10px",
+                                                bgcolor: "rgba(15, 23, 42, 0.04)",
+                                                color: "rgba(15, 23, 42, 0.5)",
+                                                fontSize: "0.85rem",
+                                                px: 1
+                                            }}
+                                        />
+                                    </Box>
+                                    <Grid container spacing={3}>
+                                        {deptProjects.map((project, i) => (
+                                            <Grid item xs={12} sm={6} md={4} key={project._id || i}>
+                                                <ProjectListCard project={project} index={i} onSelect={handleSelectProject} />
+                                            </Grid>
+                                        ))}
+                                    </Grid>
                                 </Box>
-                                <Grid container spacing={3}>
-                                    {deptProjects.map((project, i) => (
-                                        <Grid item xs={12} sm={6} md={4} key={project._id || i}>
-                                            <ProjectListCard project={project} index={i} onSelect={handleSelectProject} />
-                                        </Grid>
-                                    ))}
-                                </Grid>
-                            </Box>
-                        ))
+                            ))
                         )}
                     </motion.div>
                 )}

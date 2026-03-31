@@ -19,6 +19,7 @@ import {
   Stack,
   IconButton,
   Fade,
+  InputAdornment,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -27,6 +28,7 @@ import SecurityIcon from "@mui/icons-material/Security";
 import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
 import SupervisorAccountIcon from "@mui/icons-material/SupervisorAccount";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 // --- iOS Liquid Glass Design Constants ---
 const PRIMARY_BG = "#e6edf5";
@@ -75,6 +77,7 @@ const AdminRoleManager = () => {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [selectedRole, setSelectedRole] = useState(null);
+  const [showPassword, setShowPassword] = useState(false);
 
   const [formData, setFormData] = useState({
     email: "",
@@ -95,6 +98,7 @@ const AdminRoleManager = () => {
   const handleClose = () => {
     setOpen(false);
     setSelectedRole(null);
+    setShowPassword(false);
   };
 
   const handleChange = (e) => {
@@ -116,7 +120,7 @@ const AdminRoleManager = () => {
       if (res.data && res.data.position) {
         const position = res.data.position.toLowerCase().trim();
         let token = res.data.token;
-        localStorage.setItem("token", token);
+        localStorage.setItem("adminToken", token);
         localStorage.setItem("adminRole", position);
 
         const matchedRole = roles.find(
@@ -349,11 +353,24 @@ const AdminRoleManager = () => {
                   fullWidth
                   name="password"
                   label="Security Key"
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   placeholder="••••••••"
                   value={formData.password}
                   onChange={handleChange}
                   variant="outlined"
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          onClick={() => setShowPassword(!showPassword)}
+                          edge="end"
+                          sx={{ color: "rgba(0,0,0,0.35)", mr: 0.5 }}
+                        >
+                          {showPassword ? <VisibilityOff /> : <Visibility />}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
                   sx={{
                     "& .MuiOutlinedInput-root": {
                       borderRadius: "18px",
@@ -363,7 +380,11 @@ const AdminRoleManager = () => {
                       "& fieldset": { borderColor: "rgba(0,0,0,0.05)" },
                       "&:hover fieldset": { borderColor: selectedRole?.color },
                       "&.Mui-focused fieldset": { borderColor: selectedRole?.color },
-                      "& input": { color: "rgba(0,0,0,0.8)" }
+                      "& input": {
+                        color: "rgba(0,0,0,0.8)",
+                        "&::-ms-reveal": { display: "none" },
+                        "&::-ms-clear": { display: "none" },
+                      },
                     },
                     "& .MuiInputLabel-root": { color: "rgba(0,0,0,0.35)", fontWeight: 700 },
                   }}

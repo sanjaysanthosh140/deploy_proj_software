@@ -103,6 +103,10 @@ const Login = () => {
       fontWeight: 500,
       fontSize: "0.95rem",
       "&::placeholder": { color: "#9e9e9e", opacity: 1 },
+      // Hide browser-native password reveal button (Edge/Chrome/IE)
+      "&::-ms-reveal": { display: "none" },
+      "&::-ms-clear": { display: "none" },
+      "&::-webkit-credentials-auto-fill-button": { display: "none" },
     },
     "& .MuiInputAdornment-root svg": {
       color: "#757575",

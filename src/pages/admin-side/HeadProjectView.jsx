@@ -111,7 +111,7 @@ const HeadProjectView = () => {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [editingProjectData, setEditingProjectData] = useState(null);
 
-  const token = localStorage.getItem("token");
+  const token = localStorage.getItem("adminToken");
 
   useEffect(() => {
     const fetchProjects = async () => {

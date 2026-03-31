@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import {
   Box, Typography, IconButton, TextField, Avatar,
   alpha, Fade, Badge, List, ListItem, ListItemAvatar, ListItemText, Divider,
-  Dialog, DialogTitle, DialogContent, DialogActions, Button, Checkbox, FormControlLabel,
+  Dialog, DialogTitle, DialogContent, DialogActions, Button, Checkbox, FormControlLabel, Tooltip,
 } from "@mui/material";
 import ChatBubbleRoundedIcon from "@mui/icons-material/ChatBubbleRounded";
 import AddRoundedIcon from "@mui/icons-material/AddRounded";
@@ -12,11 +12,12 @@ import ChevronLeftRoundedIcon from "@mui/icons-material/ChevronLeftRounded";
 import GroupsRoundedIcon from "@mui/icons-material/GroupsRounded";
 import BusinessRoundedIcon from "@mui/icons-material/BusinessRounded";
 import CircleIcon from "@mui/icons-material/Circle";
+import DeleteOutlineRoundedIcon from "@mui/icons-material/DeleteOutlineRounded";
 import axios from "axios";
 import io from "socket.io-client";
 const socket = io("http://localhost:8080", {
   auth: {
-    token: localStorage.getItem("token")
+    token: localStorage.getItem("token") || localStorage.getItem("adminToken")
   }
 });
 
@@ -70,35 +71,69 @@ const TeamChat = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const token = localStorage.getItem("token");
+        const adminToken = localStorage.getItem("adminToken");
+        const employeeToken = localStorage.getItem("token");
+        const token = adminToken || employeeToken;
+        const adminRole = localStorage.getItem("adminRole");
 
         if (token) {
-          // Reverting to employee_profile to get the specific logged-in user
-          const profileRes = await axios.get("http://localhost:8080/employee_profile", {
+          try {
+            // Determine endpoint based on which token is present
+            const profileEndpoint = adminToken
+              ? "http://localhost:8080/admin/admin_profile"
+              : "http://localhost:8080/employee_profile";
+
+            const profileRes = await axios.get(profileEndpoint, {
+              headers: { Authorization: token }
+            });
+            const userData = profileRes.data && profileRes.data[0];
+
+            if (userData) {
+              console.log("Logged in User Profile:", userData);
+              setUser({
+                id: userData._id,
+                name: userData.name,
+                department: userData.department,
+                initials: (userData.name || "U").charAt(0).toUpperCase()
+              });
+            } else if (adminRole) {
+              // Fallback for admin if profile data is empty
+              setUser({
+                id: "admin-" + adminRole,
+                name: adminRole.toUpperCase(),
+                department: adminRole,
+                initials: adminRole.charAt(0).toUpperCase()
+              });
+            }
+          } catch (profileErr) {
+            console.warn("Profile fetch failed, using fallback:", profileErr);
+            if (adminRole) {
+              setUser({
+                id: "admin-" + adminRole,
+                name: adminRole.toUpperCase(),
+                department: adminRole,
+                initials: adminRole.charAt(0).toUpperCase()
+              });
+            }
+          }
+
+          // Fetch departments
+          const deptsRes = await axios.get("http://localhost:8080/admin/departments");
+          setDepartments(deptsRes.data);
+
+          // Fetch groups
+          const groupsRes = await axios.get("http://localhost:8080/groups/user", {
             headers: { Authorization: token }
           });
-          const userData = profileRes.data[0];
-          console.log("Logged in User Profile:", userData);
-          setUser({
-            id: userData._id,
-            name: userData.name,
-            department: userData.department,
-            initials: (userData.name || "U").charAt(0).toUpperCase()
-          });
-        }
-        const deptsRes = await axios.get("http://localhost:8080/admin/departments");
-        setDepartments(deptsRes.data);
-
-        const groupsRes = await axios.get("http://localhost:8080/groups/user", {
-          headers: { Authorization: token }
-        });
-        if (groupsRes.data) {
-          setGroups(groupsRes.data.map(g => ({
-            id: g._id,
-            title: g.name,
-            type: "group",
-            lastMsg: "Connected"
-          })));
+          console.log("Groups response:", groupsRes.data);
+          if (groupsRes.data) {
+            setGroups(groupsRes.data.map(g => ({
+              id: g._id,
+              title: g.groupName,
+              type: "group",
+              lastMsg: `${g.members?.length ?? 0} members`
+            })));
+          }
         }
       } catch (err) {
         console.error("Failed to fetch chat data:", err);
@@ -142,14 +177,35 @@ const TeamChat = () => {
       });
     };
 
+    const handleMessageDeleted = ({ roomId, messageId }) => {
+      setMessagesByRoom((prev) => ({
+        ...prev,
+        [roomId]: (prev[roomId] || []).filter((msg) => msg.id !== messageId),
+      }));
+    };
+
+    const handleMessageReceipt = ({ tempId, realId, roomId }) => {
+      setMessagesByRoom((prev) => {
+        const roomMessages = prev[roomId] || [];
+        const updatedMessages = roomMessages.map((msg) =>
+          msg.id === tempId ? { ...msg, id: realId } : msg
+        );
+        return { ...prev, [roomId]: updatedMessages };
+      });
+    };
+
     socket.on("receive_message", handleReceiveMessage);
     socket.on("typing", handleTyping);
     socket.on("stop_typing", handleStopTyping);
+    socket.on("message_deleted", handleMessageDeleted);
+    socket.on("message_receipt", handleMessageReceipt);
 
     return () => {
       socket.off("receive_message", handleReceiveMessage);
       socket.off("typing", handleTyping);
       socket.off("stop_typing", handleStopTyping);
+      socket.off("message_deleted", handleMessageDeleted);
+      socket.off("message_receipt", handleMessageReceipt);
     };
   }, [open, activeRoom]);
 
@@ -232,6 +288,32 @@ const TeamChat = () => {
     if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); }
   };
 
+  const handleDeleteMessage = async (msgId) => {
+    if (!activeRoom) return;
+
+    // Optimistic UI Update
+    setMessagesByRoom(prev => ({
+      ...prev,
+      [activeRoom.id]: (prev[activeRoom.id] || []).filter(m => m.id !== msgId)
+    }));
+
+    try {
+      const token = localStorage.getItem("token") || localStorage.getItem("adminToken");
+
+      // Call REST API for persistence
+      // await axios.delete(`http://localhost:8080/messages/${msgId}`, {
+      //   headers: { Authorization: token }
+      // });
+
+      // Emit socket event for real-time update
+      socket.emit("delete_message", { roomId: activeRoom.id, messageId: msgId });
+    } catch (err) {
+      console.error("Failed to delete message:", err);
+      // Optional: Re-fetch history if delete fails to revert optimistic update
+      selectRoom(activeRoom);
+    }
+  };
+
   const handleCreateGroup = async () => {
     if (!newGroupName.trim() || selectedMembers.length === 0) return;
     try {
@@ -243,9 +325,9 @@ const TeamChat = () => {
       if (res.data) {
         setGroups(prev => [...prev, {
           id: res.data._id,
-          title: res.data.name,
+          title: res.data.groupName || newGroupName,
           type: "group",
-          lastMsg: res.data.name || newGroupName
+          lastMsg: `${res.data.members?.length ?? 0} members`
         }]);
         setShowCreateGroup(false);
         setNewGroupName("");
@@ -257,8 +339,15 @@ const TeamChat = () => {
   };
 
   const fetchUsers = async () => {
+    const token = localStorage.getItem("token") || localStorage.getItem("adminToken");
     try {
-      const res = await axios.get("http://localhost:8080/employeelists");
+      const res = await axios.get("http://localhost:8080/employeelists", {
+        headers: {
+          Authorization: `${token}`,
+          "Content-Type": "application/json"
+        }
+      });
+      console.log("employee", res.data);
       setAllUsers(res.data);
     } catch (err) {
       console.error("Failed to fetch users:", err);
@@ -454,10 +543,48 @@ const TeamChat = () => {
                               lineHeight: 1.5,
                               boxShadow: isSelf ? "0 4px 12px rgba(79,70,229,0.2)" : "0 2px 8px rgba(0,0,0,0.05)",
                               border: isSelf ? "none" : `1px solid ${alpha(memberColor, 0.1)}`,
-                              position: "relative"
+                              opacity: typeof msg.id === "number" ? 0.7 : 1,
+                              position: "relative",
+                              "&:hover .delete-btn": { opacity: 1 }
                             }}
                           >
                             {msg.text}
+                            {isSelf && (
+                              <Tooltip
+                                title={typeof msg.id === "number" ? "Sending to server..." : "Delete message"}
+                                arrow
+                                placement="left"
+                                disableInteractive
+                                componentsProps={{
+                                  tooltip: { sx: { pointerEvents: "none" } }
+                                }}
+                              >
+                                <span style={{
+                                  position: "absolute",
+                                  left: -35,
+                                  top: "50%",
+                                  transform: "translateY(-50%)",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                  opacity: 0,
+                                  transition: "all 0.2s",
+                                }} className="delete-btn">
+                                  <IconButton
+                                    size="small"
+                                    onClick={() => handleDeleteMessage(msg.id)}
+                                    disabled={typeof msg.id === "number"}
+                                    sx={{
+                                      color: alpha(SECONDARY_SLATE, 0.6),
+                                      "&:hover": { color: "#ef4444", bgcolor: alpha("#ef4444", 0.1) },
+                                      padding: "4px"
+                                    }}
+                                  >
+                                    <DeleteOutlineRoundedIcon sx={{ fontSize: 18 }} />
+                                  </IconButton>
+                                </span>
+                              </Tooltip>
+                            )}
                           </Box>
                           <Typography sx={{ fontSize: "0.6rem", color: alpha(SECONDARY_SLATE, 0.6), mt: 0.5, textAlign: isSelf ? "right" : "left", mx: 0.5 }}>
                             {msg.time}

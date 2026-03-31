@@ -120,9 +120,9 @@ const HRDashboard = () => {
   // --- Initial Data Fetch ---
   useEffect(() => {
     const loadData = async () => {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("adminToken");
       const role = localStorage.getItem("adminRole");
-
+      console.log(token, role);
       if (!token || role !== "hr") {
         navigate("/admin");
         return;
@@ -179,7 +179,7 @@ const HRDashboard = () => {
 
   const fetchLogs = async () => {
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("adminToken");
       const res = await axios.get("http://localhost:8080/admin/employe_log", {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -374,227 +374,227 @@ const HRDashboard = () => {
 
   return (
     <>
-    <Box
-      sx={{
-        minHeight: "100vh",
-        background: `linear-gradient(135deg, ${PRIMARY_BG} 0%, ${SECONDARY_BG} 100%)`,
-        p: { xs: 2, md: 4 },
-        pb: 8,
-        color: "#0f172a",
-      }}
-    >
-      {/* Header Section */}
-      <Fade in={true} timeout={800}>
-        <Box sx={{ mb: 6, pl: 1, display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
-          <Box>
-            <Typography variant="h2" sx={{ fontWeight: 1000, color: "rgba(0,0,0,0.85)", fontSize: { xs: "2rem", md: "3.5rem" }, lineHeight: 1 }}>
-              HR Command Center
-            </Typography>
-            <Typography variant="caption" sx={{ color: alpha("#000", 0.3), fontWeight: 900, letterSpacing: "4px", textTransform: "uppercase" }}>
-              • Advanced Management Interface •
-            </Typography>
-          </Box>
+      <Box
+        sx={{
+          minHeight: "100vh",
+          background: `linear-gradient(135deg, ${PRIMARY_BG} 0%, ${SECONDARY_BG} 100%)`,
+          p: { xs: 2, md: 4 },
+          pb: 8,
+          color: "#0f172a",
+        }}
+      >
+        {/* Header Section */}
+        <Fade in={true} timeout={800}>
+          <Box sx={{ mb: 6, pl: 1, display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
+            <Box>
+              <Typography variant="h2" sx={{ fontWeight: 1000, color: "rgba(0,0,0,0.85)", fontSize: { xs: "2rem", md: "3.5rem" }, lineHeight: 1 }}>
+                HR Command Center
+              </Typography>
+              <Typography variant="caption" sx={{ color: alpha("#000", 0.3), fontWeight: 900, letterSpacing: "4px", textTransform: "uppercase" }}>
+                • Advanced Management Interface •
+              </Typography>
+            </Box>
 
-          {/* Logout Button */}
-          <Box
-            component="button"
-            onClick={handleLogout}
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              gap: 1,
-              px: { xs: 2, sm: 3 },
-              py: { xs: 1, sm: 1.4 },
-              background: "rgba(255,255,255,0.55)",
-              backdropFilter: "blur(16px)",
-              border: "1.5px solid rgba(192,57,43,0.3)",
-              borderRadius: "16px",
-              boxShadow: "0 4px 20px rgba(0,0,0,0.06)",
-              color: "#c0392b",
-              fontWeight: 800,
-              fontSize: { xs: "0.78rem", sm: "0.88rem" },
-              cursor: "pointer",
-              letterSpacing: "0.5px",
-              transition: "all 0.3s ease",
-              whiteSpace: "nowrap",
-              flexShrink: 0,
-              mt: { xs: 0.5, sm: 0 },
-              "&:hover": {
-                background: "#c0392b",
-                color: "#fff",
-                borderColor: "#c0392b",
-                transform: "translateY(-2px)",
-                boxShadow: "0 10px 28px rgba(192,57,43,0.2)",
-              },
-            }}
-          >
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-              <polyline points="16 17 21 12 16 7" />
-              <line x1="21" y1="12" x2="9" y2="12" />
-            </svg>
-            Logout
-          </Box>
-        </Box>
-      </Fade>
-
-      {/* Top Stats Section */}
-      <StatCards stats={stats} />
-
-      {/* Main Feature Area */}
-      <GlassCard sx={{ minHeight: "60vh", borderRadius: "32px" }}>
-        {/* Navigation Tabs */}
-        <Box sx={{ borderBottom: "1px solid rgba(0,0,0,0.05)", background: "rgba(255,255,255,0.4)", px: 2 }}>
-          <Tabs
-            value={tabValue}
-            onChange={handleTabChange}
-            variant="scrollable"
-            scrollButtons="auto"
-            sx={{
-              "& .MuiTab-root": {
-                fontWeight: 900,
-                fontSize: "0.85rem",
-                color: "rgba(0,0,0,0.4)",
-                minHeight: 64,
+            {/* Logout Button */}
+            <Box
+              component="button"
+              onClick={handleLogout}
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 1,
+                px: { xs: 2, sm: 3 },
+                py: { xs: 1, sm: 1.4 },
+                background: "rgba(255,255,255,0.55)",
+                backdropFilter: "blur(16px)",
+                border: "1.5px solid rgba(192,57,43,0.3)",
+                borderRadius: "16px",
+                boxShadow: "0 4px 20px rgba(0,0,0,0.06)",
+                color: "#c0392b",
+                fontWeight: 800,
+                fontSize: { xs: "0.78rem", sm: "0.88rem" },
+                cursor: "pointer",
+                letterSpacing: "0.5px",
                 transition: "all 0.3s ease",
-                "&.Mui-selected": { color: "#38bdf8" }
-              },
-              "& .MuiTabs-indicator": { height: 4, borderRadius: "2px", background: "linear-gradient(90deg, #38bdf8, #818cf8)" }
-            }}
-          >
-            <Tab label="Employees" />
-            <Tab label="Departments" />
-            <Tab label="Work Reports" />
-            <Tab label="Attendance" />
-            <Tab label="Intelligence" />
-            <Tab label="Responsibles" />
-          </Tabs>
-        </Box>
+                whiteSpace: "nowrap",
+                flexShrink: 0,
+                mt: { xs: 0.5, sm: 0 },
+                "&:hover": {
+                  background: "#c0392b",
+                  color: "#fff",
+                  borderColor: "#c0392b",
+                  transform: "translateY(-2px)",
+                  boxShadow: "0 10px 28px rgba(192,57,43,0.2)",
+                },
+              }}
+            >
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                <polyline points="16 17 21 12 16 7" />
+                <line x1="21" y1="12" x2="9" y2="12" />
+              </svg>
+              Logout
+            </Box>
+          </Box>
+        </Fade>
 
-        {/* Content Area */}
-        <Box sx={{ p: { xs: 2, md: 4 } }}>
-          <AnimatePresence mode="wait">
-            {tabValue === 0 && (
-              <EmployeeManager
-                key="employees"
-                users={users}
-                searchQuery={searchQuery}
-                setSearchQuery={setSearchQuery}
-                departmentFilter={departmentFilter}
-                setDepartmentFilter={setDepartmentFilter}
-                departmentsList={DEPARTMENTS}
-                onAddEmployee={() => handleUserDialogOpen()}
-                onAddResponsible={() => {
-                  setResponsibleForm({
-                    name: "",
-                    email: "",
-                    post: "",
-                    department: "",
-                    password: "",
-                  });
-                  setOpenResponsibleDialog(true);
-                }}
-                onEditUser={handleUserDialogOpen}
-                onEditPassword={(user) => handlePasswordDialogOpen(user, "employee")}
-                onDeleteUser={(user) => { setUserToDelete(user); setAdminToDelete(null); setOpenDeleteDialog(true); }}
-              />
-            )}
-            {tabValue === 5 && (
-              <EmployeeManager
-                key="responsibles"
-                users={admins}
-                isAdminView={true}
-                searchQuery={searchQuery}
-                setSearchQuery={setSearchQuery}
-                departmentFilter={departmentFilter}
-                setDepartmentFilter={setDepartmentFilter}
-                departmentsList={POSTS}
-                onAddEmployee={() => handleUserDialogOpen()}
-                onAddResponsible={() => handleAdminDialogOpen()}
-                onEditUser={handleAdminDialogOpen}
-                onEditPassword={(admin) => handlePasswordDialogOpen(admin, "admin")}
-                onDeleteUser={(admin) => { setAdminToDelete(admin); setUserToDelete(null); setOpenDeleteDialog(true); }}
-              />
-            )}
-            {tabValue === 1 && (
-              <DepartmentManager
-                key="depts"
-                departments={departments}
-                onAddDepartment={() => { setEditingDept(null); setDeptForm({ id: "", title: "", color: "", description: "" }); setOpenDeptDialog(true); }}
-                onEditDepartment={(dept) => { setEditingDept(dept); setDeptForm({ ...dept }); setOpenDeptDialog(true); }}
-                onDeleteDepartment={handleDeleteDept}
-                getDeptColor={getDeptColor}
-              />
-            )}
-            {tabValue === 2 && (
-              <ReportManager
-                key="reports"
-                reports={reports}
-                reportDate={reportDate}
-                setReportDate={setReportDate}
-                reportDeptFilter={reportDeptFilter}
-                setReportDeptFilter={setReportDeptFilter}
-                normalizedDepartmentOptions={normalizedDepartmentOptions}
-                getDeptColor={getDeptColor}
-                normalizeDeptName={normalizeDeptName}
-              />
-            )}
-            {tabValue === 3 && (
-              <AttendanceManager
-                key="attendance"
-                logs={logs}
-                attendanceDate={attendanceDate}
-                setAttendanceDate={setAttendanceDate}
-                attendanceDeptFilter={attendanceDeptFilter}
-                setAttendanceDeptFilter={setAttendanceDeptFilter}
-                normalizedDepartmentOptions={normalizedDepartmentOptions}
-                getDeptColor={getDeptColor}
-                normalizeDeptName={normalizeDeptName}
-              />
-            )}
-          </AnimatePresence>
-        </Box>
-      </GlassCard>
+        {/* Top Stats Section */}
+        <StatCards stats={stats} />
 
-      {/* Global Dialogs */}
-      <DashboardDialogs
-        openUserDialog={openUserDialog}
-        handleUserDialogClose={() => setOpenUserDialog(false)}
-        editingUser={editingUser}
-        userForm={userForm}
-        setUserForm={setUserForm}
-        handleUserSubmit={handleUserSubmit}
-        DEPARTMENTS={DEPARTMENTS}
-        openResponsibleDialog={openResponsibleDialog}
-        handleResponsibleDialogClose={() => setOpenResponsibleDialog(false)}
-        responsibleForm={responsibleForm}
-        setResponsibleForm={setResponsibleForm}
-        handleResponsibleSubmit={handleResponsibleSubmit}
-        POSTS={POSTS}
-        openDeptDialog={openDeptDialog}
-        handleDeptDialogClose={() => setOpenDeptDialog(false)}
-        editingDept={editingDept}
-        deptForm={deptForm}
-        setDeptForm={setDeptForm}
-        handleDeptSubmit={handleDeptSubmit}
-        openDeleteDialog={openDeleteDialog}
-        cancelDeleteUser={() => setOpenDeleteDialog(false)}
-        userToDelete={userToDelete || adminToDelete}
-        confirmDeleteUser={adminToDelete ? confirmDeleteAdmin : confirmDeleteUser}
-        openPasswordDialog={openPasswordDialog}
-        handlePasswordDialogClose={() => setOpenPasswordDialog(false)}
-        passwordForm={passwordForm}
-        setPasswordForm={setPasswordForm}
-        handlePasswordSubmit={handlePasswordSubmit}
-      />
+        {/* Main Feature Area */}
+        <GlassCard sx={{ minHeight: "60vh", borderRadius: "32px" }}>
+          {/* Navigation Tabs */}
+          <Box sx={{ borderBottom: "1px solid rgba(0,0,0,0.05)", background: "rgba(255,255,255,0.4)", px: 2 }}>
+            <Tabs
+              value={tabValue}
+              onChange={handleTabChange}
+              variant="scrollable"
+              scrollButtons="auto"
+              sx={{
+                "& .MuiTab-root": {
+                  fontWeight: 900,
+                  fontSize: "0.85rem",
+                  color: "rgba(0,0,0,0.4)",
+                  minHeight: 64,
+                  transition: "all 0.3s ease",
+                  "&.Mui-selected": { color: "#38bdf8" }
+                },
+                "& .MuiTabs-indicator": { height: 4, borderRadius: "2px", background: "linear-gradient(90deg, #38bdf8, #818cf8)" }
+              }}
+            >
+              <Tab label="Employees" />
+              <Tab label="Departments" />
+              <Tab label="Work Reports" />
+              <Tab label="Attendance" />
+              <Tab label="Intelligence" />
+              <Tab label="Responsibles" />
+            </Tabs>
+          </Box>
 
-      {/* Snackbar Alert */}
-      {alertOpen && (
-        <Alert severity="success" onClose={() => setAlertOpen(false)} sx={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, borderRadius: "12px", boxShadow: "0 8px 32px rgba(0,0,0,0.1)" }}>
-          {alertMessage}
-        </Alert>
-      )}
-    </Box>
+          {/* Content Area */}
+          <Box sx={{ p: { xs: 2, md: 4 } }}>
+            <AnimatePresence mode="wait">
+              {tabValue === 0 && (
+                <EmployeeManager
+                  key="employees"
+                  users={users}
+                  searchQuery={searchQuery}
+                  setSearchQuery={setSearchQuery}
+                  departmentFilter={departmentFilter}
+                  setDepartmentFilter={setDepartmentFilter}
+                  departmentsList={DEPARTMENTS}
+                  onAddEmployee={() => handleUserDialogOpen()}
+                  onAddResponsible={() => {
+                    setResponsibleForm({
+                      name: "",
+                      email: "",
+                      post: "",
+                      department: "",
+                      password: "",
+                    });
+                    setOpenResponsibleDialog(true);
+                  }}
+                  onEditUser={handleUserDialogOpen}
+                  onEditPassword={(user) => handlePasswordDialogOpen(user, "employee")}
+                  onDeleteUser={(user) => { setUserToDelete(user); setAdminToDelete(null); setOpenDeleteDialog(true); }}
+                />
+              )}
+              {tabValue === 5 && (
+                <EmployeeManager
+                  key="responsibles"
+                  users={admins}
+                  isAdminView={true}
+                  searchQuery={searchQuery}
+                  setSearchQuery={setSearchQuery}
+                  departmentFilter={departmentFilter}
+                  setDepartmentFilter={setDepartmentFilter}
+                  departmentsList={POSTS}
+                  onAddEmployee={() => handleUserDialogOpen()}
+                  onAddResponsible={() => handleAdminDialogOpen()}
+                  onEditUser={handleAdminDialogOpen}
+                  onEditPassword={(admin) => handlePasswordDialogOpen(admin, "admin")}
+                  onDeleteUser={(admin) => { setAdminToDelete(admin); setUserToDelete(null); setOpenDeleteDialog(true); }}
+                />
+              )}
+              {tabValue === 1 && (
+                <DepartmentManager
+                  key="depts"
+                  departments={departments}
+                  onAddDepartment={() => { setEditingDept(null); setDeptForm({ id: "", title: "", color: "", description: "" }); setOpenDeptDialog(true); }}
+                  onEditDepartment={(dept) => { setEditingDept(dept); setDeptForm({ ...dept }); setOpenDeptDialog(true); }}
+                  onDeleteDepartment={handleDeleteDept}
+                  getDeptColor={getDeptColor}
+                />
+              )}
+              {tabValue === 2 && (
+                <ReportManager
+                  key="reports"
+                  reports={reports}
+                  reportDate={reportDate}
+                  setReportDate={setReportDate}
+                  reportDeptFilter={reportDeptFilter}
+                  setReportDeptFilter={setReportDeptFilter}
+                  normalizedDepartmentOptions={normalizedDepartmentOptions}
+                  getDeptColor={getDeptColor}
+                  normalizeDeptName={normalizeDeptName}
+                />
+              )}
+              {tabValue === 3 && (
+                <AttendanceManager
+                  key="attendance"
+                  logs={logs}
+                  attendanceDate={attendanceDate}
+                  setAttendanceDate={setAttendanceDate}
+                  attendanceDeptFilter={attendanceDeptFilter}
+                  setAttendanceDeptFilter={setAttendanceDeptFilter}
+                  normalizedDepartmentOptions={normalizedDepartmentOptions}
+                  getDeptColor={getDeptColor}
+                  normalizeDeptName={normalizeDeptName}
+                />
+              )}
+            </AnimatePresence>
+          </Box>
+        </GlassCard>
+
+        {/* Global Dialogs */}
+        <DashboardDialogs
+          openUserDialog={openUserDialog}
+          handleUserDialogClose={() => setOpenUserDialog(false)}
+          editingUser={editingUser}
+          userForm={userForm}
+          setUserForm={setUserForm}
+          handleUserSubmit={handleUserSubmit}
+          DEPARTMENTS={DEPARTMENTS}
+          openResponsibleDialog={openResponsibleDialog}
+          handleResponsibleDialogClose={() => setOpenResponsibleDialog(false)}
+          responsibleForm={responsibleForm}
+          setResponsibleForm={setResponsibleForm}
+          handleResponsibleSubmit={handleResponsibleSubmit}
+          POSTS={POSTS}
+          openDeptDialog={openDeptDialog}
+          handleDeptDialogClose={() => setOpenDeptDialog(false)}
+          editingDept={editingDept}
+          deptForm={deptForm}
+          setDeptForm={setDeptForm}
+          handleDeptSubmit={handleDeptSubmit}
+          openDeleteDialog={openDeleteDialog}
+          cancelDeleteUser={() => setOpenDeleteDialog(false)}
+          userToDelete={userToDelete || adminToDelete}
+          confirmDeleteUser={adminToDelete ? confirmDeleteAdmin : confirmDeleteUser}
+          openPasswordDialog={openPasswordDialog}
+          handlePasswordDialogClose={() => setOpenPasswordDialog(false)}
+          passwordForm={passwordForm}
+          setPasswordForm={setPasswordForm}
+          handlePasswordSubmit={handlePasswordSubmit}
+        />
+
+        {/* Snackbar Alert */}
+        {alertOpen && (
+          <Alert severity="success" onClose={() => setAlertOpen(false)} sx={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, borderRadius: "12px", boxShadow: "0 8px 32px rgba(0,0,0,0.1)" }}>
+            {alertMessage}
+          </Alert>
+        )}
+      </Box>
 
       {/* Floating TeamChat Bubble */}
       <TeamChat />
