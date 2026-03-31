@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
   Box, Typography, IconButton, TextField, Avatar,
-  alpha, Fade, Badge, List, ListItem, ListItemAvatar, ListItemText, Divider,
+  alpha, Fade, Badge, List, ListItem, ListItemButton, ListItemAvatar, ListItemText, Divider,
   Dialog, DialogTitle, DialogContent, DialogActions, Button, Checkbox, FormControlLabel, Tooltip,
 } from "@mui/material";
 import ChatBubbleRoundedIcon from "@mui/icons-material/ChatBubbleRounded";
@@ -150,13 +150,43 @@ const TeamChat = () => {
     }
   }, [activeRoom]);
 
+  const fetchRoomHistory = useCallback(async (roomId) => {
+    if (!roomId) return;
+    try {
+      const response = await axios.get(`http://localhost:8080/messages/${roomId}`);
+      if (response.data) {
+        console.log("Fetched history for sync:", response.data.length, "messages");
+        const history = response.data.map(m => ({
+          id: m._id,
+          room: roomId,
+          from: m.name || "Unknown",
+          initials: (m.name || "U").charAt(0).toUpperCase(),
+          text: m.message,
+          time: formatTime(m.time) || new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Kolkata" }),
+          self: m.sender === user.id || m.sender?._id === user.id,
+          senderId: m.sender?._id || m.sender
+        }));
+        setMessagesByRoom(prev => ({ ...prev, [roomId]: history }));
+      }
+    } catch (err) {
+      console.warn("Background fetch failed:", err);
+    }
+  }, [user.id]);
+
   // 3. Global Message & Typing Listener
   useEffect(() => {
     const handleReceiveMessage = (msg) => {
+      // Optimistic update
       setMessagesByRoom((prev) => ({
         ...prev,
         [msg.room]: [...(prev[msg.room] || []), msg]
       }));
+
+      // Instant DB refresh for active room
+      if (activeRoom && activeRoom.id === msg.room) {
+        fetchRoomHistory(msg.room);
+      }
+
       if (!open || (activeRoom && activeRoom.id !== msg.room)) {
         setUnreadCount((c) => c + 1);
       }
@@ -182,16 +212,26 @@ const TeamChat = () => {
         ...prev,
         [roomId]: (prev[roomId] || []).filter((msg) => msg.id !== messageId),
       }));
+      // Refresh DB state after deletion to ensure sync
+      if (activeRoom && activeRoom.id === roomId) {
+        fetchRoomHistory(roomId);
+      }
     };
 
     const handleMessageReceipt = ({ tempId, realId, roomId }) => {
-      setMessagesByRoom((prev) => {
-        const roomMessages = prev[roomId] || [];
-        const updatedMessages = roomMessages.map((msg) =>
-          msg.id === tempId ? { ...msg, id: realId } : msg
-        );
-        return { ...prev, [roomId]: updatedMessages };
-      });
+      // Refresh entire history when our own message is confirmed
+      if (activeRoom && activeRoom.id === roomId) {
+        fetchRoomHistory(roomId);
+      } else {
+        // Fallback to manual sync if not in active room
+        setMessagesByRoom((prev) => {
+          const roomMessages = prev[roomId] || [];
+          const updatedMessages = roomMessages.map((msg) =>
+            msg.id === tempId ? { ...msg, id: realId } : msg
+          );
+          return { ...prev, [roomId]: updatedMessages };
+        });
+      }
     };
 
     socket.on("receive_message", handleReceiveMessage);
@@ -207,7 +247,7 @@ const TeamChat = () => {
       socket.off("message_deleted", handleMessageDeleted);
       socket.off("message_receipt", handleMessageReceipt);
     };
-  }, [open, activeRoom]);
+  }, [open, activeRoom, fetchRoomHistory]);
 
   // 4. Scroll to Bottom
   useEffect(() => {
@@ -256,32 +296,18 @@ const TeamChat = () => {
       [activeRoom.id]: [...(prev[activeRoom.id] || []), msg]
     }));
     setInput("");
+
+    // Sudden re-fetch to ensure we have the REAL MongoDB ID for deletion
+    setTimeout(() => {
+      fetchRoomHistory(activeRoom.id);
+    }, 500);
   };
 
   const selectRoom = async (room) => {
     setActiveRoom(room);
     setView("chat");
     setUnreadCount(0);
-
-    try {
-      const response = await axios.get(`http://localhost:8080/messages/${room.id}`);
-      if (response.data) {
-        console.log(response.data);
-        const history = response.data.map(m => ({
-          id: m._id,
-          room: room.id,
-          from: m.name || "Unknown",
-          initials: (m.name || "U").charAt(0).toUpperCase(),
-          text: m.message,
-          time: formatTime(m.time) || new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Kolkata" }),
-          self: m.sender === user.id,
-          senderId: m.sender
-        }));
-        setMessagesByRoom(prev => ({ ...prev, [room.id]: history }));
-      }
-    } catch (err) {
-      console.error("Failed to fetch chat history:", err);
-    }
+    fetchRoomHistory(room.id);
   };
 
   const handleKey = (e) => {
@@ -434,20 +460,24 @@ const TeamChat = () => {
                 </Typography>
                 {departments.map((dept) => (
                   <ListItem
-                    button
                     key={dept.Dep_id}
-                    onClick={() => selectRoom({ id: dept.Dep_id, title: dept.title, type: "dept" })}
+                    disablePadding
                     sx={{ "&:hover": { bgcolor: alpha(INDIGO_ACCENT, 0.04) } }}
                   >
-                    <ListItemAvatar>
-                      <Avatar sx={{ bgcolor: alpha(INDIGO_ACCENT, 0.1), color: INDIGO_ACCENT }}>
-                        <BusinessRoundedIcon sx={{ fontSize: 18 }} />
-                      </Avatar>
-                    </ListItemAvatar>
-                    <ListItemText
-                      primary={<Typography sx={{ fontWeight: 700, fontSize: "0.85rem", color: PRIMARY_SLATE }}>{dept.title}</Typography>}
-                      secondary={<Typography noWrap sx={{ fontSize: "0.75rem", color: SECONDARY_SLATE }}>{dept.description?.substring(0, 30)}...</Typography>}
-                    />
+                    <ListItemButton
+                      onClick={() => selectRoom({ id: dept.Dep_id, title: dept.title, type: "dept" })}
+                      sx={{ py: 1 }}
+                    >
+                      <ListItemAvatar>
+                        <Avatar sx={{ bgcolor: alpha(INDIGO_ACCENT, 0.1), color: INDIGO_ACCENT }}>
+                          <BusinessRoundedIcon sx={{ fontSize: 18 }} />
+                        </Avatar>
+                      </ListItemAvatar>
+                      <ListItemText
+                        primary={<Typography sx={{ fontWeight: 700, fontSize: "0.85rem", color: PRIMARY_SLATE }}>{dept.title}</Typography>}
+                        secondary={<Typography noWrap sx={{ fontSize: "0.75rem", color: SECONDARY_SLATE }}>{dept.description?.substring(0, 30)}...</Typography>}
+                      />
+                    </ListItemButton>
                   </ListItem>
                 ))}
 
@@ -464,20 +494,24 @@ const TeamChat = () => {
                 </Box>
                 {groups.map((grp) => (
                   <ListItem
-                    button
                     key={grp.id}
-                    onClick={() => selectRoom(grp)}
+                    disablePadding
                     sx={{ "&:hover": { bgcolor: alpha(INDIGO_ACCENT, 0.04) } }}
                   >
-                    <ListItemAvatar>
-                      <Avatar sx={{ bgcolor: alpha("#10b981", 0.1), color: "#10b981" }}>
-                        <GroupsRoundedIcon sx={{ fontSize: 18 }} />
-                      </Avatar>
-                    </ListItemAvatar>
-                    <ListItemText
-                      primary={<Typography sx={{ fontWeight: 700, fontSize: "0.85rem", color: PRIMARY_SLATE }}>{grp.title}</Typography>}
-                      secondary={<Typography noWrap sx={{ fontSize: "0.75rem", color: SECONDARY_SLATE }}>{grp.lastMsg}</Typography>}
-                    />
+                    <ListItemButton
+                      onClick={() => selectRoom(grp)}
+                      sx={{ py: 1 }}
+                    >
+                      <ListItemAvatar>
+                        <Avatar sx={{ bgcolor: alpha("#10b981", 0.1), color: "#10b981" }}>
+                          <GroupsRoundedIcon sx={{ fontSize: 18 }} />
+                        </Avatar>
+                      </ListItemAvatar>
+                      <ListItemText
+                        primary={<Typography sx={{ fontWeight: 700, fontSize: "0.85rem", color: PRIMARY_SLATE }}>{grp.title}</Typography>}
+                        secondary={<Typography noWrap sx={{ fontSize: "0.75rem", color: SECONDARY_SLATE }}>{grp.lastMsg}</Typography>}
+                      />
+                    </ListItemButton>
                   </ListItem>
                 ))}
               </List>
@@ -543,7 +577,6 @@ const TeamChat = () => {
                               lineHeight: 1.5,
                               boxShadow: isSelf ? "0 4px 12px rgba(79,70,229,0.2)" : "0 2px 8px rgba(0,0,0,0.05)",
                               border: isSelf ? "none" : `1px solid ${alpha(memberColor, 0.1)}`,
-                              opacity: typeof msg.id === "number" ? 0.7 : 1,
                               position: "relative",
                               "&:hover .delete-btn": { opacity: 1 }
                             }}
@@ -551,7 +584,7 @@ const TeamChat = () => {
                             {msg.text}
                             {isSelf && (
                               <Tooltip
-                                title={typeof msg.id === "number" ? "Sending to server..." : "Delete message"}
+                                title="Delete message"
                                 arrow
                                 placement="left"
                                 disableInteractive
@@ -559,30 +592,34 @@ const TeamChat = () => {
                                   tooltip: { sx: { pointerEvents: "none" } }
                                 }}
                               >
-                                <span style={{
-                                  position: "absolute",
-                                  left: -35,
-                                  top: "50%",
-                                  transform: "translateY(-50%)",
-                                  display: "flex",
-                                  alignItems: "center",
-                                  justifyContent: "center",
-                                  opacity: 0,
-                                  transition: "all 0.2s",
-                                }} className="delete-btn">
+                                <Box
+                                  component="span"
+                                  className="delete-btn"
+                                  sx={{
+                                    position: "absolute",
+                                    left: -35,
+                                    top: "50%",
+                                    transform: "translateY(-50%)",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    opacity: 0,
+                                    transition: "all 0.2s",
+                                    pointerEvents: "auto",
+                                  }}
+                                >
                                   <IconButton
                                     size="small"
                                     onClick={() => handleDeleteMessage(msg.id)}
-                                    disabled={typeof msg.id === "number"}
                                     sx={{
-                                      color: alpha(SECONDARY_SLATE, 0.6),
-                                      "&:hover": { color: "#ef4444", bgcolor: alpha("#ef4444", 0.1) },
+                                      color: "#ef4444",
+                                      "&:hover": { bgcolor: alpha("#ef4444", 0.12) },
                                       padding: "4px"
                                     }}
                                   >
                                     <DeleteOutlineRoundedIcon sx={{ fontSize: 18 }} />
                                   </IconButton>
-                                </span>
+                                </Box>
                               </Tooltip>
                             )}
                           </Box>
@@ -702,9 +739,11 @@ const TeamChat = () => {
           <Typography sx={{ fontSize: "0.8rem", fontWeight: 700, mb: 1, mt: 1 }}>Select Members</Typography>
           <List sx={{ pt: 0 }}>
             {allUsers.filter(u => u._id !== user.id).map((u) => (
-              <ListItem key={u._id} dense button onClick={() => toggleMember(u._id)} sx={{ borderRadius: "8px" }}>
-                <Checkbox edge="start" checked={selectedMembers.includes(u._id)} />
-                <ListItemText primary={u.name} secondary={u.department} />
+              <ListItem key={u._id} disablePadding>
+                <ListItemButton onClick={() => toggleMember(u._id)} sx={{ borderRadius: "8px" }}>
+                  <Checkbox edge="start" checked={selectedMembers.includes(u._id)} />
+                  <ListItemText primary={u.name} secondary={u.department} />
+                </ListItemButton>
               </ListItem>
             ))}
           </List>
