@@ -3,6 +3,7 @@ import {
   Box, Typography, IconButton, TextField, Avatar,
   alpha, Fade, Badge, List, ListItem, ListItemButton, ListItemAvatar, ListItemText, Divider,
   Dialog, DialogTitle, DialogContent, DialogActions, Button, Checkbox, FormControlLabel, Tooltip,
+  Menu, MenuItem,
 } from "@mui/material";
 import ChatBubbleRoundedIcon from "@mui/icons-material/ChatBubbleRounded";
 import AddRoundedIcon from "@mui/icons-material/AddRounded";
@@ -13,12 +14,11 @@ import GroupsRoundedIcon from "@mui/icons-material/GroupsRounded";
 import BusinessRoundedIcon from "@mui/icons-material/BusinessRounded";
 import CircleIcon from "@mui/icons-material/Circle";
 import DeleteOutlineRoundedIcon from "@mui/icons-material/DeleteOutlineRounded";
+import MoreVertRoundedIcon from "@mui/icons-material/MoreVertRounded";
 import axios from "axios";
 import io from "socket.io-client";
 const socket = io("http://localhost:8080", {
-  auth: {
-    token: localStorage.getItem("token") || localStorage.getItem("adminToken")
-  }
+  autoConnect: false
 });
 
 const INDIGO_ACCENT = "#4f46e5";
@@ -66,6 +66,24 @@ const TeamChat = () => {
   const [allUsers, setAllUsers] = useState([]);
   const [newGroupName, setNewGroupName] = useState("");
   const [selectedMembers, setSelectedMembers] = useState([]); // Array of IDs
+  const [menuAnchorEl, setMenuAnchorEl] = useState(null);
+  const [selectedGroup, setSelectedGroup] = useState(null);
+  const [isEditingGroup, setIsEditingGroup] = useState(false);
+  
+  // 0. Socket Connection Management
+  useEffect(() => {
+    const token = localStorage.getItem("token") || localStorage.getItem("adminToken");
+    if (token) {
+      socket.auth = { token };
+      socket.connect();
+      console.log("Socket connecting with token...");
+    }
+
+    return () => {
+      socket.disconnect();
+      console.log("Socket disconnected");
+    };
+  }, []);
 
   // 1. Fetch User and Departments
   useEffect(() => {
@@ -340,28 +358,127 @@ const TeamChat = () => {
     }
   };
 
-  const handleCreateGroup = async () => {
-    if (!newGroupName.trim() || selectedMembers.length === 0) return;
+  const handleMenuOpen = (event, group) => {
+    event.stopPropagation();
+    setMenuAnchorEl(event.currentTarget);
+    setSelectedGroup(group);
+  };
+
+  const handleMenuClose = () => {
+    setMenuAnchorEl(null);
+  };
+
+  const handleDeleteGroup = async () => {
+    if (!selectedGroup) return;
     try {
-      const res = await axios.post("http://localhost:8080/groups/create", {
+      const token = localStorage.getItem("token") || localStorage.getItem("adminToken");
+      await axios.delete(`http://localhost:8080/admin/group_delete/${selectedGroup.id}`, {
+        headers: { Authorization: token }
+      });
+      setGroups(prev => prev.filter(g => g.id !== selectedGroup.id));
+      handleMenuClose();
+      setSelectedGroup(null);
+    } catch (err) {
+      console.error("Failed to delete group:", err);
+    }
+  };
+
+  const handleEditGroupClick = async () => {
+    if (!selectedGroup) return;
+    try {
+      const token = localStorage.getItem("token") || localStorage.getItem("adminToken");
+      // Fetch the latest group data (not strictly necessary but ensures parity)
+      const res = await axios.get(`http://localhost:8080/admin/groups/${selectedGroup.id}`, {
+        headers: { Authorization: token }
+      });
+      // console.log("edit group", res.data);
+      const gData = Array.isArray(res.data) ? res.data[0] : res.data;
+      if (gData) {
+        setNewGroupName(gData.groupName);
+        // Map member objects to just IDs (excluding self if necessary, or keeping all)
+        const memberIds = (gData.members || [])
+          .map(m => (m._id || m).toString())
+          .filter(id => id !== user.id?.toString());
+        setSelectedMembers(memberIds);
+        setIsEditingGroup(true);
+        fetchUsers();
+        setShowCreateGroup(true);
+      }
+      handleMenuClose();
+    } catch (err) {
+      console.error("Failed to fetch group for edit:", err);
+      // Fallback if direct fetch fails (use from existing state)
+      setNewGroupName(selectedGroup.title);
+      setIsEditingGroup(true);
+      fetchUsers();
+      setShowCreateGroup(true);
+      handleMenuClose();
+    }
+  };
+
+  const handleUpdateGroup = async () => {
+    console.log("handleUpdateGroup called", { name: newGroupName, members: selectedMembers, group: selectedGroup });
+    if (!newGroupName?.trim() || !selectedGroup) return;
+    try {
+      const token = localStorage.getItem("token") || localStorage.getItem("adminToken");
+      const groupData = {
         name: newGroupName,
         members: [...selectedMembers, user.id],
         createdBy: user.id
+      };
+      const res = await axios.put(`http://localhost:8080/admin/update_groups/${selectedGroup.id}`, groupData, {
+        headers: { Authorization: token }
       });
-      if (res.data) {
+
+      const updatedData = Array.isArray(res.data) ? res.data[0] : res.data;
+      if (updatedData) {
+        setGroups(prev => prev.map(g => g.id === selectedGroup.id ? {
+          ...g,
+          title: updatedData.groupName || newGroupName,
+          lastMsg: `${updatedData.members?.length ?? 0} members`
+        } : g));
+        resetGroupForm();
+      }
+    } catch (err) {
+      console.error("Failed to update group:", err);
+    }
+  };
+
+  const handleCreateGroup = async () => {
+    console.log("handleCreateGroup called", { name: newGroupName, members: selectedMembers });
+    if (!newGroupName?.trim()) return;
+    try {
+      const token = localStorage.getItem("token") || localStorage.getItem("adminToken");
+      const groupData = {
+        name: newGroupName,
+        members: [...selectedMembers, user.id],
+        createdBy: user.id
+      };
+      const res = await axios.post("http://localhost:8080/groups/create", groupData, {
+        headers: { Authorization: token }
+      });
+
+      const newData = Array.isArray(res.data) ? res.data[0] : res.data;
+      if (newData) {
         setGroups(prev => [...prev, {
-          id: res.data._id,
-          title: res.data.groupName || newGroupName,
+          id: newData._id,
+          title: newData.groupName || newGroupName,
           type: "group",
-          lastMsg: `${res.data.members?.length ?? 0} members`
+          lastMsg: `${newData.members?.length ?? 0} members`
         }]);
-        setShowCreateGroup(false);
-        setNewGroupName("");
-        setSelectedMembers([]);
+        resetGroupForm();
       }
     } catch (err) {
       console.error("Failed to create group:", err);
     }
+  };
+
+  const resetGroupForm = () => {
+    setShowCreateGroup(false);
+    setNewGroupName("");
+    setSelectedMembers([]);
+    setIsEditingGroup(false);
+    setSelectedGroup(null);
   };
 
   const fetchUsers = async () => {
@@ -381,8 +498,9 @@ const TeamChat = () => {
   };
 
   const toggleMember = (id) => {
+    const idStr = id.toString();
     setSelectedMembers(prev =>
-      prev.includes(id) ? prev.filter(m => m !== id) : [...prev, id]
+      prev.includes(idStr) ? prev.filter(m => m !== idStr) : [...prev, idStr]
     );
   };
 
@@ -511,6 +629,13 @@ const TeamChat = () => {
                         primary={<Typography sx={{ fontWeight: 700, fontSize: "0.85rem", color: PRIMARY_SLATE }}>{grp.title}</Typography>}
                         secondary={<Typography noWrap sx={{ fontSize: "0.75rem", color: SECONDARY_SLATE }}>{grp.lastMsg}</Typography>}
                       />
+                      <IconButton
+                        size="small"
+                        onClick={(e) => handleMenuOpen(e, grp)}
+                        sx={{ ml: 1, color: alpha(SECONDARY_SLATE, 0.4), "&:hover": { color: INDIGO_ACCENT, bgcolor: alpha(INDIGO_ACCENT, 0.08) } }}
+                      >
+                        <MoreVertRoundedIcon sx={{ fontSize: 16 }} />
+                      </IconButton>
                     </ListItemButton>
                   </ListItem>
                 ))}
@@ -723,7 +848,9 @@ const TeamChat = () => {
 
       {/* Create Group Dialog */}
       <Dialog open={showCreateGroup} onClose={() => setShowCreateGroup(false)} maxWidth="xs" fullWidth>
-        <DialogTitle sx={{ fontWeight: 800, fontSize: "1.1rem" }}>Create New Group</DialogTitle>
+        <DialogTitle sx={{ fontWeight: 800, fontSize: "1.1rem" }}>
+          {isEditingGroup ? "Edit Group" : "Create New Group"}
+        </DialogTitle>
         <DialogContent dividers>
           <TextField
             autoFocus
@@ -741,7 +868,7 @@ const TeamChat = () => {
             {allUsers.filter(u => u._id !== user.id).map((u) => (
               <ListItem key={u._id} disablePadding>
                 <ListItemButton onClick={() => toggleMember(u._id)} sx={{ borderRadius: "8px" }}>
-                  <Checkbox edge="start" checked={selectedMembers.includes(u._id)} />
+                  <Checkbox edge="start" checked={selectedMembers.includes(u._id?.toString())} />
                   <ListItemText primary={u.name} secondary={u.department} />
                 </ListItemButton>
               </ListItem>
@@ -749,17 +876,41 @@ const TeamChat = () => {
           </List>
         </DialogContent>
         <DialogActions sx={{ p: 2 }}>
-          <Button onClick={() => setShowCreateGroup(false)} sx={{ color: SECONDARY_SLATE }}>Cancel</Button>
+          <Button onClick={resetGroupForm} sx={{ color: SECONDARY_SLATE }}>Cancel</Button>
           <Button
-            onClick={handleCreateGroup}
+            onClick={isEditingGroup ? handleUpdateGroup : handleCreateGroup}
             variant="contained"
-            disabled={!newGroupName.trim() || selectedMembers.length === 0}
+            disabled={!newGroupName?.trim()}
             sx={{ bgcolor: INDIGO_ACCENT, "&:hover": { bgcolor: "#3730a3" } }}
           >
-            Create Group
+            {isEditingGroup ? "Update Group" : "Create Group"}
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Group Settings Menu */}
+      <Menu
+        anchorEl={menuAnchorEl}
+        open={Boolean(menuAnchorEl)}
+        onClose={handleMenuClose}
+        PaperProps={{
+          sx: {
+            borderRadius: "12px",
+            boxShadow: "0 8px 16px rgba(0,0,0,0.1)",
+            mt: 0.5,
+            minWidth: 140,
+          }
+        }}
+        transformOrigin={{ horizontal: "right", vertical: "top" }}
+        anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+      >
+        <MenuItem onClick={handleEditGroupClick} sx={{ fontSize: "0.75rem", fontWeight: 600, color: PRIMARY_SLATE }}>
+          Edit Group
+        </MenuItem>
+        <MenuItem onClick={handleDeleteGroup} sx={{ fontSize: "0.75rem", fontWeight: 600, color: "#ef4444" }}>
+          Delete Group
+        </MenuItem>
+      </Menu>
     </Box>
   );
 };

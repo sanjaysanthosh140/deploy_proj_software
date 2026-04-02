@@ -79,38 +79,36 @@ const Login = () => {
 
   /* ── Shared glass input style ── */
   const inputSx = {
-    mb: 2,
+    mb: 2.5,
     "& .MuiOutlinedInput-root": {
       borderRadius: "12px",
       background: "#fff",
-      transition: "all 0.2s ease",
       "& fieldset": {
-        borderColor: "#e0e0e0",
-        borderWidth: "1px",
+        borderColor: "rgba(0, 0, 0, 0.08)",
+        borderWidth: "1.5px",
       },
       "&:hover fieldset": {
-        borderColor: "#bdbdbd",
+        borderColor: "rgba(0, 0, 0, 0.15)",
       },
       "&.Mui-focused": {
         "& fieldset": {
-          borderColor: "#1a1a1a",
+          borderColor: "#1A5296",
           borderWidth: "1.5px",
         },
       },
     },
     "& input": {
-      color: "#1a1a1a",
-      fontWeight: 500,
+      color: "#333",
       fontSize: "0.95rem",
-      "&::placeholder": { color: "#9e9e9e", opacity: 1 },
-      // Hide browser-native password reveal button (Edge/Chrome/IE)
+      py: 1.8,
+      "&::placeholder": { color: "#b0b0b0", opacity: 1 },
       "&::-ms-reveal": { display: "none" },
       "&::-ms-clear": { display: "none" },
       "&::-webkit-credentials-auto-fill-button": { display: "none" },
     },
     "& .MuiInputAdornment-root svg": {
-      color: "#757575",
-      fontSize: "20px",
+      color: "#9e9e9e",
+      fontSize: "22px",
     },
   };
 
@@ -121,212 +119,197 @@ const Login = () => {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        bgcolor: "#fcfcfc",
+        bgcolor: "#ffffff",
         p: { xs: 2.5, sm: 4 },
       }}
     >
-
-      {/* ── Login Card ── */}
       <motion.div
-        initial={{ opacity: 0, y: 28, scale: 0.97 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-        style={{ width: "100%", maxWidth: 420, position: "relative", zIndex: 1 }}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        style={{ width: "100%", maxWidth: 500 }}
       >
-        <Box
-          sx={{
-            width: "100%",
-            p: { xs: 4, md: 6 },
-            borderRadius: "24px",
-            bgcolor: "#ffffff",
-            border: "1px solid #eaeaea",
-            boxShadow: "0 20px 50px rgba(0,0,0,0.05)",
-          }}
-        >
+        <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", mb: 6 }}>
+          {/* Pill Badge */}
+          <Box
+            sx={{
+              px: 3,
+              py: 1,
+              borderRadius: "30px",
+              border: "1px solid rgba(0, 0, 0, 0.12)",
+              mb: 3,
+            }}
+          >
+            <Typography
+              variant="subtitle2"
+              sx={{ fontWeight: 600, color: "#4B5563", letterSpacing: "0.02em" }}
+            >
+              Department Portal
+            </Typography>
+          </Box>
 
+          {/* Title and Subtitle */}
+          <Typography
+            variant="h3"
+            sx={{
+              fontWeight: 700,
+              color: "#374151",
+              textAlign: "center",
+              mb: 2.5,
+              fontSize: { xs: "2rem", md: "3rem" },
+              letterSpacing: "-0.01em",
+            }}
+          >
+            Choose your Division
+          </Typography>
+          <Typography
+            variant="body1"
+            sx={{
+              color: "#6B7280",
+              textAlign: "center",
+              maxWidth: 440,
+              lineHeight: 1.6,
+              mb: 0,
+              fontSize: "1.05rem",
+            }}
+          >
+            Select your department to access your workspace, track tasks, and collaborate with your team.
+          </Typography>
+        </Box>
 
-          {/* ── Card content ── */}
-          <Box sx={{ position: "relative", zIndex: 1 }}>
+        <Box sx={{ width: "100%", px: { xs: 1, sm: 4 } }}>
+          {/* Alert Messages */}
+          {alertStatus === "error" && (
+            <Alert
+              severity="error"
+              onClose={() => setAlertStatus(null)}
+              sx={{ mb: 3, borderRadius: "12px" }}
+            >
+              {alertMessage}
+            </Alert>
+          )}
+          {alertStatus === "success" && (
+            <Alert
+              severity="success"
+              onClose={() => setAlertStatus(null)}
+              sx={{ mb: 3, borderRadius: "12px" }}
+            >
+              {alertMessage}
+            </Alert>
+          )}
 
-            {/* Alert Messages */}
-            {alertStatus === "error" && (
-              <Alert
-                severity="error"
-                onClose={() => setAlertStatus(null)}
-                sx={{
-                  mb: 3,
-                  background: "rgba(244, 63, 94, 0.12)",
-                  border: "1px solid rgba(244, 63, 94, 0.3)",
-                  color: "rgba(192, 30, 60, 0.9)",
-                  borderRadius: "12px",
-                  fontWeight: 600,
-                  fontSize: "0.9rem",
-                  "& .MuiAlert-icon": { color: "rgba(244, 63, 94, 0.8)" },
-                }}
-              >
-                {alertMessage}
-              </Alert>
-            )}
-            {alertStatus === "success" && (
-              <Alert
-                severity="success"
-                onClose={() => setAlertStatus(null)}
-                sx={{
-                  mb: 3,
-                  background: "rgba(74, 222, 128, 0.12)",
-                  border: "1px solid rgba(74, 222, 128, 0.3)",
-                  color: "rgba(22, 140, 60, 0.9)",
-                  borderRadius: "12px",
-                  fontWeight: 600,
-                  fontSize: "0.9rem",
-                  "& .MuiAlert-icon": { color: "rgba(74, 222, 128, 0.8)" },
-                }}
-              >
-                {alertMessage}
-              </Alert>
-            )}
+          {/* Email Input */}
+          <TextField
+            fullWidth
+            required
+            variant="outlined"
+            placeholder="Enter Your Email"
+            name="email"
+            value={formData.email}
+            onChange={handleChnage}
+            sx={inputSx}
+          />
 
-            {/* Header */}
-            <Box sx={{ textAlign: "center", mb: 4 }}>
-              {/* Logo mark */}
-              <Box
-                sx={{
-                  width: 52,
-                  height: 52,
-                  borderRadius: "14px",
-                  background: "#1a1a1a",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  mx: "auto",
-                  mb: 2.5,
-                  boxShadow: "0 8px 16px rgba(0,0,0,0.1)",
-                }}
-              >
-                <BoltIcon sx={{ fontSize: 24, color: "#fff" }} />
-              </Box>
+          {/* Password Input */}
+          <TextField
+            fullWidth
+            required
+            variant="outlined"
+            type={showPassword ? "text" : "password"}
+            placeholder="Enter Your Password"
+            name="password"
+            value={formData.password}
+            onChange={handleChnage}
+            sx={inputSx}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    aria-label="toggle password visibility"
+                    onClick={() => setShowPassword(!showPassword)}
+                    edge="end"
+                    size="small"
+                  >
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+          />
 
-              <Typography
-                variant="h5"
-                sx={{
-                  fontWeight: 900,
-                  color: "rgba(12,20,50,0.88)",
-                  mb: 1,
-                  letterSpacing: "-0.03em",
-                  textShadow: "0 1px 2px rgba(255,255,255,0.5)",
-                }}
-              >
-                Welcome Back
-              </Typography>
-              <Typography
-                variant="body2"
-                sx={{ color: "#757575", fontWeight: 500, lineHeight: 1.6, fontSize: "0.85rem" }}
-              >
-                Sign in to access your project workspace
-              </Typography>
-            </Box>
-
-            {/* Email */}
-            <TextField
-              fullWidth
-              required
-              variant="outlined"
-              placeholder="Email Address"
-              name="email"
-              value={formData.email}
-              onChange={handleChnage}
-              sx={inputSx}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <EmailIcon />
-                  </InputAdornment>
-                ),
-              }}
-            />
-
-            {/* Password */}
-            <TextField
-              fullWidth
-              required
-              variant="outlined"
-              type={showPassword ? "text" : "password"}
-              placeholder="Password"
-              name="password"
-              value={formData.password}
-              onChange={handleChnage}
-              sx={inputSx}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <LockIcon />
-                  </InputAdornment>
-                ),
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      aria-label="toggle password visibility"
-                      onClick={() => setShowPassword(!showPassword)}
-                      edge="end"
-                      size="small"
-                    >
-                      {showPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-            />
-
-
-            {/* Sign In Button */}
-            <motion.div whileHover={{ scale: 1.015 }} whileTap={{ scale: 0.98 }}>
-              <Button
-                variant="contained"
-                fullWidth
-                size="large"
-                onClick={handle_submit}
-                sx={{
-                  py: 1.8,
-                  fontSize: "0.95rem",
-                  fontWeight: 900,
-                  borderRadius: "14px",
-                  textTransform: "none",
-                  letterSpacing: 0.2,
-                  background: "#1a1a1a",
-                  color: "#fff",
-                  boxShadow: "0 10px 20px rgba(0,0,0,0.15)",
-                  "&:hover": {
-                    background: "#333",
-                    boxShadow: "0 15px 30px rgba(0,0,0,0.2)",
-                  },
-                }}
-              >
-                Sign In
-              </Button>
-            </motion.div>
-
-            {/* Divider */}
-            <Box sx={{ mt: 3.5, mb: 3 }}>
-              <Stack direction="row" alignItems="center" spacing={2}>
-                <Box sx={{ flex: 1, height: "1px", bgcolor: "#efefef" }} />
-                <Typography
-                  variant="caption"
-                  sx={{ color: "#9e9e9e", fontWeight: 700, letterSpacing: 1, whiteSpace: "nowrap" }}
-                >
-                  OR CONTINUE WITH
+          {/* Extra Buttons Row */}
+          <Stack
+            direction="row"
+            justifyContent="space-between"
+            alignItems="center"
+            sx={{ mb: 4, mt: -0.5 }}
+          >
+            <FormControlLabel
+              control={
+                <Checkbox
+                  size="small"
+                  sx={{
+                    color: "rgba(0, 0, 0, 0.12)",
+                    "&.Mui-checked": { color: "#1A5296" },
+                  }}
+                />
+              }
+              label={
+                <Typography variant="body2" sx={{ color: "#6B7280", fontWeight: 500 }}>
+                  Remember Me
                 </Typography>
-                <Box sx={{ flex: 1, height: "1px", bgcolor: "#efefef" }} />
-              </Stack>
-            </Box>
+              }
+            />
+            <Typography
+              variant="body2"
+              sx={{
+                color: "#1A5296",
+                fontWeight: 600,
+                cursor: "pointer",
+                "&:hover": { textDecoration: "underline" },
+              }}
+            >
+              Forgot Password
+            </Typography>
+          </Stack>
 
-            {/* OAuth Buttons */}
-            <Stack direction="row" spacing={1.5}>
+          {/* Login Button */}
+          <Button
+            variant="contained"
+            fullWidth
+            onClick={handle_submit}
+            sx={{
+              py: 2,
+              borderRadius: "12px",
+              background: "#1A5296",
+              fontSize: "1.1rem",
+              fontWeight: 700,
+              textTransform: "none",
+              boxShadow: "0 10px 25px rgba(26, 82, 150, 0.2)",
+              "&:hover": {
+                background: "#14437a",
+                boxShadow: "0 12px 30px rgba(26, 82, 150, 0.3)",
+              },
+            }}
+          >
+            Login
+          </Button>
 
-
-            </Stack>
-
-
-
+          {/* Footer Link */}
+          <Box sx={{ mt: 5, textAlign: "center" }}>
+            <Typography variant="body2" sx={{ color: "#6B7280", fontWeight: 500 }}>
+              Don't have an account?{" "}
+              <span
+                style={{
+                  color: "#1A5296",
+                  fontWeight: 700,
+                  cursor: "pointer",
+                }}
+              // onClick={() => navigate("/signup")}
+              >
+                Sign Up
+              </span>
+            </Typography>
           </Box>
         </Box>
       </motion.div>

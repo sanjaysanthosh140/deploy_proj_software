@@ -1,15 +1,8 @@
-/**
- * AdminRoleManager.jsx
- * iOS Liquid Glass Redesign v1.0.
- */
-
 import React, { useState } from "react";
 import {
   Box,
   Card,
-  CardContent,
   Typography,
-  Chip,
   Grid,
   Dialog,
   DialogTitle,
@@ -24,52 +17,48 @@ import {
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
-import SecurityIcon from "@mui/icons-material/Security";
-import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
-import SupervisorAccountIcon from "@mui/icons-material/SupervisorAccount";
-import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
+import PersonIcon from "@mui/icons-material/Person";
+import GroupsIcon from "@mui/icons-material/Groups";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 
-// --- iOS Liquid Glass Design Constants ---
-const PRIMARY_BG = "#e6edf5";
-const SECONDARY_BG = "#d9e3ef";
-const TERTIARY_BG = "#cfd8e5";
-
-const glassEffect = {
-  background: "rgba(255, 255, 255, 0.25)",
-  backdropFilter: "blur(30px) saturate(160%)",
-  border: "1px solid rgba(255, 255, 255, 0.45)",
-  borderRadius: "28px",
-  boxShadow: "0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 1px rgba(255, 255, 255, 0.5)",
-  position: "relative",
-  overflow: "hidden",
-  transition: "all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
-};
+// Provide a linear gradient for the icons
+const GradientDefs = () => (
+  <svg width="0" height="0">
+    <linearGradient id="blue-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stopColor="#1e5296" />
+      <stop offset="100%" stopColor="#0b2545" />
+    </linearGradient>
+  </svg>
+);
 
 const roles = [
   {
-    title: "Super Admin",
-    level: "Critical",
-    color: "#ff4d4f",
-    icon: <SecurityIcon />,
-    description: "Full system control & infrastructure oversight",
-    route: "/super-admin",
-  },
-  {
     title: "HR",
-    level: "High",
-    color: "#00d4ff",
-    icon: <SupervisorAccountIcon />,
-    description: "Personnel management & operational routing",
-    route: "/hr-dashboard"
+    icon: (
+      <PersonIcon
+        sx={{
+          fontSize: 100,
+          fill: "url(#blue-gradient)",
+          filter: "drop-shadow(0px 4px 4px rgba(0,0,0,0.15))",
+        }}
+      />
+    ),
+    description: "Personal management\nand Operational routing",
+    route: "/hr-dashboard",
   },
   {
     title: "Head",
-    level: "Medium",
-    color: "#4ade80",
-    icon: <AdminPanelSettingsIcon />,
-    description: "Departmental leadership & protocol verification",
-    route: "/head"
+    icon: (
+      <GroupsIcon
+        sx={{
+          fontSize: 100,
+          fill: "url(#blue-gradient)",
+          filter: "drop-shadow(0px 4px 4px rgba(0,0,0,0.15))",
+        }}
+      />
+    ),
+    description: "Departmental leadership\nand Protocol verification",
+    route: "/head",
   },
 ];
 
@@ -137,160 +126,135 @@ const AdminRoleManager = () => {
         alert("Response doesn't contain position information");
       }
     } catch (error) {
-      alert("Failed to verify authorization");
+      alert("Failed to verify authorization. Please check your credentials.");
+      console.error(error);
     }
   };
 
   return (
     <Box
       sx={{
-        height: "100%",
         minHeight: "100vh",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
         p: { xs: 2, sm: 3, md: 4 },
-        background: `linear-gradient(135deg, ${PRIMARY_BG} 0%, ${SECONDARY_BG} 50%, ${TERTIARY_BG} 100%)`,
+        backgroundColor: "#ffffff", // Clean white background
         position: "relative",
-        overflow: "hidden",
+        overflowY: "auto",
       }}
     >
-      {/* Background Decorative Bloom */}
-      <Box
-        sx={{
-          position: "absolute",
-          top: "10%",
-          left: "10%",
-          width: "50vw",
-          maxWidth: "100%",
-          height: "50vw",
-          maxHeight: "100%",
-          background: "radial-gradient(circle, rgba(255,255,255,0.4) 0%, transparent 60%)",
-          filter: "blur(80px)",
-          zIndex: 0,
-          pointerEvents: "none",
-        }}
-      />
+      <GradientDefs />
 
-      <Fade in={true} timeout={1000}>
-        <Box sx={{ position: "relative", zIndex: 1, width: "100%", maxWidth: 1200 }}>
-          <Box sx={{ textAlign: "center", mb: 8 }}>
+      <Fade in={true} timeout={800}>
+        <Box sx={{ width: "100%", maxWidth: 950, textAlign: "center" }}>
+          {/* Header Section */}
+          <Box sx={{ mb: 8 }}>
             <Typography
               variant="h2"
               sx={{
-                fontWeight: 900,
-                color: "rgba(0,0,0,0.85)",
-                letterSpacing: { xs: "-1px", md: "-2px" },
-                mb: 1,
-                fontSize: { xs: "1.8rem", sm: "2.5rem", md: "4rem" },
+                fontWeight: 700,
+                color: "#4B5563",
+                mb: 1.5,
+                fontSize: { xs: "2.2rem", sm: "2.8rem", md: "3.5rem" },
+                letterSpacing: "-0.02em",
               }}
             >
-              Command Center
+              Access Portal
             </Typography>
             <Typography
               variant="body1"
               sx={{
-                color: "rgba(0,0,0,0.4)",
-                fontWeight: 800,
-                textTransform: "uppercase",
-                letterSpacing: { xs: "2px", md: "4px" },
-                fontSize: { xs: "0.7rem", md: "0.85rem" },
+                color: "#6B7280",
+                fontSize: { xs: "0.95rem", sm: "1.05rem" },
+                fontWeight: 500,
               }}
             >
-              Authorization Required
+              Access your company workspace based on your assigned role
             </Typography>
           </Box>
 
-          <Grid container spacing={4} justifyContent="center">
+          {/* Cards Grid */}
+          <Grid container spacing={5} justifyContent="center">
             {roles.map((role, index) => (
-              <Grid item xs={12} sm={6} md={4} key={role.title}>
+              <Grid item xs={12} sm={6} md={6} key={role.title}>
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
+                  transition={{ delay: index * 0.1, duration: 0.5 }}
+                  whileHover={{ y: -5 }}
+                  style={{ height: "100%" }}
                 >
                   <Card
                     onClick={() => handleOpen(role)}
+                    elevation={0}
                     sx={{
-                      ...glassEffect,
                       cursor: "pointer",
                       height: "100%",
-                      p: 4,
+                      py: 6,
+                      px: 4,
                       display: "flex",
                       flexDirection: "column",
                       alignItems: "center",
                       textAlign: "center",
-                      gap: 3,
+                      borderRadius: "16px",
+                      backgroundColor: "#ffffff",
+                      border: "1px solid #f0f0f0",
+                      boxShadow: "0 10px 30px rgba(0,0,0,0.06)",
+                      transition: "all 0.3s ease",
                       "&:hover": {
-                        background: "rgba(255, 255, 255, 0.4)",
-                        boxShadow: `0 20px 40px ${role.color}15`,
-                        border: `1px solid ${role.color}40`,
-                        "& .icon-wrapper": {
-                          transform: "scale(1.1)",
-                          background: `${role.color}20`,
-                          color: role.color,
+                        boxShadow: "0 15px 40px rgba(0,0,0,0.12)",
+                        borderColor: "#e0e0e0",
+                        "& .circle-icon": {
+                          transform: "scale(1.05)",
                         },
-                        "& .arrow-icon": {
-                          transform: "translateX(4px)",
-                          opacity: 1,
-                        }
                       },
                     }}
                   >
+                    {/* Circle Background for Icon */}
                     <Box
-                      className="icon-wrapper"
+                      className="circle-icon"
                       sx={{
-                        width: { xs: 60, sm: 70, md: 80 },
-                        height: { xs: 60, sm: 70, md: 80 },
-                        borderRadius: "20px",
-                        bgcolor: "rgba(0,0,0,0.04)",
+                        width: 140,
+                        height: 140,
+                        borderRadius: "50%",
+                        backgroundColor: "#E8F0FE", // Light blue matching the design
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
-                        transition: "all 0.3s ease",
-                        color: "rgba(0,0,0,0.25)",
-                        "& svg": { fontSize: { xs: 28, md: 40 } },
+                        mb: 4,
+                        transition: "transform 0.3s ease",
                       }}
                     >
                       {role.icon}
                     </Box>
 
-                    <Box>
-                      <Chip
-                        label={role.level}
-                        size="small"
-                        sx={{
-                          bgcolor: `${role.color}15`,
-                          color: role.color,
-                          fontWeight: 900,
-                          fontSize: "0.65rem",
-                          textTransform: "uppercase",
-                          mb: 2,
-                          border: `1px solid ${role.color}20`
-                        }}
-                      />
-                      <Typography variant="h5" sx={{ fontWeight: 900, color: "rgba(0,0,0,0.8)", mb: 1 }}>
-                        {role.title}
-                      </Typography>
-                      <Typography variant="body2" sx={{ color: "rgba(0,0,0,0.45)", fontWeight: 600, px: 2 }}>
-                        {role.description}
-                      </Typography>
-                    </Box>
-
-                    <IconButton
-                      className="arrow-icon"
+                    {/* Role Title */}
+                    <Typography
+                      variant="h5"
                       sx={{
-                        mt: "auto",
-                        opacity: 0.3,
-                        transition: "all 0.3s ease",
-                        bgcolor: "rgba(0,0,0,0.03)"
+                        fontWeight: 700,
+                        color: "#4B5563",
+                        mb: 1.5,
+                        fontSize: "1.5rem",
                       }}
                     >
-                      <ArrowForwardIosIcon sx={{ fontSize: 16 }} />
-                    </IconButton>
+                      {role.title}
+                    </Typography>
+
+                    {/* Description */}
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        color: "#6B7280",
+                        fontWeight: 500,
+                        whiteSpace: "pre-line",
+                        lineHeight: 1.5,
+                      }}
+                    >
+                      {role.description}
+                    </Typography>
                   </Card>
                 </motion.div>
               </Grid>
@@ -299,60 +263,65 @@ const AdminRoleManager = () => {
         </Box>
       </Fade>
 
-      {/* Modern Glass Login Dialog */}
+      {/* Clean Desktop/Mobile Login Dialog */}
       <AnimatePresence>
         {open && (
           <Dialog
             open={open}
             onClose={handleClose}
-            maxWidth="sm"
-            fullWidth
             PaperProps={{
               sx: {
-                ...glassEffect,
-                background: "rgba(255, 255, 255, 0.45)",
-                backdropFilter: "blur(50px) saturate(180%)",
-                p: 2,
+                width: { xs: "90vw", sm: "360px" },
+                maxWidth: "360px",
+                borderRadius: "16px",
+                p: { xs: 2, sm: 3 },
+                boxShadow: "0 25px 50px rgba(0,0,0,0.15)",
+                backgroundColor: "#ffffff",
+                mx: "auto",
               },
             }}
           >
-            <DialogTitle sx={{ textAlign: "center", pt: 4 }}>
-              <Typography variant="h4" sx={{ fontWeight: 950, color: "rgba(0,0,0,0.85)", letterSpacing: "-1px" }}>
-                {selectedRole?.title} Access
+            <DialogTitle sx={{ textAlign: "center", pt: 2, pb: 1 }}>
+              <Typography
+                variant="h5"
+                sx={{
+                  fontWeight: 700,
+                  color: "#374151",
+                  mb: 0.5,
+                }}
+              >
+                {selectedRole?.title} Authorization
               </Typography>
-              <Typography variant="caption" sx={{ color: "rgba(0,0,0,0.35)", fontWeight: 800, textTransform: "uppercase", letterSpacing: "2px" }}>
-                Enter Security Credentials
+              <Typography
+                variant="body2"
+                sx={{ color: "#6B7280" }}
+              >
+                Enter your security credentials
               </Typography>
             </DialogTitle>
 
-            <DialogContent sx={{ pb: 6 }}>
-              <Stack spacing={3} sx={{ mt: 4 }}>
+            <DialogContent>
+              <Stack spacing={3} sx={{ mt: 2 }}>
                 <TextField
                   fullWidth
                   name="email"
-                  label="Network Identifier"
-                  placeholder="admin@protocol.sec"
+                  label="Email Address"
+                  placeholder="admin@company.com"
                   value={formData.email}
                   onChange={handleChange}
                   variant="outlined"
                   sx={{
+                    "& .MuiInputBase-input": { color: "#000000" },
+                    "& .MuiInputLabel-root": { color: "#4B5563" },
                     "& .MuiOutlinedInput-root": {
-                      borderRadius: "18px",
-                      bgcolor: "rgba(255,255,255,0.4)",
-                      fontSize: "1rem",
-                      fontWeight: 700,
-                      "& fieldset": { borderColor: "rgba(0,0,0,0.05)" },
-                      "&:hover fieldset": { borderColor: selectedRole?.color },
-                      "&.Mui-focused fieldset": { borderColor: selectedRole?.color },
-                      "& input": { color: "rgba(0,0,0,0.8)" }
+                      borderRadius: "12px",
                     },
-                    "& .MuiInputLabel-root": { color: "rgba(0,0,0,0.35)", fontWeight: 700 },
                   }}
                 />
                 <TextField
                   fullWidth
                   name="password"
-                  label="Security Key"
+                  label="Password"
                   type={showPassword ? "text" : "password"}
                   placeholder="••••••••"
                   value={formData.password}
@@ -364,7 +333,8 @@ const AdminRoleManager = () => {
                         <IconButton
                           onClick={() => setShowPassword(!showPassword)}
                           edge="end"
-                          sx={{ color: "rgba(0,0,0,0.35)", mr: 0.5 }}
+                          tabIndex={-1}
+                          sx={{ color: "#4B5563" }}
                         >
                           {showPassword ? <VisibilityOff /> : <Visibility />}
                         </IconButton>
@@ -372,21 +342,15 @@ const AdminRoleManager = () => {
                     ),
                   }}
                   sx={{
+                    "& .MuiInputBase-input": { color: "#000000" },
+                    "& .MuiInputLabel-root": { color: "#4B5563" },
                     "& .MuiOutlinedInput-root": {
-                      borderRadius: "18px",
-                      bgcolor: "rgba(255,255,255,0.4)",
-                      fontSize: "1rem",
-                      fontWeight: 700,
-                      "& fieldset": { borderColor: "rgba(0,0,0,0.05)" },
-                      "&:hover fieldset": { borderColor: selectedRole?.color },
-                      "&.Mui-focused fieldset": { borderColor: selectedRole?.color },
+                      borderRadius: "12px",
                       "& input": {
-                        color: "rgba(0,0,0,0.8)",
                         "&::-ms-reveal": { display: "none" },
                         "&::-ms-clear": { display: "none" },
                       },
                     },
-                    "& .MuiInputLabel-root": { color: "rgba(0,0,0,0.35)", fontWeight: 700 },
                   }}
                 />
 
@@ -394,20 +358,18 @@ const AdminRoleManager = () => {
                   onClick={handleSubmit}
                   fullWidth
                   variant="contained"
+                  disableElevation
                   sx={{
-                    mt: 2,
-                    py: 2.2,
-                    borderRadius: "18px",
-                    bgcolor: "rgba(0,0,0,0.9)",
-                    color: "#fff",
-                    fontWeight: 900,
+                    mt: 1,
+                    py: 1.5,
+                    borderRadius: "12px",
+                    backgroundColor: "#1A5296",
+                    color: "#ffffff",
+                    fontWeight: 600,
                     fontSize: "1rem",
                     textTransform: "none",
-                    boxShadow: "0 10px 30px rgba(0,0,0,0.2)",
                     "&:hover": {
-                      bgcolor: "#000",
-                      transform: "translateY(-2px)",
-                      boxShadow: "0 15px 35px rgba(0,0,0,0.3)",
+                      backgroundColor: "#0D2B51",
                     },
                   }}
                 >
