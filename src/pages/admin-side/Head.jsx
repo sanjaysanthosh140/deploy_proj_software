@@ -85,30 +85,30 @@ const Head = () => {
 
   // Sample tasks data
   const [tasks, setTasks] = useState([
-    {
-      id: 101,
-      title: "Design Landing Page",
-      priority: "High",
-      deadline: "Today",
-      status: "in_progress",
-      desc: "Create high-fidelity mockups for main landing page.",
-    },
-    {
-      id: 102,
-      title: "Setup Database",
-      priority: "Critical",
-      deadline: "Tomorrow",
-      status: "pending",
-      desc: "Configure MongoDB and create necessary schemas.",
-    },
-    {
-      id: 103,
-      title: "API Documentation",
-      priority: "Medium",
-      deadline: "2025-01-20",
-      status: "completed",
-      desc: "Document all REST endpoints with examples.",
-    },
+    // {
+    //   id: 101,
+    //   title: "Design Landing Page",
+    //   priority: "High",
+    //   deadline: "Today",
+    //   status: "in_progress",
+    //   desc: "Create high-fidelity mockups for main landing page.",
+    // },
+    // {
+    //   id: 102,
+    //   title: "Setup Database",
+    //   priority: "Critical",
+    //   deadline: "Tomorrow",
+    //   status: "pending",
+    //   desc: "Configure MongoDB and create necessary schemas.",
+    // },
+    // {
+    //   id: 103,
+    //   title: "API Documentation",
+    //   priority: "Medium",
+    //   deadline: "2025-01-20",
+    //   status: "completed",
+    //   desc: "Document all REST endpoints with examples.",
+    // },
   ]);
 
   const [openDialog, setOpenDialog] = useState(false);
@@ -343,7 +343,7 @@ const Head = () => {
                       mt: 1
                     }}
                   >
-                    Command Center Intelligence Suite
+                    {/* Command Center Intelligence Suite */}
                   </Typography>
                 </Box>
               </Box>
@@ -392,7 +392,7 @@ const Head = () => {
         </Fade>
 
         {/* Stats Cards (Control Center Widgets) */}
-        <Grid container spacing={{ xs: 3, md: 5 }} sx={{ mb: 8, position: "relative", zIndex: 1 }}>
+        {/* <Grid container spacing={{ xs: 3, md: 5 }} sx={{ mb: 8, position: "relative", zIndex: 1 }}>
           {[
             { title: "Active Protocols", value: tasks.length, color: "#4ade80", icon: <AssessmentIcon /> },
             { title: "Processing", value: tasks.filter((t) => t.status === "in_progress").length, color: "#38bdf8", icon: <FolderIcon /> },
@@ -436,7 +436,7 @@ const Head = () => {
               </Box>
             </Grid>
           ))}
-        </Grid>
+        </Grid> */}
 
         {/* Action Suite (Edge Mirror Buttons) */}
         <Box
@@ -450,14 +450,14 @@ const Head = () => {
             zIndex: 1,
           }}
         >
-          <Button
+          {/* <Button
             variant="contained"
             startIcon={<AddIcon />}
             onClick={() => setOpenDialog(true)}
             sx={{ ...iPhoneGlassButton, px: 5, py: 2.2, minWidth: "220px" }}
           >
             Initialize Task
-          </Button>
+          </Button> */}
           <Button
             variant="contained"
             startIcon={<FolderIcon />}
@@ -480,7 +480,7 @@ const Head = () => {
             onClick={() => navigate("/head/project-overview")}
             sx={{ ...iPhoneGlassButton, px: 5, py: 2.2, minWidth: "220px" }}
           >
-            Analytics Map
+            Project Progress
           </Button>
         </Box>
 

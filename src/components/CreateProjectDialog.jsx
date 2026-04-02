@@ -137,7 +137,7 @@ const CreateProjectDialog = ({ open, onClose, onSubmit, initialData }) => {
 
   const fetchEmployees = async () => {
     try {
-      let token = localStorage.getItem("token");
+      let token = localStorage.getItem("adminToken");
       axios
         .get("http://localhost:8080/admin/employes", {
           headers: {
@@ -568,15 +568,13 @@ const CreateProjectDialog = ({ open, onClose, onSubmit, initialData }) => {
                 />
 
                 <TextField
-                  label="Strategic Narrative (Description)"
+                  select
+                  label="Department"
                   name="description"
                   value={projectData.description}
                   onChange={handleProjectChange}
                   fullWidth
                   required
-                  multiline
-                  rows={isMobile ? 3 : 5}
-                  placeholder="Describe the operational scope and long-term vision..."
                   InputLabelProps={{ sx: { color: "rgba(0,0,0,0.6)", fontWeight: 1000, textTransform: "uppercase", letterSpacing: 2, fontSize: { xs: "0.65rem", md: "0.8rem" } } }}
                   sx={{
                     "& .MuiOutlinedInput-root": {
@@ -585,13 +583,27 @@ const CreateProjectDialog = ({ open, onClose, onSubmit, initialData }) => {
                       backdropFilter: "blur(20px)",
                       borderRadius: "24px",
                       fontWeight: 800,
-                      p: 2,
                       "& fieldset": { borderColor: "rgba(255,255,255,0.7)" },
                       "&:hover fieldset": { borderColor: "rgba(255,255,255,1)" },
                       "&.Mui-focused fieldset": { borderColor: "#00d4ff", borderWidth: "2.5px" },
                     },
                   }}
-                />
+                >
+                  {[
+                    "Information Technology",
+                    "Digital marketing",
+                    "Editing",
+                    "Content-writing",
+                    "video-production",
+                    "Graphic Design",
+                    "Accounts",
+                    "Sales"
+                  ].map((dept) => (
+                    <MenuItem key={dept} value={dept} sx={{ fontWeight: 800, color: "rgba(0,0,0,0.8)" }}>
+                      {dept}
+                    </MenuItem>
+                  ))}
+                </TextField>
 
                 <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, gap: { xs: 3, md: 4 } }}>
                   <TextField
@@ -774,7 +786,7 @@ const CreateProjectDialog = ({ open, onClose, onSubmit, initialData }) => {
                         },
                       }}
                     >
-                      Capture Protocol
+                      Add Task
                     </Button>
                   </Box>
                 </Paper>
@@ -905,7 +917,7 @@ const CreateProjectDialog = ({ open, onClose, onSubmit, initialData }) => {
                         variant="subtitle1"
                         sx={{ color: "rgba(0,0,0,0.85)", fontWeight: 1000, letterSpacing: "-0.02em", fontSize: "1.2rem" }}
                       >
-                        Global Talent Pool ({availableEmployees.length})
+                        Available Employees ({availableEmployees.length})
                       </Typography>
                     </Box>
                     <Droppable droppableId="available">
@@ -1043,7 +1055,7 @@ const CreateProjectDialog = ({ open, onClose, onSubmit, initialData }) => {
                         variant="subtitle1"
                         sx={{ color: "rgba(0,0,0,0.85)", fontWeight: 1000, letterSpacing: "-0.02em", fontSize: "1.2rem" }}
                       >
-                        Project Consortium ({selectedTeam.length})
+                        Selected Team ({selectedTeam.length})
                       </Typography>
                     </Box>
                     <Droppable droppableId="team">
@@ -1201,7 +1213,7 @@ const CreateProjectDialog = ({ open, onClose, onSubmit, initialData }) => {
               width: { xs: "100%", sm: "auto" }
             }}
           >
-            Tactical Regression (Back)
+            Back
           </Button>
           <Box sx={{ display: "flex", gap: 3, width: { xs: "100%", sm: "auto" } }}>
             {activeStep < steps.length - 1 ? (
@@ -1224,7 +1236,7 @@ const CreateProjectDialog = ({ open, onClose, onSubmit, initialData }) => {
                   },
                 }}
               >
-                Advance Protocol
+                Next
               </Button>
             ) : (
               <Button

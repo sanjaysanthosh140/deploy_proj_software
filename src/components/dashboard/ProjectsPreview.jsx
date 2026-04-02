@@ -263,7 +263,7 @@ const ProjectsPreview = ({ userId }) => {
                       >
                         Details
                       </Button>
-                      {!project.isEnrolled && (
+                      {/* {!project.isEnrolled && (
                         <Button
                           variant="outlined"
                           size="small"
@@ -284,7 +284,7 @@ const ProjectsPreview = ({ userId }) => {
                         >
                           Enroll
                         </Button>
-                      )}
+                      )} */}
                     </Box>
                   </Box>
                 </Paper>

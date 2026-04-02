@@ -371,9 +371,9 @@ const ProjectDetailView = () => {
               <Box sx={{ flex: 1, minWidth: 0 }}>
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
                   <TrendingUpIcon sx={{ color: getPriorityColor(project.priority), fontSize: { xs: 22, sm: 28, md: 32 } }} />
-                  <Typography sx={{ fontWeight: 900, color: "rgba(0,0,0,0.75)", fontSize: { xs: "1rem", sm: "1.2rem", md: "1.4rem" } }}>Operation Velocity</Typography>
+                  <Typography sx={{ fontWeight: 900, color: "rgba(0,0,0,0.75)", fontSize: { xs: "1rem", sm: "1.2rem", md: "1.4rem" } }}>Progress</Typography>
                 </Box>
-                <Typography variant="body2" sx={{ color: "rgba(0,0,0,0.45)", fontWeight: 600, fontSize: { xs: "0.78rem", sm: "0.875rem" } }}>Synchronized with active protocol sequences</Typography>
+                <Typography variant="body2" sx={{ color: "rgba(0,0,0,0.45)", fontWeight: 600, fontSize: { xs: "0.78rem", sm: "0.875rem" } }}>Todo's completed</Typography>
               </Box>
               <Typography sx={{ fontWeight: 900, color: getPriorityColor(project.priority), lineHeight: 0.9, fontSize: { xs: "1.8rem", sm: "2.2rem", md: "2.6rem" } }}>
                 {calculatedProgress}%
@@ -551,7 +551,7 @@ const ProjectDetailView = () => {
 
                           {(todo.subTasks?.some(st => st.isNew) || modifiedTasks[todo._id]) && (
                             <Button fullWidth onClick={() => handleSaveAllSubTasks(todo._id)} variant="contained" sx={{ mt: 2, borderRadius: "14px", bgcolor: "#00e676", color: "#fff", fontWeight: 850, textTransform: "none", fontSize: "0.9rem", boxShadow: "0 6px 18px rgba(0, 230, 118, 0.3)", "&:hover": { bgcolor: "#00c853" } }}>
-                              Authorize Protocol Changes
+                              Submit
                             </Button>
                           )}
                         </Box>

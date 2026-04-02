@@ -37,52 +37,6 @@ const AssignedProjectsList = ({ userId }) => {
         // setProjects(res.data);
 
         // Mock data
-        const mockProjects = [
-          {
-            _id: "p1",
-            title: "AI-Powered Analytics Engine",
-            description:
-              "Developing predictive analysis models for user behavior tracking using Python and TensorFlow.",
-            deadline: "2026-02-05",
-            progress: 78,
-            teamSize: 8,
-            isEnrolled: true,
-            priority: "High",
-          },
-          {
-            _id: "p2",
-            title: "Cloud Migration Phase 2",
-            description:
-              "Migrating legacy infrastructure to AWS with Kubernetes orchestration and microservices.",
-            deadline: "2026-02-15",
-            progress: 45,
-            teamSize: 12,
-            isEnrolled: true,
-            priority: "Critical",
-          },
-          {
-            _id: "p3",
-            title: "Mobile App Redesign",
-            description:
-              "Complete UI/UX overhaul of the mobile application with React Native and modern design patterns.",
-            deadline: "2026-02-02",
-            progress: 92,
-            teamSize: 5,
-            isEnrolled: false,
-            priority: "Medium",
-          },
-          {
-            _id: "p4",
-            title: "API Gateway Optimization",
-            description:
-              "Performance optimization and security hardening of the API gateway infrastructure.",
-            deadline: "2026-03-10",
-            progress: 30,
-            teamSize: 6,
-            isEnrolled: true,
-            priority: "Medium",
-          },
-        ];
 
         setTimeout(() => {
           setProjects(mockProjects);

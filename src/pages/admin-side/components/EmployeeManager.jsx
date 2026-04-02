@@ -183,7 +183,7 @@ const EmployeeManager = ({
                   "&:hover": { background: "linear-gradient(135deg, #6366f1 0%, #4338ca 100%)" }
                 }}
               >
-                Responsible
+                Head
               </Button>
             </Stack>
           </Stack>

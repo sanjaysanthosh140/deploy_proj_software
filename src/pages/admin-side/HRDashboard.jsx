@@ -357,9 +357,9 @@ const HRDashboard = () => {
 
   const stats = [
     { title: "Total Employees", value: users.length, icon: PeopleIcon, color: "#38bdf8" },
-    { title: "Active Nodes", value: users.length, icon: CheckCircleIcon, color: "#4ade80" },
+    // { title: "Active Nodes", value: users.length, icon: CheckCircleIcon, color: "#4ade80" },
     { title: "Departments", value: departments.length, icon: FolderIcon, color: "#f472b6" },
-    { title: "Pending Reports", value: pendingReportsCount, icon: AssessmentIcon, color: "#fbbf24" },
+    // { title: "Pending Reports", value: pendingReportsCount, icon: AssessmentIcon, color: "#fbbf24" },
   ];
 
   const normalizedDepartmentOptions = Array.from(new Set(DEPARTMENTS.map(normalizeDeptName)));
@@ -391,7 +391,7 @@ const HRDashboard = () => {
                 HR Command Center
               </Typography>
               <Typography variant="caption" sx={{ color: alpha("#000", 0.3), fontWeight: 900, letterSpacing: "4px", textTransform: "uppercase" }}>
-                • Advanced Management Interface •
+                {/* • Advanced Management Interface • */}
               </Typography>
             </Box>
 
