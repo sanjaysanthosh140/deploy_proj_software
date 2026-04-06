@@ -80,6 +80,6 @@ export const getDeptColor = (dept) => {
     case "graphic-design": return "#facc15";
     case "Accounts": return "#60a5fa";
     case "Sales": return "#fb923c";
-    default: return "#94a3b8"; 
+    default: return "#94a3b8";
   }
 };

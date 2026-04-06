@@ -15,6 +15,8 @@ import {
   Tooltip,
   alpha,
   Skeleton,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import EditIcon from "@mui/icons-material/Edit";
@@ -110,6 +112,8 @@ const HeadProjectView = () => {
   // Creation/Edit Dialog State
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [editingProjectData, setEditingProjectData] = useState(null);
+  const [alertOpen, setAlertOpen] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
 
   const token = localStorage.getItem("adminToken");
 
@@ -117,7 +121,7 @@ const HeadProjectView = () => {
     const fetchProjects = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:8080/admin/headProj",
+          "https://project-management-sodtware-backend-end.onrender.com/admin/headProj",
           {
             headers: {
               Authorization: `${token}`,
@@ -138,20 +142,29 @@ const HeadProjectView = () => {
     }
   }, [token]);
 
-  const handleDelete = (e, id) => {
+  const handleDelete = async (e, id) => {
     if (e) e.stopPropagation();
     try {
       console.log("Delete triggered for project:", id);
-      // Integration point for delete API
+      let res = await axios.delete(`https://project-management-sodtware-backend-end.onrender.com/admin/delete_proj/${id}`);
+      console.log("delete response", res.data);
+      if (res.status === 200) {
+        setProjectsList((prev) => prev.filter((project) => project._id !== id));
+        setAlertMessage(res.data.message || "Project deleted successfully");
+        setAlertOpen(true);
+      }
     } catch (error) {
       console.error("Delete error:", error);
+      setAlertMessage("Failed to delete project");
+      setAlertOpen(true);
     }
   };
+
 
   const handleEdit = async (e, id) => {
     if (e) e.stopPropagation();
     try {
-      let res = await axios.delete(`http://localhost:8080/admin/edit_project/${id}`, {
+      let res = await axios.delete(`https://project-management-sodtware-backend-end.onrender.com/admin/edit_project/${id}`, {
         headers: {
           Authorization: `${token}`,
           "Content-Type": "application/json",
@@ -627,23 +640,51 @@ const HeadProjectView = () => {
         onSubmit={async (finalData) => {
           try {
             if (editingProjectData?._id) {
-              await axios.put(`http://localhost:8080/admin/updateProj/${editingProjectData._id}`, finalData, {
+              await axios.put(`https://project-management-sodtware-backend-end.onrender.com/admin/updateProj/${editingProjectData._id}`, finalData, {
                 headers: { Authorization: `${token}` }
               });
+              setAlertMessage("Project updated successfully");
             } else {
-              await axios.post("http://localhost:8080/admin/createProj", finalData, {
+              await axios.post("https://project-management-sodtware-backend-end.onrender.com/admin/createProj", finalData, {
                 headers: { Authorization: `${token}` }
               });
+              setAlertMessage("Project created successfully");
             }
-            const response = await axios.get("http://localhost:8080/admin/headProj", {
+            setAlertOpen(true);
+            const response = await axios.get("https://project-management-sodtware-backend-end.onrender.com/admin/headProj", {
               headers: { Authorization: `${token}` }
             });
             setProjectsList(response.data);
           } catch (error) {
             console.error("Submission error:", error);
+            setAlertMessage("Submission failed");
+            setAlertOpen(true);
           }
         }}
       />
+      <Snackbar
+        open={alertOpen}
+        autoHideDuration={4000}
+        onClose={() => setAlertOpen(false)}
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+      >
+        <Alert
+          onClose={() => setAlertOpen(false)}
+          severity={alertMessage.toLowerCase().includes("fail") ? "error" : "success"}
+          sx={{
+            width: "100%",
+            borderRadius: "16px",
+            fontWeight: 700,
+            boxShadow: "0 10px 40px rgba(0,0,0,0.1)",
+            backdropFilter: "blur(10px)",
+            backgroundColor: alertMessage.toLowerCase().includes("fail") ? "rgba(255, 77, 79, 0.9)" : "rgba(74, 222, 128, 0.9)",
+            color: "#fff",
+            "& .MuiAlert-icon": { color: "#fff" }
+          }}
+        >
+          {alertMessage}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };

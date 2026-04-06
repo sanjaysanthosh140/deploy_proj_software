@@ -173,7 +173,7 @@ const DashboardDialogs = ({
                     </InputAdornment>
                   ),
                 }}
-              sx={{
+                sx={{
                   "& .MuiOutlinedInput-root": {
                     borderRadius: "14px",
                     background: "rgba(255, 255, 255, 0.3)",
@@ -570,7 +570,7 @@ const DashboardDialogs = ({
                 background: "linear-gradient(135deg, #6366f1 0%, #4338ca 100%)",
                 color: "#fff",
                 boxShadow: "0 10px 20px -5px rgba(67, 56, 202, 0.3)",
-                "&:hover": { 
+                "&:hover": {
                   background: "linear-gradient(135deg, #4f46e5 0%, #3730a3 100%)",
                   transform: "translateY(-2px)"
                 }

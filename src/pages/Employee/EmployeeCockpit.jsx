@@ -1,18 +1,24 @@
 /**
  * EmployeeCockpit.jsx
- * Full-width stacked layout — each section fills the complete page width.
- * Responsive on all device sizes. TeamChat bubble fixed bottom-right.
+ * Figma-matched layout:
+ *   Header  → "Welcome back, [Name] 👋"  |  Logout
+ *   Section 1 → AttendanceWidget (4 navy stat cards + punch actions)
+ *   Section 2 → ProjectsPreview
+ *   Section 3 → WorkReportForm (textarea + inline reports list, submit btn)
+ *
+ * UserReportsList is rendered inside WorkReportForm now — NOT separately here.
  */
 import React from "react";
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, Divider } from "@mui/material";
 import { useParams, useNavigate } from "react-router-dom";
 import AttendanceWidget from "../../components/AttendanceWidget";
 import ProjectsPreview from "../../components/dashboard/ProjectsPreview";
 import WorkReportForm from "../../components/dashboard/WorkReportForm";
-import UserReportsList from "../../components/dashboard/UserReportsList";
 import TeamChat from "../../components/TeamChat";
 import axios from "axios";
-// import DeadlineNotifications from "../../components/dashboard/DeadlineNotifications";
+
+const PRIMARY = "#0f172a";
+const SECONDARY = "#64748b";
 
 const EmployeeCockpit = (props) => {
   const { deptId: paramDeptId } = useParams();
@@ -22,25 +28,31 @@ const EmployeeCockpit = (props) => {
   const [refreshTrigger, setRefreshTrigger] = React.useState(0);
   const navigate = useNavigate();
 
+  /* ── Logout ── */
   const handleLogout = () => {
     localStorage.clear();
     navigate("/");
   };
 
+  /* ── Report submitted callback ── */
   const handleReportSubmitted = () => {
     setRefreshTrigger((prev) => prev + 1);
   };
 
+  /* ── Fetch employee profile (API preserved exactly) ── */
   React.useEffect(() => {
     const fetchProfile = async () => {
       try {
         if (token) {
-          const res = await axios.get("http://localhost:8080/employee_profile", {
-            headers: {
-              Authorization: `${token}`,
-              "Content-Type": "application/json",
-            },
-          });
+          const res = await axios.get(
+            "https://project-management-sodtware-backend-end.onrender.com/employee_profile",
+            {
+              headers: {
+                Authorization: `${token}`,
+                "Content-Type": "application/json",
+              },
+            }
+          );
           const profileData = Array.isArray(res.data) ? res.data[0] : res.data;
           setProfile(profileData);
         }
@@ -51,7 +63,11 @@ const EmployeeCockpit = (props) => {
     fetchProfile();
   }, [token]);
 
-  const userId = profile?._id || profile?.id || token;
+  /* Derive first name for greeting */
+  const firstName =
+    profile?.name?.split(" ")[0] ||
+    profile?.username?.split(" ")[0] ||
+    "there";
 
   return (
     <>
@@ -59,39 +75,54 @@ const EmployeeCockpit = (props) => {
         sx={{
           width: "100%",
           minHeight: "100%",
-          py: { xs: 2, sm: 2.5, md: 3 },
-          px: { xs: 1, sm: 1.5, md: 2 },
+          py: { xs: 2.5, sm: 3, md: 3.5 },
+          px: { xs: 2, sm: 2.5, md: 3 },
           boxSizing: "border-box",
           display: "flex",
           flexDirection: "column",
-          gap: { xs: 2, sm: 2.5, md: 3 },
+          gap: { xs: 3, sm: 3.5, md: 4 },
+          bgcolor: "#f8f9fb",
         }}
       >
-        {/* ── Page Header ─────────────────────────────────── */}
-        <Box sx={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
+        {/* ══ Page Header ════════════════════════════════════════════════ */}
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "flex-start",
+            justifyContent: "space-between",
+            gap: 2,
+          }}
+        >
+          {/* Greeting */}
           <Box>
             <Typography
               sx={{
                 fontWeight: 800,
-                color: "rgba(0,0,0,0.88)",
-                fontSize: { xs: "1.2rem", sm: "1.45rem", md: "1.6rem" },
-                letterSpacing: "-0.02em",
+                color: PRIMARY,
+                fontSize: { xs: "1.25rem", sm: "1.45rem", md: "1.6rem" },
+                letterSpacing: "-0.025em",
+                lineHeight: 1.15,
+                display: "flex",
+                alignItems: "center",
+                gap: 1,
               }}
             >
-              Workday Overview
+              Welcome back, {firstName}&nbsp;
+              <span style={{ fontSize: "1.1em" }}>👋</span>
             </Typography>
             <Typography
               sx={{
-                color: "rgba(0,0,0,0.45)",
-                fontSize: { xs: "0.8rem", sm: "0.88rem" },
-                mt: 0.3,
+                color: SECONDARY,
+                fontSize: { xs: "0.78rem", sm: "0.85rem" },
+                mt: 0.4,
+                fontWeight: 400,
               }}
             >
-              Attendance, projects & daily report
+              Here's your workday overview
             </Typography>
           </Box>
 
-          {/* Logout Button */}
+          {/* Logout pill */}
           <Box
             component="button"
             onClick={handleLogout}
@@ -99,20 +130,20 @@ const EmployeeCockpit = (props) => {
               display: "flex",
               alignItems: "center",
               gap: 0.7,
-              px: { xs: 1.5, sm: 2 },
-              py: { xs: 0.6, sm: 0.75 },
-              border: "1.5px solid rgba(220,38,38,0.35)",
+              px: { xs: 1.6, sm: 2.2 },
+              py: { xs: 0.65, sm: 0.8 },
+              border: "1.5px solid rgba(220,38,38,0.3)",
               borderRadius: "999px",
-              background: "rgba(254,242,242,0.85)",
+              background: "rgba(254,242,242,0.9)",
               color: "#c0392b",
-              fontWeight: 600,
-              fontSize: { xs: "0.72rem", sm: "0.8rem" },
+              fontWeight: 700,
+              fontSize: { xs: "0.72rem", sm: "0.78rem" },
               cursor: "pointer",
               letterSpacing: "0.01em",
               transition: "all 0.18s ease",
-              backdropFilter: "blur(4px)",
               whiteSpace: "nowrap",
-              mt: { xs: 0.3, sm: 0 },
+              mt: { xs: 0.3, sm: 0.2 },
+              flexShrink: 0,
               "&:hover": {
                 background: "#c0392b",
                 color: "#fff",
@@ -121,10 +152,9 @@ const EmployeeCockpit = (props) => {
               },
             }}
           >
-            {/* Logout icon (inline SVG — no extra dep needed) */}
             <svg
-              width="14"
-              height="14"
+              width="13"
+              height="13"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
@@ -140,17 +170,27 @@ const EmployeeCockpit = (props) => {
           </Box>
         </Box>
 
-        {/* ── Section 1: Attendance — full width ─────────── */}
+        {/* ══ Section 1 — Attendance (4 navy stat cards + punch actions) ═ */}
         <AttendanceWidget currentUserId={token} />
 
-        {/* ── Section 2: Projects — full width ───────────── */}
+        {/* Subtle divider */}
+        <Divider sx={{ borderColor: "rgba(15,23,42,0.06)" }} />
+
+        {/* ══ Section 2 — My Projects ════════════════════════════════════ */}
         <ProjectsPreview userId={token} maxProjects={9} />
 
-        {/* ── Section 3: Work Report — full width ────────── */}
-        <WorkReportForm deptId={deptId} profile={profile} onReportSubmitted={handleReportSubmitted} />
+        {/* Subtle divider */}
+        <Divider sx={{ borderColor: "rgba(15,23,42,0.06)" }} />
 
-        {/* ── Section 4: Submitted Reports List ───────────── */}
-        <UserReportsList userId={profile?._id || profile?.id} refreshTrigger={refreshTrigger} />
+        {/* ══ Section 3 — Daily Work Report (form + inline list) ═════════ */}
+        <WorkReportForm
+          deptId={deptId}
+          profile={profile}
+          onReportSubmitted={handleReportSubmitted}
+        />
+
+        {/* Bottom breathing room */}
+        <Box sx={{ pb: { xs: 6, sm: 2 } }} />
       </Box>
 
       {/* Floating chat bubble */}

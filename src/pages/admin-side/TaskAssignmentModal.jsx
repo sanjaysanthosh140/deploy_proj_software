@@ -58,7 +58,7 @@ const TaskAssignmentModal = ({ open, onClose, projectData, onSave }) => {
           // 2. Fetch Existing Data from DB
           let id = projectData._id;
           const response = await axios.get(
-            `http://localhost:8080/admin/check_assigned_tasks/${id}`,
+            `https://project-management-sodtware-backend-end.onrender.com/admin/check_assigned_tasks/${id}`,
           );
           const existingData = response.data;
 
@@ -253,14 +253,14 @@ const TaskAssignmentModal = ({ open, onClose, projectData, onSave }) => {
         console.log("Updating Assignments (PUT):", submissionData);
         let id = projectData._id;
         await axios.put(
-          `http://localhost:8080/admin/assigned_tasks/${id}`,
+          `https://project-management-sodtware-backend-end.onrender.com/admin/assigned_tasks/${id}`,
           submissionData,
         );
         console.log(submissionData);
       } else {
         console.log("Creating Assignments (POST):", submissionData);
         await axios.post(
-          "http://localhost:8080/admin/assigned_tasks",
+          "https://project-management-sodtware-backend-end.onrender.com/admin/assigned_tasks",
           submissionData,
         );
         setIsUpdate(true);

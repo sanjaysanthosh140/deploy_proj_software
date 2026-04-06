@@ -102,7 +102,7 @@ const DepartmentGateway = () => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:8080/admin/departments")
+      .get("https://project-management-sodtware-backend-end.onrender.com/admin/departments")
       .then((res) => {
         setDepartments(res.data);
         setLoading(false);
@@ -122,7 +122,7 @@ const DepartmentGateway = () => {
         return;
       }
 
-      const res = await axios.get("http://localhost:8080/employee_profile", {
+      const res = await axios.get("https://project-management-sodtware-backend-end.onrender.com/employee_profile", {
         headers: {
           Authorization: `${token}`,
           "Content-Type": "application/json",
@@ -248,19 +248,19 @@ const DepartmentGateway = () => {
         >
           {loading
             ? Array.from({ length: 8 }).map((_, i) => (
-                <Box key={`skel-${i}`} sx={{ width: "100%" }}>
-                  <SkeletonCard />
-                </Box>
-              ))
+              <Box key={`skel-${i}`} sx={{ width: "100%" }}>
+                <SkeletonCard />
+              </Box>
+            ))
             : departments.map((dept, i) => (
-                <Box key={dept.id || i} sx={{ display: "flex", width: "100%" }}>
-                  <DeptCard
-                    dept={dept}
-                    onClick={() => handleEnter(dept.Dep_id)}
-                    index={i}
-                  />
-                </Box>
-              ))}
+              <Box key={dept.id || i} sx={{ display: "flex", width: "100%" }}>
+                <DeptCard
+                  dept={dept}
+                  onClick={() => handleEnter(dept.Dep_id)}
+                  index={i}
+                />
+              </Box>
+            ))}
         </Box>
 
         {!loading && departments.length === 0 && (

@@ -1,90 +1,55 @@
-
 /**
- * AntyGravity Instruction:
- * Apply rules from /docs/component_analysis_prompt.md
- */import React, { useState, useEffect } from "react";
-import { Box, Typography, Grid, Button, Chip, Paper, alpha } from "@mui/material";
+ * ProjectsPreview.jsx — Figma redesign.
+ * Clean white cards: title, priority badge, description, deadline, progress bar, "View Details" button.
+ * All API logic preserved exactly.
+ */
+import React, { useState, useEffect } from "react";
+import { Box, Typography, Grid, Button, Chip, Paper } from "@mui/material";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import VisibilityIcon from "@mui/icons-material/Visibility";
-import PersonAddIcon from "@mui/icons-material/PersonAdd";
-import FolderIcon from "@mui/icons-material/Folder";
-import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import TrendingUpIcon from "@mui/icons-material/TrendingUp";
+import VisibilityIcon from "@mui/icons-material/Visibility";
 import axios from "axios";
 
-const PRIMARY_SLATE = "#0f172a";
-const SECONDARY_SLATE = "#475569";
-const INDIGO_ACCENT = "#4f46e5";
-const GLASS_BG = "rgba(255, 255, 255, 0.75)";
-const GLASS_BORDER = "rgba(10, 15, 25, 0.08)";
+const PRIMARY = "#0f172a";
+const SECONDARY = "#64748b";
+const BORDER = "rgba(15,23,42,0.09)";
 
-const ProjectsPreview = ({ userId }) => {
+const ProjectsPreview = ({ userId, maxProjects }) => {
   const [projects, setProjects] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        // TODO: Replace with actual API call
-        // const res = await axios.get(`/api/projects/assigned?userId=${userId}&limit=${maxProjects}`);
-        // setProjects(res.data);
         axios
-          .get("http://localhost:8080/employee_included_proj", {
-            headers: {
-              Authorization: `${userId}`,
-              "Content-Type": "application/json",
-            },
-          })
+          .get(
+            "https://project-management-sodtware-backend-end.onrender.com/employee_included_proj",
+            {
+              headers: {
+                Authorization: `${userId}`,
+                "Content-Type": "application/json",
+              },
+            }
+          )
           .then((res) => {
             console.log(res.data);
             setProjects(res.data);
           });
-
-        // Mock data
-        const mockProjects = [
-          {
-            _id: "p1",
-            title: "AI-Powered Analytics Engine",
-            progress: 78,
-            deadline: "2026-02-05",
-            isEnrolled: true,
-            priority: "High",
-          },
-          {
-            _id: "p2",
-            title: "Cloud Migration Phase 2",
-            progress: 45,
-            deadline: "2026-02-15",
-            isEnrolled: true,
-            priority: "Critical",
-          },
-          {
-            _id: "p3",
-            title: "Mobile App Redesign",
-            progress: 92,
-            deadline: "2026-02-02",
-            isEnrolled: false,
-            priority: "Medium",
-          },
-        ];
       } catch (error) {
         console.error("Error fetching projects:", error);
       }
     };
-
     fetchProjects();
   }, [userId]);
 
   const handleEnroll = async (projectId) => {
     try {
-      // TODO: Replace with actual API call
-      // await axios.post('/api/projects/enroll', { projectId, userId });
-
       setProjects(
         projects.map((p) =>
-          p._id === projectId ? { ...p, isEnrolled: true } : p,
-        ),
+          p._id === projectId ? { ...p, isEnrolled: true } : p
+        )
       );
     } catch (error) {
       console.error("Error enrolling in project:", error);
@@ -93,14 +58,19 @@ const ProjectsPreview = ({ userId }) => {
 
   const getPriorityColor = (priority) => {
     switch (priority) {
-      case "Critical":
-        return "#ef4444"; // Red
-      case "High":
-        return "#f59e0b"; // Amber
-      case "Medium":
-        return "#6366f1"; // Indigo
-      default:
-        return "#10b981"; // Emerald
+      case "Critical": return "#ef4444";
+      case "High":     return "#ef4444";
+      case "Medium":   return "#f97316";
+      default:         return "#10b981";
+    }
+  };
+
+  const getPriorityBg = (priority) => {
+    switch (priority) {
+      case "Critical": return "#fef2f2";
+      case "High":     return "#fef2f2";
+      case "Medium":   return "#fff7ed";
+      default:         return "#f0fdf4";
     }
   };
 
@@ -112,181 +82,235 @@ const ProjectsPreview = ({ userId }) => {
     return diffDays;
   };
 
+  const getDescription = (project) =>
+    project.description ||
+    project.desc ||
+    "Complete UIUX Overall of the shopping experience";
+
   if (projects.length === 0) return null;
 
   return (
-    <Box sx={{ mb: 2 }}>
-      {/* Section Header */}
-      <Typography sx={{ fontWeight: 700, color: PRIMARY_SLATE, fontSize: { xs: "0.9rem", sm: "0.95rem" }, mb: { xs: 1.2, sm: 1.5 }, letterSpacing: "-0.01em" }}>
+    <Box>
+      {/* Section header */}
+      <Typography
+        sx={{
+          fontWeight: 800,
+          color: PRIMARY,
+          fontSize: { xs: "1.1rem", sm: "1.2rem" },
+          letterSpacing: "-0.02em",
+          mb: 0.5,
+        }}
+      >
         My Projects
       </Typography>
-      {/* Projects Grid — 1 col xs, 2 col sm, 3 col md, 4 col lg */}
-      <Grid container spacing={{ xs: 1.5, sm: 2, md: 2.5 }}>
-        {projects.map((project, index) => {
+      <Typography
+        sx={{
+          color: SECONDARY,
+          fontSize: { xs: "0.78rem", sm: "0.83rem" },
+          mb: { xs: 2, sm: 2.5 },
+        }}
+      >
+        Track your ongoing projects and deadlines
+      </Typography>
+
+      {/* Project cards grid — 1 col xs, 2 col sm, 3 col md */}
+      <Grid container spacing={{ xs: 2, sm: 2.5 }}>
+        {projects.slice(0, maxProjects || 9).map((project, index) => {
           const daysRemaining = getDaysRemaining(project.deadline);
           const isUrgent = daysRemaining <= 7;
+          const priorityColor = getPriorityColor(project.priority);
+          const priorityBg = getPriorityBg(project.priority);
+          const progress = project.progress ?? 0;
 
           return (
-            <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={project._id}>
+            <Grid size={{ xs: 12, sm: 6, md: 4 }} key={project._id}>
               <motion.div
-                initial={{ opacity: 0, y: 15 }}
+                initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
+                transition={{ delay: index * 0.07, duration: 0.35 }}
+                style={{ height: "100%" }}
               >
                 <Paper
+                  elevation={0}
                   sx={{
                     p: { xs: 2, sm: 2.5 },
                     borderRadius: "16px",
-                    background: GLASS_BG,
-                    backdropFilter: "blur(24px) saturate(160%)",
-                    border: `1px solid ${isUrgent ? alpha(getPriorityColor(project.priority), 0.3) : GLASS_BORDER}`,
-                    position: "relative",
-                    overflow: "hidden",
-                    transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                    border: `1px solid ${BORDER}`,
+                    background: "#fff",
                     height: "100%",
                     display: "flex",
                     flexDirection: "column",
-                    boxShadow: "0 4px 16px -4px rgba(10,15,25,0.06)",
+                    gap: 0,
+                    transition: "box-shadow 0.22s ease, transform 0.22s ease",
                     "&:hover": {
-                      transform: "translateY(-3px)",
-                      borderColor: alpha(getPriorityColor(project.priority), 0.4),
-                      boxShadow: `0 8px 24px ${alpha(getPriorityColor(project.priority), 0.1)}`,
+                      boxShadow: "0 8px 28px rgba(15,23,42,0.10)",
+                      transform: "translateY(-2px)",
                     },
                   }}
                 >
-                  {/* Background Glow */}
+                  {/* Row 1: Title + Priority badge */}
                   <Box
                     sx={{
-                      position: "absolute",
-                      top: "-30%",
-                      right: "-20%",
-                      width: "120px",
-                      height: "120px",
-                      background: `radial-gradient(circle, ${getPriorityColor(project.priority)}15 0%, transparent 70%)`,
-                      filter: "blur(30px)",
-                      zIndex: 0,
-                    }}
-                  />
-
-                  <Box
-                    sx={{
-                      position: "relative",
-                      zIndex: 1,
-                      flex: 1,
                       display: "flex",
-                      flexDirection: "column",
+                      alignItems: "flex-start",
+                      justifyContent: "space-between",
+                      gap: 1,
+                      mb: 1,
                     }}
                   >
-                    {/* Priority badge + days on same compact row */}
-                    <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1 }}>
-                      <Chip
-                        label={project.priority}
-                        size="small"
-                        sx={{
-                          bgcolor: `${getPriorityColor(project.priority)}18`,
-                          color: getPriorityColor(project.priority),
-                          fontWeight: 700,
-                          border: `1px solid ${getPriorityColor(project.priority)}35`,
-                          fontSize: { xs: "0.65rem", sm: "0.7rem" },
-                          height: { xs: 20, sm: 22 },
-                          "& .MuiChip-label": { px: 0.8 },
-                        }}
-                      />
-                      <Box sx={{ display: "flex", alignItems: "center", gap: 0.4 }}>
-                        <AccessTimeIcon sx={{ fontSize: { xs: 11, sm: 12 }, color: isUrgent ? "#ffab00" : alpha(SECONDARY_SLATE, 0.5) }} />
-                        <Typography sx={{ fontSize: { xs: "0.65rem", sm: "0.7rem" }, color: isUrgent ? "#ffab00" : alpha(SECONDARY_SLATE, 0.55), fontWeight: isUrgent ? 700 : 500 }}>
-                          {daysRemaining}d left
-                        </Typography>
-                      </Box>
-                    </Box>
-                    {/* Title */}
                     <Typography
                       sx={{
                         fontWeight: 700,
-                        color: PRIMARY_SLATE,
-                        mb: 1,
+                        color: PRIMARY,
+                        fontSize: { xs: "0.88rem", sm: "0.93rem" },
                         lineHeight: 1.35,
+                        flex: 1,
                         display: "-webkit-box",
                         WebkitLineClamp: 2,
                         WebkitBoxOrient: "vertical",
                         overflow: "hidden",
-                        fontSize: { xs: "0.85rem", sm: "0.92rem", md: "0.95rem" },
                         letterSpacing: "-0.01em",
                       }}
                     >
                       {project.title}
                     </Typography>
-
-                    {/* Progress */}
-                    <Box sx={{ mb: 1 }}>
-                      <Box sx={{ display: "flex", justifyContent: "space-between", mb: 0.5, alignItems: "center" }}>
-                        <Box sx={{ display: "flex", alignItems: "center", gap: 0.4 }}>
-                          <TrendingUpIcon sx={{ fontSize: { xs: 11, sm: 12 }, color: alpha(SECONDARY_SLATE, 0.5) }} />
-                          <Typography sx={{ color: SECONDARY_SLATE, fontWeight: 600, fontSize: { xs: "0.65rem", sm: "0.7rem" } }}>
-                            Progress
-                          </Typography>
-                        </Box>
-                        <Typography sx={{ color: INDIGO_ACCENT, fontWeight: 800, fontSize: { xs: "0.68rem", sm: "0.72rem" } }}>
-                          {project.progress ?? 0}%
-                        </Typography>
-                      </Box>
-
-                      <Box sx={{ position: "relative", height: 5, borderRadius: 3, bgcolor: "rgba(15,23,42,0.06)", overflow: "hidden" }}>
-                        <motion.div
-                          initial={{ width: 0 }}
-                          animate={{ width: `${project.progress ?? 0}%` }}
-                          transition={{ duration: 1.2, ease: "easeOut" }}
-                          style={{ height: "100%", background: `linear-gradient(90deg, ${getPriorityColor(project.priority)}, ${getPriorityColor(project.priority)}80)`, borderRadius: 3 }}
-                        />
-                      </Box>
-                    </Box>
-
-                    {/* Action Buttons */}
-                    <Box sx={{ display: "flex", gap: 1, mt: "auto", pt: 1 }}>
-                      <Button
-                        variant="contained"
+                    {project.priority && (
+                      <Chip
+                        label={project.priority}
                         size="small"
-                        disableElevation
-                        startIcon={<VisibilityIcon sx={{ fontSize: { xs: 13, sm: 14 } }} />}
-                        onClick={() => navigate(`/app/projects/${project._id}`)}
                         sx={{
-                          flex: 1,
-                          borderRadius: "10px",
-                          textTransform: "none",
+                          bgcolor: priorityBg,
+                          color: priorityColor,
                           fontWeight: 700,
-                          fontSize: { xs: "0.7rem", sm: "0.75rem" },
-                          py: { xs: 0.6, sm: 0.75 },
-                          minHeight: { xs: 28, sm: 30 },
-                          background: INDIGO_ACCENT,
-                          "&:hover": { background: "#3730a3" },
+                          fontSize: "0.68rem",
+                          height: 22,
+                          borderRadius: "6px",
+                          flexShrink: 0,
+                          "& .MuiChip-label": { px: 1 },
                         }}
+                      />
+                    )}
+                  </Box>
+
+                  {/* Description */}
+                  <Typography
+                    sx={{
+                      color: SECONDARY,
+                      fontSize: { xs: "0.75rem", sm: "0.78rem" },
+                      lineHeight: 1.55,
+                      mb: 1.5,
+                      display: "-webkit-box",
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: "vertical",
+                      overflow: "hidden",
+                    }}
+                  >
+                    {getDescription(project)}
+                  </Typography>
+
+                  {/* Deadline row */}
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      mb: 1,
+                    }}
+                  >
+                    <Typography
+                      sx={{
+                        color: SECONDARY,
+                        fontSize: "0.74rem",
+                        fontWeight: 500,
+                      }}
+                    >
+                      Deadline
+                    </Typography>
+                    <Typography
+                      sx={{
+                        color: isUrgent ? "#ef4444" : PRIMARY,
+                        fontSize: "0.74rem",
+                        fontWeight: 700,
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 0.3,
+                      }}
+                    >
+                      <AccessTimeIcon sx={{ fontSize: 12 }} />
+                      {daysRemaining > 0
+                        ? `${daysRemaining} days left`
+                        : daysRemaining === 0
+                        ? "Due today"
+                        : `${Math.abs(daysRemaining)}d overdue`}
+                    </Typography>
+                  </Box>
+
+                  {/* Progress row */}
+                  <Box sx={{ mb: 2 }}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        mb: 0.6,
+                      }}
+                    >
+                      <Typography
+                        sx={{ color: SECONDARY, fontSize: "0.74rem", fontWeight: 500 }}
                       >
-                        Details
-                      </Button>
-                      {/* {!project.isEnrolled && (
-                        <Button
-                          variant="outlined"
-                          size="small"
-                          startIcon={<PersonAddIcon sx={{ fontSize: { xs: 13, sm: 14 } }} />}
-                          onClick={() => handleEnroll(project._id)}
-                          sx={{
-                            flex: 1,
-                            borderRadius: "10px",
-                            textTransform: "none",
-                            fontWeight: 600,
-                            fontSize: { xs: "0.7rem", sm: "0.75rem" },
-                            py: { xs: 0.6, sm: 0.75 },
-                            minHeight: { xs: 28, sm: 30 },
-                            borderColor: "rgba(0,230,118,0.5)",
-                            color: "#00e676",
-                            "&:hover": { borderColor: "#00e676", bgcolor: "rgba(0,230,118,0.08)" },
-                          }}
-                        >
-                          Enroll
-                        </Button>
-                      )} */}
+                        Progress
+                      </Typography>
+                      <Typography
+                        sx={{ color: PRIMARY, fontSize: "0.74rem", fontWeight: 700 }}
+                      >
+                        {progress}%
+                      </Typography>
+                    </Box>
+                    {/* Progress bar */}
+                    <Box
+                      sx={{
+                        height: 6,
+                        borderRadius: 4,
+                        bgcolor: "rgba(15,23,42,0.07)",
+                        overflow: "hidden",
+                      }}
+                    >
+                      <motion.div
+                        initial={{ width: 0 }}
+                        animate={{ width: `${progress}%` }}
+                        transition={{ duration: 1.1, ease: "easeOut" }}
+                        style={{
+                          height: "100%",
+                          background:
+                            "linear-gradient(90deg, #1a2d5a 0%, #0f3a8a 100%)",
+                          borderRadius: 4,
+                        }}
+                      />
                     </Box>
                   </Box>
+
+                  {/* View Details button */}
+                  <Button
+                    variant="contained"
+                    disableElevation
+                    startIcon={<VisibilityIcon sx={{ fontSize: 14 }} />}
+                    onClick={() => navigate(`/app/projects/${project._id}`)}
+                    sx={{
+                      mt: "auto",
+                      background: "linear-gradient(135deg,#1a2d5a 0%,#0f3a8a 100%)",
+                      color: "#fff",
+                      fontWeight: 700,
+                      fontSize: "0.78rem",
+                      borderRadius: "10px",
+                      textTransform: "none",
+                      py: 0.9,
+                      "&:hover": {
+                        background: "linear-gradient(135deg,#0f1f42 0%,#0a2a6e 100%)",
+                      },
+                    }}
+                  >
+                    View Details
+                  </Button>
                 </Paper>
               </motion.div>
             </Grid>
@@ -296,6 +320,5 @@ const ProjectsPreview = ({ userId }) => {
     </Box>
   );
 };
-
 
 export default ProjectsPreview;

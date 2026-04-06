@@ -188,7 +188,7 @@ const Head = () => {
 
       console.log("form data", formData);
       const response = await axios.post(
-        "http://localhost:8080/admin/add_task",
+        "https://project-management-sodtware-backend-end.onrender.com/admin/add_task",
         formData,
         {
           headers: {
@@ -227,7 +227,7 @@ const Head = () => {
       console.log("project data ", projectData);
       // TODO: Replace with actual API call
       const response = await axios.post(
-        "http://localhost:8080/admin/create_project",
+        "https://project-management-sodtware-backend-end.onrender.com/admin/create_project",
         projectData,
         {
           headers: {

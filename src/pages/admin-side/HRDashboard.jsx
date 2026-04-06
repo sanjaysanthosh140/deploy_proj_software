@@ -143,7 +143,7 @@ const HRDashboard = () => {
 
   const fetchUsers = async () => {
     try {
-      const res = await axios.get("http://localhost:8080/admin/users");
+      const res = await axios.get("https://project-management-sodtware-backend-end.onrender.com/admin/users");
       setUsers(res.data);
     } catch (err) {
       console.error("Error fetching users:", err);
@@ -152,7 +152,7 @@ const HRDashboard = () => {
 
   const fetchAdmins = async () => {
     try {
-      const res = await axios.get("http://localhost:8080/admin/get_admins");
+      const res = await axios.get("https://project-management-sodtware-backend-end.onrender.com/admin/get_admins");
       setAdmins(res.data);
     } catch (err) {
       console.error("Error fetching admins:", err);
@@ -161,7 +161,7 @@ const HRDashboard = () => {
 
   const fetchDepartments = async () => {
     try {
-      const res = await axios.get("http://localhost:8080/admin/departments");
+      const res = await axios.get("https://project-management-sodtware-backend-end.onrender.com/admin/departments");
       setDepartments(res.data);
     } catch (err) {
       console.error("Error fetching departments:", err);
@@ -170,7 +170,7 @@ const HRDashboard = () => {
 
   const fetchReports = async () => {
     try {
-      const res = await axios.get("http://localhost:8080/admin/reports");
+      const res = await axios.get("https://project-management-sodtware-backend-end.onrender.com/admin/reports");
       setReports(res.data);
     } catch (err) {
       console.error("Error fetching reports:", err);
@@ -180,7 +180,7 @@ const HRDashboard = () => {
   const fetchLogs = async () => {
     try {
       const token = localStorage.getItem("adminToken");
-      const res = await axios.get("http://localhost:8080/admin/employe_log", {
+      const res = await axios.get("https://project-management-sodtware-backend-end.onrender.com/admin/employe_log", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setLogs(res.data);
@@ -232,9 +232,9 @@ const HRDashboard = () => {
     try {
       if (editingUser) {
         const { password, ...updateData } = userForm;
-        await axios.put(`http://localhost:8080/admin/updateEmploye/${editingUser._id}`, updateData);
+        await axios.put(`https://project-management-sodtware-backend-end.onrender.com/admin/updateEmploye/${editingUser._id}`, updateData);
       } else {
-        await axios.post("http://localhost:8080/admin/employes", userForm);
+        await axios.post("https://project-management-sodtware-backend-end.onrender.com/admin/employes", userForm);
         setAlertMessage(`User ${userForm.name} added successfully`);
         setAlertOpen(true);
       }
@@ -248,9 +248,9 @@ const HRDashboard = () => {
   const handlePasswordSubmit = async () => {
     try {
       if (passwordForm.accountType === "admin") {
-        await axios.put("http://localhost:8080/admin/updatePassword_admin", passwordForm);
+        await axios.put("https://project-management-sodtware-backend-end.onrender.com/admin/updatePassword_admin", passwordForm);
       } else {
-        await axios.post("http://localhost:8080/admin/updatePassword", passwordForm);
+        await axios.post("https://project-management-sodtware-backend-end.onrender.com/admin/updatePassword", passwordForm);
       }
       setAlertMessage(`Password updated for ${passwordForm.email}`);
       setAlertOpen(true);
@@ -265,10 +265,10 @@ const HRDashboard = () => {
       const payload = { ...responsibleForm, role: responsibleForm.post, active: true };
       delete payload.post;
       if (editingAdmin) {
-        await axios.put(`http://localhost:8080/admin/update_admin/${editingAdmin._id}`, payload);
+        await axios.put(`https://project-management-sodtware-backend-end.onrender.com/admin/update_admin/${editingAdmin._id}`, payload);
         setAlertMessage(`Responsible User ${responsibleForm.name} updated successfully`);
       } else {
-        await axios.post("http://localhost:8080/admin/add_admins", payload);
+        await axios.post("https://project-management-sodtware-backend-end.onrender.com/admin/add_admins", payload);
         setAlertMessage(`Responsible User ${responsibleForm.name} added successfully`);
       }
       setAlertOpen(true);
@@ -289,9 +289,9 @@ const HRDashboard = () => {
   const handleDeptSubmit = async () => {
     try {
       if (editingDept) {
-        await axios.put(`http://localhost:8080/admin/Editdepartments/${editingDept._id}`, deptForm);
+        await axios.put(`https://project-management-sodtware-backend-end.onrender.com/admin/Editdepartments/${editingDept._id}`, deptForm);
       } else {
-        await axios.post("http://localhost:8080/admin/addDep", deptForm);
+        await axios.post("https://project-management-sodtware-backend-end.onrender.com/admin/addDep", deptForm);
       }
       fetchDepartments();
       setOpenDeptDialog(false);
@@ -304,7 +304,7 @@ const HRDashboard = () => {
   const confirmDeleteUser = async () => {
     if (!userToDelete) return;
     try {
-      await axios.delete(`http://localhost:8080/admin/deleteEmp/${userToDelete._id}`);
+      await axios.delete(`https://project-management-sodtware-backend-end.onrender.com/admin/deleteEmp/${userToDelete._id}`);
       setUsers(users.filter((u) => u._id !== userToDelete._id));
       setAlertMessage(`User deleted successfully`);
       setAlertOpen(true);
@@ -319,7 +319,7 @@ const HRDashboard = () => {
     if (!adminToDelete) return;
     try {
       let id = adminToDelete._id;
-      await axios.delete(`http://localhost:8080/admin/delete_admin/${id}`);
+      await axios.delete(`https://project-management-sodtware-backend-end.onrender.com/admin/delete_admin/${id}`);
       fetchAdmins();
       setAlertMessage(`Responsible User deleted successfully`);
       setAlertOpen(true);
@@ -332,7 +332,7 @@ const HRDashboard = () => {
 
   const handleDeleteDept = async (deptId) => {
     try {
-      await axios.delete(`http://localhost:8080/admin/deleteDept/${deptId}`);
+      await axios.delete(`https://project-management-sodtware-backend-end.onrender.com/admin/deleteDept/${deptId}`);
       fetchDepartments();
     } catch (err) {
       console.error("Error deleting dept:", err);
