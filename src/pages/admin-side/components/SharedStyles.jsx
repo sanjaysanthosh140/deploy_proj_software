@@ -1,8 +1,9 @@
 import { alpha } from "@mui/material";
 
 export const PRIMARY_BG = "#ffffff";
-export const SECONDARY_BG = "#eff2f5";
-export const TERTIARY_BG = "#e9eef5";
+export const SECONDARY_BG = "#f8fafc";
+export const TERTIARY_BG = "#f1f5f9";
+export const HR_NAVY = "#0f4c81";
 export const GLASS_BORDER = "rgba(255, 255, 255, 0.45)";
 
 export const glassEffect = {
@@ -39,9 +40,45 @@ export const whiteCard = {
   boxShadow: "0 4px 20px rgba(0, 0, 0, 0.04)",
   transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
   "&:hover": {
-    transform: "translateY(-4px)",
     boxShadow: "0 12px 30px rgba(0, 0, 0, 0.08)",
-    border: "1px solid rgba(0, 0, 0, 0.1)",
+  }
+};
+
+export const premiumStatCard = {
+  background: "linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%)",
+  borderRadius: "16px",
+  color: "#ffffff",
+  position: "relative",
+  overflow: "hidden",
+  padding: "24px",
+  display: "flex",
+  flexDirection: "column",
+  justifyContent: "space-between",
+  minHeight: "160px",
+  width: "100%",
+  flexGrow: 1,
+  boxShadow: "0 10px 25px rgba(30, 58, 138, 0.2)",
+  "&::before": {
+    content: '""',
+    position: "absolute",
+    bottom: "-20%",
+    left: "-10%",
+    width: "140px",
+    height: "140px",
+    background: "rgba(255, 255, 255, 0.08)",
+    borderRadius: "50%",
+    pointerEvents: "none",
+  },
+  "&::after": {
+    content: '""',
+    position: "absolute",
+    top: "-10%",
+    right: "-5%",
+    width: "100px",
+    height: "100px",
+    background: "rgba(255, 255, 255, 0.04)",
+    borderRadius: "50%",
+    pointerEvents: "none",
   }
 };
 

@@ -280,7 +280,7 @@ const AttendanceWidget = ({ currentUserId }) => {
       </Box>
 
       {/* ── Action buttons row ── */}
-      <Box sx={{ display: "flex", gap: 1.5, flexWrap: "wrap", mt: 2 }}>
+      <Box sx={{ display: "flex", gap: 1.5, flexWrap: "wrap", mt: 2, justifyContent: "flex-end" }}>
         {status !== "COMPLETED" && (
           <Button
             onClick={primaryAction}

@@ -17,6 +17,11 @@ import {
   Skeleton,
   Snackbar,
   Alert,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import EditIcon from "@mui/icons-material/Edit";
@@ -30,74 +35,13 @@ import axios from "axios";
 import TaskAssignmentModal from "./TaskAssignmentModal";
 import CreateProjectDialog from "../../components/CreateProjectDialog";
 
-// --- iOS Liquid Glass Design Constants ---
-const PRIMARY_BG = "#ffffff";
-const SECONDARY_BG = "#f8f9fa";
-const TERTIARY_BG = "#f1f3f5";
+// --- Redesigned Head Operations Branding ---
+const PRIMARY_COLOR = "#0d254a";
+const SECONDARY_COLOR = "#1e4db7";
+const LIGHT_BG = "#fcfcfc";
 
-const glassEffect = {
-  background: "rgba(255, 255, 255, 1)",
-  backdropFilter: "blur(25px) saturate(160%)",
-  border: "1px solid rgba(0, 0, 0, 0.08)",
-  borderRadius: "28px",
-  boxShadow: "0 10px 40px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0,0,0,0.02)",
-  transition: "all 0.4s cubic-bezier(0.23, 1, 0.32, 1)",
-  position: "relative",
-  overflow: "visible",
-};
 
-const iPhoneGlassButton = {
-  background: "rgba(255, 255, 255, 1)",
-  backdropFilter: "blur(20px)",
-  border: "1px solid rgba(0, 0, 0, 0.1)",
-  borderRadius: "20px",
-  color: "rgba(0, 0, 0, 0.9)",
-  fontWeight: 1000,
-  textTransform: "none",
-  letterSpacing: "-0.02em",
-  boxShadow: "0 8px 20px rgba(0, 0, 0, 0.05)",
-  transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
-  "& .MuiButton-startIcon svg": { fontSize: 26 },
-  "& .MuiButton-endIcon svg": { fontSize: 26 },
-  "&:hover": {
-    background: "rgba(255, 255, 255, 1)",
-    transform: "translateY(-4px) scale(1.02)",
-    boxShadow: "0 20px 45px rgba(0, 0, 0, 0.08)",
-    border: "1px solid rgba(0, 0, 0, 0.15)",
-  },
-  "&:active": {
-    transform: "translateY(-1px) scale(0.98)",
-  }
-};
 
-const GlassCard = ({ children, sx = {}, hoverEffect = true, onClick }) => (
-  <Card
-    component={motion.div}
-    {...(hoverEffect ? {
-      whileHover: {
-        translateY: -10,
-        boxShadow: "0 30px 60px rgba(0, 0, 0, 0.08)",
-        background: "rgba(255, 255, 255, 1)",
-        borderColor: "rgba(0, 0, 0, 0.12)",
-      }
-    } : {})}
-    initial={{ opacity: 0, scale: 0.95 }}
-    animate={{ opacity: 1, scale: 1 }}
-    transition={{ type: "spring", stiffness: 200, damping: 25 }}
-    onClick={onClick}
-    sx={{
-      ...glassEffect,
-      p: 0,
-      m: 0,
-      display: "flex",
-      flexDirection: "column",
-      border: "1px solid rgba(0, 0, 0, 0.08)",
-      ...sx,
-    }}
-  >
-    {children}
-  </Card>
-);
 
 const HeadProjectView = () => {
   const navigate = useNavigate();
@@ -114,6 +58,10 @@ const HeadProjectView = () => {
   const [editingProjectData, setEditingProjectData] = useState(null);
   const [alertOpen, setAlertOpen] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
+
+  // Delete Confirmation State
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [projectToDelete, setProjectToDelete] = useState(null);
 
   const token = localStorage.getItem("adminToken");
 
@@ -142,14 +90,20 @@ const HeadProjectView = () => {
     }
   }, [token]);
 
-  const handleDelete = async (e, id) => {
+  const confirmDelete = (e, id) => {
     if (e) e.stopPropagation();
+    setProjectToDelete(id);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDelete = async () => {
+    if (!projectToDelete) return;
     try {
-      console.log("Delete triggered for project:", id);
-      let res = await axios.delete(`https://project-management-sodtware-backend-end.onrender.com/admin/delete_proj/${id}`);
+      console.log("Delete triggered for project:", projectToDelete);
+      let res = await axios.delete(`https://project-management-sodtware-backend-end.onrender.com/admin/delete_proj/${projectToDelete}`);
       console.log("delete response", res.data);
       if (res.status === 200) {
-        setProjectsList((prev) => prev.filter((project) => project._id !== id));
+        setProjectsList((prev) => prev.filter((project) => project._id !== projectToDelete));
         setAlertMessage(res.data.message || "Project deleted successfully");
         setAlertOpen(true);
       }
@@ -157,6 +111,9 @@ const HeadProjectView = () => {
       console.error("Delete error:", error);
       setAlertMessage("Failed to delete project");
       setAlertOpen(true);
+    } finally {
+      setDeleteDialogOpen(false);
+      setProjectToDelete(null);
     }
   };
 
@@ -205,194 +162,91 @@ const HeadProjectView = () => {
   );
 
   return (
-    <Box
-      sx={{
-        height: "100%",
-        minHeight: "100vh",
-        background: `#ffffff`,
-        position: "relative",
-        overflowX: "hidden",
-        p: { xs: 2.5, sm: 4, md: 6 },
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        color: "rgba(0,0,0,0.9)",
-      }}
-    >
-      <Box
-        sx={{
-          mb: 8,
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          flexWrap: "wrap",
-          gap: { xs: 2, sm: 4 },
-          position: "relative",
-          zIndex: 1,
-          width: "95%",
-          maxWidth: "1800px",
-        }}
-      >
-        <Box>
-          <motion.div
-            initial={{ x: -40, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-          >
-            <Button
-              startIcon={<ArrowBackIcon sx={{ fontSize: 24 }} />}
-              onClick={() => navigate("/head")}
-              sx={{
-                ...iPhoneGlassButton,
-                mb: { xs: 3, md: 6 },
-                px: 4,
-                py: 2,
-                fontSize: "1rem",
-                borderRadius: "22px"
-              }}
-            >
-              Tactical Retreat (Back)
-            </Button>
-            <Typography
-              variant="h1"
-              sx={{
-                fontWeight: 1000,
-                fontSize: { xs: "2.2rem", sm: "3rem", md: "4.5rem" },
-                letterSpacing: { xs: "-0.04em", md: "-0.06em" },
-                mb: 2,
-                color: "rgba(0,0,0,0.95)",
-                lineHeight: 0.95,
-              }}
-            >
-              Intelligence Registry
+    <Box sx={{ minHeight: "100vh", backgroundColor: "#fcfcfc" }}>
+      {/* Header Section */}
+      <Box sx={{ py: 3, backgroundColor: "#fff", borderBottom: "1px solid #eee" }}>
+        <Box sx={{ maxWidth: "1800px", mx: "auto", px: { xs: 2, md: 4, lg: 6 }, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <Box>
+            <Typography variant="h4" sx={{ fontWeight: 700, color: "#333", mb: 0.5, fontSize: "1.75rem" }}>
+              Head Operations
             </Typography>
-            <Typography
-              variant="h6"
-              sx={{
-                color: "rgba(0,0,0,0.5)",
-                fontWeight: 800,
-                maxWidth: 800,
-                lineHeight: 1.5,
-                letterSpacing: "-0.01em",
-                fontSize: { xs: "0.95rem", md: "1.1rem" }
-              }}
-            >
-              Strategic departmental oversight and high-fidelity resource orchestration for organization-wide intelligence synthesis.
+            <Typography variant="body2" sx={{ color: "#888", fontWeight: 500, fontSize: "0.9rem" }}>
+              Workspace Hub
             </Typography>
-          </motion.div>
+          </Box>
+          <Button onClick={() => navigate("/head")} sx={{ color: "#666", fontWeight: 600, textTransform: "none", "&:hover": { color: "#d32f2f" } }}>
+            Logout
+          </Button>
         </Box>
+      </Box>
 
-        <Box sx={{ display: "flex", gap: 3, alignItems: "center", width: { xs: "100%", sm: "auto" }, mt: { xs: 2, sm: 0 } }}>
+      <Box sx={{ maxWidth: "1800px", mx: "auto", px: { xs: 2, md: 4, lg: 6 }, pt: 4, pb: 10 }}>
+        {/* Navigation & Search Row */}
+        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 4, flexWrap: "wrap", gap: 2 }}>
+          <Button
+            startIcon={<ArrowBackIcon />}
+            onClick={() => navigate("/head")}
+            sx={{ color: "#444", fontWeight: 600, textTransform: "none", fontSize: "1rem", p: 0, "&:hover": { background: "none", color: "#000" } }}
+          >
+            Back to Dashboard
+          </Button>
+
           <TextField
-            placeholder="Search Intelligence Registry..."
+            placeholder="Search Records..."
             variant="outlined"
+            size="small"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <SearchIcon sx={{ color: "rgba(0,0,0,0.5)", fontSize: 28, ml: 1.5 }} />
+                  <SearchIcon sx={{ color: "#aaa" }} />
                 </InputAdornment>
               ),
             }}
             sx={{
-              width: { xs: "100%", sm: 600 },
+              width: { xs: "100%", sm: 350 },
               "& .MuiOutlinedInput-root": {
-                background: "rgba(255, 255, 255, 1)",
-                backdropFilter: "blur(20px)",
-                borderRadius: "24px",
-                fontWeight: 800,
-                color: "rgba(0,0,0,0.9)",
-                px: 1.5,
-                py: 0.8,
-                fontSize: "1rem",
-                "& input": { color: "rgba(0,0,0,0.9)" },
-                "& fieldset": { border: "1px solid rgba(0,0,0,0.08)" },
-                "&:hover": {
-                  background: "rgba(255, 255, 255, 1)",
-                  "& fieldset": { border: "1px solid rgba(0,0,0,0.15)" }
-                },
-                "&.Mui-focused": {
-                  background: "rgba(255, 255, 255, 1)",
-                  boxShadow: "0 15px 45px rgba(0,0,0,0.05)",
-                  "& fieldset": { border: "2px solid #000" }
-                },
-              },
+                borderRadius: "10px",
+                backgroundColor: "#fff",
+              }
             }}
           />
         </Box>
-      </Box>
 
-      <Box sx={{ width: "95%", maxWidth: "1800px", position: "relative", zIndex: 1 }}>
+        {/* Title Section */}
+        <Box sx={{ mb: 6 }}>
+          <Typography variant="h4" sx={{ fontWeight: 700, color: "#333", mb: 1 }}>
+            Records
+          </Typography>
+          <Typography variant="body2" sx={{ color: "#666", fontWeight: 500 }}>
+            Manage departments and resources efficiently
+          </Typography>
+        </Box>
+
+        {/* Projects Grid */}
         {loading ? (
-          <Grid container spacing={4}>
-            {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-              <Grid item xs={12} sm={6} md={4} lg={3} key={i}>
-                <GlassCard sx={{ p: 4, height: 420 }}>
-                  <Skeleton
-                    variant="rounded"
-                    width={72}
-                    height={72}
-                    sx={{ bgcolor: "rgba(0, 0, 0, 0.05)", borderRadius: "22px", mb: 4 }}
-                  />
-                  <Skeleton variant="text" width="60%" height={50} sx={{ bgcolor: "rgba(0,0,0,0.05)", mb: 2.5 }} />
-                  <Skeleton variant="text" width="90%" height={28} sx={{ bgcolor: "rgba(0,0,0,0.03)", mb: 1.5 }} />
-                  <Skeleton variant="text" width="85%" height={28} sx={{ bgcolor: "rgba(0,0,0,0.03)", mb: 5 }} />
-                  <Box sx={{ mt: "auto", background: "rgba(0,0,0,0.02)", p: 3, borderRadius: "24px" }}>
-                    <Skeleton variant="rounded" height={12} sx={{ bgcolor: "rgba(0,0,0,0.05)", borderRadius: 6 }} />
+          <Grid container spacing={3}>
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <Grid item xs={12} sm={6} md={4} key={i}>
+                <Box sx={{ bgcolor: "#fff", p: 4, borderRadius: "16px", border: "1px solid #eee", height: 320 }}>
+                  <Skeleton variant="text" width="60%" height={40} sx={{ mb: 2 }} />
+                  <Skeleton variant="text" width="40%" height={24} sx={{ mb: 4 }} />
+                  <Skeleton variant="rectangular" height={12} sx={{ borderRadius: 6, mb: 4 }} />
+                  <Box sx={{ display: "flex", justifyContent: "space-between", mt: "auto" }}>
+                    <Skeleton variant="circular" width={40} height={40} />
+                    <Skeleton variant="circular" width={40} height={40} />
                   </Box>
-                </GlassCard>
+                </Box>
               </Grid>
             ))}
           </Grid>
         ) : filteredProjects.length === 0 ? (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6, ease: "easeOut" }}
-          >
-            <Box sx={{ textAlign: "center", mt: { xs: 10, md: 15 } }}>
-              <Box
-                sx={{
-                  width: { xs: 140, md: 180 },
-                  height: { xs: 140, md: 180 },
-                  borderRadius: "48px",
-                  background: "rgba(0, 0, 0, 0.03)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  margin: "0 auto 40px",
-                  border: "1px solid rgba(0, 0, 0, 0.05)",
-                  color: "rgba(0, 0, 0, 0.1)",
-                }}
-              >
-                <SearchIcon sx={{ fontSize: { xs: 64, md: 84 } }} />
-              </Box>
-              <Typography
-                variant="h4"
-                sx={{
-                  color: "rgba(0,0,0,0.95)",
-                  fontWeight: 1000,
-                  mb: 2.5,
-                  fontSize: { xs: "2rem", md: "3rem" }
-                }}
-              >
-                Zero Stream Matches
-              </Typography>
-              <Typography sx={{
-                color: "rgba(0,0,0,0.5)",
-                fontWeight: 800,
-                maxWidth: 500,
-                mx: "auto",
-                lineHeight: 1.6,
-                fontSize: { xs: "1rem", md: "1.2rem" }
-              }}>
-                The system was unable to identify any project intelligence archives matching your current operational parameters.
-              </Typography>
-            </Box>
-          </motion.div>
+          <Box sx={{ textAlign: "center", py: 10 }}>
+            <Typography variant="h6" sx={{ color: "#888" }}>No records found matching your search.</Typography>
+          </Box>
         ) : (
-          <Grid container spacing={4} sx={{ alignItems: "stretch" }}>
+          <Grid container spacing={3}>
             {filteredProjects.map((project) => {
               const teamMembers = project.teamMembers || [];
               const tasks = project.todos || [];
@@ -401,221 +255,93 @@ const HeadProjectView = () => {
               const sc = getStatusColor(project.status || "Active");
 
               return (
-                <Grid item xs={12} sm={6} md={4} lg={3} key={project._id} sx={{ display: "flex" }}>
-                  <GlassCard
+                <Grid item xs={12} sm={6} md={4} key={project._id}>
+                  <Box
                     sx={{
-                      cursor: "pointer",
-                      p: 0,
+                      bgcolor: "#fff",
+                      borderRadius: "16px",
+                      p: 4,
+                      border: "1px solid #eee",
+                      boxShadow: "0 2px 8px rgba(0,0,0,0.02)",
                       height: "100%",
-                      width: "100%",
                       display: "flex",
                       flexDirection: "column",
+                      cursor: "pointer",
+                      transition: "transform 0.2s ease, box-shadow 0.2s ease",
+                      "&:hover": {
+                        transform: "translateY(-4px)",
+                        boxShadow: "0 12px 24px rgba(0,0,0,0.06)",
+                      }
                     }}
                     onClick={() => {
                       setSelectedProject(project);
                       setIsModalOpen(true);
                     }}
                   >
-                    <Box sx={{ p: { xs: 3, md: 4 }, height: "100%", display: "flex", flexDirection: "column" }}>
-                      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 3.5 }}>
-                        <Box
-                          sx={{
-                            width: { xs: 48, md: 60 },
-                            height: { xs: 48, md: 60 },
-                            borderRadius: "18px",
-                            background: "rgba(0, 0, 0, 0.03)",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            color: sc,
-                            border: "1px solid rgba(0, 0, 0, 0.05)",
-                          }}
-                        >
-                          <FolderIcon sx={{ fontSize: { xs: 26, md: 34 } }} />
-                        </Box>
-
-                        <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
-                          <Chip
-                            label={project.status || "Active"}
-                            sx={{
-                              bgcolor: `${sc}12`,
-                              color: sc,
-                              fontWeight: 1000,
-                              borderRadius: "12px",
-                              px: 1.5,
-                              py: 0.5,
-                              border: `1px solid ${alpha(sc, 0.2)}`
-                            }}
-                          />
-                          <IconButton
-                            sx={{
-                              color: "rgba(0, 0, 0, 0.4)",
-                              bgcolor: "rgba(0, 0, 0, 0.03)",
-                              borderRadius: "14px",
-                              "&:hover": { color: "#000", background: "rgba(0, 0, 0, 0.07)" },
-                            }}
-                          >
-                            <MoreVertIcon sx={{ fontSize: 24 }} />
-                          </IconButton>
-                        </Box>
-                      </Box>
-
-                      <Typography
-                        variant="caption"
-                        sx={{
-                          color: "rgba(0,0,0,0.4)",
-                          fontWeight: 1000,
-                          letterSpacing: 3,
-                          textTransform: "uppercase",
-                          mb: 1.5,
-                          display: "block",
-                          fontSize: "0.75rem"
-                        }}
-                      >
-                        GENESIS_ID: {project._id.substring(project._id.length - 8).toUpperCase()}
-                      </Typography>
-
-                      <Typography
-                        sx={{
-                          color: "rgba(0,0,0,0.95)",
-                          fontWeight: 1000,
-                          fontSize: { xs: "1.5rem", md: "1.85rem" },
-                          mb: 2,
-                          lineHeight: 1.1,
-                          letterSpacing: "-1px"
-                        }}
-                      >
+                    <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 2 }}>
+                      <Typography variant="h6" sx={{ fontWeight: 700, color: "#333", fontSize: "1.25rem", lineHeight: 1.2 }}>
                         {project.title}
                       </Typography>
-
-                      <Typography
+                      <Chip
+                        label={project.status || "Active"}
+                        size="small"
                         sx={{
-                          color: "rgba(0,0,0,0.55)",
-                          mb: 4,
-                          lineHeight: 1.4,
+                          bgcolor: `${sc}12`,
+                          color: sc,
                           fontWeight: 700,
-                          fontSize: "1rem",
-                          minHeight: 70,
+                          fontSize: "0.75rem",
+                          borderRadius: "6px",
                         }}
-                      >
-                        {project.description}
-                      </Typography>
+                      />
+                    </Box>
 
-                      <Box
-                        sx={{
-                          mb: 4,
-                          background: "rgba(0, 0, 0, 0.02)",
-                          p: 3,
-                          borderRadius: "20px",
-                          border: "1px solid rgba(0, 0, 0, 0.04)",
-                        }}
-                      >
-                        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2.5 }}>
-                          <Typography variant="caption" sx={{ color: "rgba(0,0,0,0.4)", fontWeight: 1000 }}>
-                            Deployment Velocity
-                          </Typography>
-                          <Typography variant="caption" sx={{ color: sc, fontWeight: 1000, fontSize: "1.1rem" }}>
-                            {progress}%
-                          </Typography>
-                        </Box>
-                        <LinearProgress
-                          variant="determinate"
-                          value={progress}
-                          sx={{
-                            height: 12,
-                            borderRadius: 6,
-                            bgcolor: "rgba(0, 0, 0, 0.05)",
-                            "& .MuiLinearProgress-bar": {
-                              background: `linear-gradient(90deg, ${sc}, ${alpha(sc, 0.6)})`,
-                              borderRadius: 6,
-                            },
-                          }}
-                        />
-                      </Box>
+                    <Typography sx={{ color: "#888", fontSize: "0.85rem", fontWeight: 700, mb: 1 }}>IT</Typography>
+                    <Chip
+                      label={project.priority || "High"}
+                      size="small"
+                      sx={{
+                        bgcolor: "#fee2e2",
+                        color: "#ef4444",
+                        fontWeight: 700,
+                        fontSize: "0.7rem",
+                        borderRadius: "4px",
+                        width: "fit-content",
+                        mb: 3
+                      }}
+                    />
 
-                      <Grid container spacing={4} sx={{ mb: 5 }}>
-                        <Grid item xs={6}>
-                          <Box sx={{ borderLeft: `4px solid ${getPriorityColor(project.priority)}`, pl: 2.5 }}>
-                            <Typography sx={{ color: "rgba(0,0,0,0.45)", fontSize: "0.75rem", fontWeight: 1000, mb: 0.5 }}>
-                              Priority
-                            </Typography>
-                            <Typography sx={{ color: "rgba(0,0,0,0.9)", fontWeight: 1000, fontSize: "1.1rem" }}>
-                              {project.priority || "Medium"}
-                            </Typography>
-                          </Box>
-                        </Grid>
-                        <Grid item xs={6}>
-                          <Box sx={{ borderLeft: "4px solid rgba(0, 0, 0, 0.08)", pl: 2.5 }}>
-                            <Typography sx={{ color: "rgba(0,0,0,0.45)", fontSize: "0.75rem", fontWeight: 1000, mb: 0.5 }}>
-                              Temporal Limit
-                            </Typography>
-                            <Typography sx={{ color: "rgba(0,0,0,0.9)", fontWeight: 1000, fontSize: "1.1rem" }}>
-                              {project.deadline || "TBD"}
-                            </Typography>
-                          </Box>
-                        </Grid>
-                      </Grid>
-
-                      <Box
-                        sx={{
-                          mt: "auto",
-                          pt: 4,
-                          display: "flex",
-                          justifyContent: "space-between",
-                          alignItems: "center",
-                          borderTop: "1px solid rgba(0,0,0,0.04)",
-                        }}
-                      >
-                        <AvatarGroup
-                          max={4}
-                          sx={{
-                            "& .MuiAvatar-root": {
-                              width: 40,
-                              height: 40,
-                              border: "2px solid #fff",
-                              background: "linear-gradient(135deg, #0f172a 0%, #334155 100%)",
-                              color: "#fff",
-                              fontWeight: 1000,
-                              fontSize: "0.9rem"
-                            },
-                          }}
-                        >
-                          {teamMembers.map((m, i) => (
-                            <Tooltip key={i} title={m.name || "Specialist"}>
-                              <Avatar>{m.name?.[0] || "S"}</Avatar>
-                            </Tooltip>
-                          ))}
-                        </AvatarGroup>
-
-                        <Box sx={{ display: "flex", gap: 2.5 }}>
-                          <IconButton
-                            sx={{
-                              color: "rgba(0,0,0,0.5)",
-                              bgcolor: "rgba(0,0,0,0.03)",
-                              borderRadius: "16px",
-                              p: 1.5,
-                              "&:hover": { color: "#00d4ff", bgcolor: "rgba(0,0,0,0.07)" },
-                            }}
-                            onClick={(e) => handleEdit(e, project._id)}
-                          >
-                            <EditIcon sx={{ fontSize: 26 }} />
-                          </IconButton>
-                          <IconButton
-                            sx={{
-                              color: "rgba(0,0,0,0.5)",
-                              bgcolor: "rgba(0,0,0,0.03)",
-                              borderRadius: "16px",
-                              p: 1.5,
-                              "&:hover": { color: "#ff4d4f", bgcolor: alpha("#ff4d4f", 0.05) },
-                            }}
-                            onClick={(e) => handleDelete(e, project._id)}
-                          >
-                            <DeleteIcon sx={{ fontSize: 26 }} />
-                          </IconButton>
-                        </Box>
+                    <Box sx={{ mb: 4 }}>
+                      <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}>
+                        <Typography sx={{ color: "#aaa", fontSize: "0.8rem", fontWeight: 600 }}>Deadline</Typography>
+                        <Typography sx={{ color: "#333", fontSize: "0.85rem", fontWeight: 700 }}>2 days left</Typography>
                       </Box>
                     </Box>
-                  </GlassCard>
+
+                    <Box sx={{ mt: "auto", pt: 3, borderTop: "1px solid #f5f5f5", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <AvatarGroup max={4} sx={{ "& .MuiAvatar-root": { width: 32, height: 32, fontSize: "0.75rem", border: "2px solid #fff", color: "#fff" } }}>
+                        {teamMembers.map((m, i) => (
+                          <Avatar key={i} sx={{ bgcolor: ["#0369a1", "#f59e0b", "#991b1b"][i % 3] }}>{m.name?.[0] || m.email?.[0] || "U"}</Avatar>
+                        ))}
+                      </AvatarGroup>
+
+                      <Box sx={{ display: "flex", gap: 1 }}>
+                        <IconButton
+                          size="small"
+                          onClick={(e) => { e.stopPropagation(); handleEdit(e, project._id); }}
+                          sx={{ color: "#666", "&:hover": { color: "#3b82f6" } }}
+                        >
+                          <EditIcon fontSize="small" />
+                        </IconButton>
+                        <IconButton
+                          size="small"
+                          onClick={(e) => confirmDelete(e, project._id)}
+                          sx={{ color: "#666", "&:hover": { color: "#ef4444" } }}
+                        >
+                          <DeleteIcon fontSize="small" />
+                        </IconButton>
+                      </Box>
+                    </Box>
+                  </Box>
                 </Grid>
               );
             })}
@@ -685,6 +411,53 @@ const HeadProjectView = () => {
           {alertMessage}
         </Alert>
       </Snackbar>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+        PaperProps={{
+          sx: {
+            borderRadius: "16px",
+            padding: "16px",
+            boxShadow: "0 12px 24px rgba(0,0,0,0.5)",
+            width: "400px",
+            maxWidth: "90vw",
+            backgroundColor: "#1e1e1e", // Deep dark / black background
+            color: "#fff"
+          }
+        }}
+      >
+        <DialogTitle sx={{ fontWeight: 700, color: "#fff", pb: 1 }}>Confirm Deletion</DialogTitle>
+        <DialogContent>
+          <DialogContentText sx={{ color: "#e0e0e0", fontWeight: 500 }}>
+            Are you sure you want to delete this project? This action cannot be undone.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions sx={{ pt: 4 }}>
+          <Button
+            onClick={() => setDeleteDialogOpen(false)}
+            sx={{ color: "#aaa", fontWeight: 600, textTransform: "none", "&:hover": { color: "#fff" } }}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleDelete}
+            variant="contained"
+            sx={{
+              backgroundColor: "#ef4444",
+              color: "#fff",
+              fontWeight: 600,
+              textTransform: "none",
+              borderRadius: "8px",
+              boxShadow: "none",
+              "&:hover": { backgroundColor: "#dc2626", boxShadow: "none" }
+            }}
+          >
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };

@@ -8,68 +8,151 @@ import {
   Typography,
   TextField,
   Button,
-  Stepper,
-  Step,
-  StepLabel,
   MenuItem,
   IconButton,
   Chip,
   Avatar,
   Paper,
-  Fade,
   Alert,
   alpha,
   useTheme,
   useMediaQuery,
+  InputAdornment,
 } from "@mui/material";
 import { motion, AnimatePresence } from "framer-motion";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import CloseIcon from "@mui/icons-material/Close";
 import AddIcon from "@mui/icons-material/Add";
-import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import PersonAddIcon from "@mui/icons-material/PersonAdd";
-import GroupsIcon from "@mui/icons-material/Groups";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
+import CheckIcon from "@mui/icons-material/Check";
 import axios from "axios";
 
-const PRIMARY_BG = "#e6edf5";
-const SECONDARY_BG = "#d9e3ef";
-const TERTIARY_BG = "#cfd8e5";
+// --- Styled Components & Theme Constants ---
 
-const glassEffect = {
-  background: "rgba(255, 255, 255, 0.45)",
-  backdropFilter: "blur(40px) saturate(200%)",
-  border: "1px solid rgba(255, 255, 255, 0.55)",
-  borderRadius: "28px",
-  boxShadow: "0 12px 40px rgba(0, 0, 0, 0.1), inset 0 1px 1px rgba(255, 255, 255, 0.6)",
-  transition: "all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
-  position: "relative",
-  overflow: "visible",
+const PRIMARY_BLUE = "#1e4db7";
+const SECONDARY_BLUE = "#0d254a";
+const SUCCESS_GREEN = "#10b981";
+
+const getDaysLeft = (dateString) => {
+  if (!dateString) return "Not Set";
+  const today = new Date();
+  const target = new Date(dateString);
+  const diffTime = target - today;
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+  if (diffDays < 0) return "Overdue";
+  if (diffDays === 0) return "Due Today";
+  if (diffDays === 1) return "1 day left";
+  return `${diffDays} days left`;
 };
 
-const iPhoneGlassButton = {
-  background: "rgba(255, 255, 255, 0.5)",
-  backdropFilter: "blur(25px)",
-  border: "1px solid rgba(255, 255, 255, 0.6)",
-  borderRadius: "18px",
-  color: "rgba(0, 0, 0, 0.9)",
-  fontWeight: 1000,
-  textTransform: "none",
-  letterSpacing: "-0.02em",
-  boxShadow: "0 8px 20px rgba(0, 0, 0, 0.05)",
-  transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-  "&:hover": {
-    background: "rgba(255, 255, 255, 0.7)",
-    transform: "translateY(-3px) scale(1.02)",
-    boxShadow: "0 15px 35px rgba(0, 0, 0, 0.1)",
+const formHeaderStyle = {
+  fontSize: "2rem",
+  fontWeight: 900,
+  color: "#222",
+  letterSpacing: "-0.04em",
+};
+
+const inputStyle = {
+  "& .MuiOutlinedInput-root": {
+    borderRadius: "14px",
+    background: "#fff",
+    "& fieldset": { borderColor: "#eee" },
+    "&:hover fieldset": { borderColor: "#ddd" },
+    "&.Mui-focused fieldset": { borderColor: PRIMARY_BLUE, borderWidth: "1.5px" },
   },
-  "&:active": {
-    transform: "translateY(-1px) scale(0.98)",
+  "& .MuiInputLabel-root": {
+    color: "#888",
+    fontWeight: 600,
+    fontSize: "0.9rem",
+  },
+  "& .MuiInputBase-input": {
+    fontWeight: 700,
+    color: "#333",
   }
 };
 
+const navButtonStyle = {
+  borderRadius: "12px",
+  textTransform: "none",
+  fontWeight: 800,
+  fontSize: "1.1rem",
+  px: 4,
+  py: 1.5,
+};
+
+// --- Custom Stepper Component ---
+
+const CustomStepper = ({ activeStep, completed }) => {
+  const steps = [
+    { label: "Enter Your Email", index: 1 },
+    { label: "Add Tasks", index: 2 },
+    { label: "Assign Team", index: 3 },
+  ];
+
+  return (
+    <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 8, position: "relative" }}>
+      {/* Background Line */}
+      <Box sx={{ position: "absolute", top: "16px", left: "5%", right: "5%", height: "2px", bgcolor: "#eee", zIndex: 0 }} />
+
+      {steps.map((step, i) => {
+        const isActive = activeStep === i;
+        const isCompleted = activeStep > i;
+
+        return (
+          <Box key={i} sx={{ display: "flex", alignItems: "center", gap: 1.5, zIndex: 1, px: 2, bgcolor: "#fff", position: "relative" }}>
+            <Box
+              sx={{
+                width: 32,
+                height: 32,
+                borderRadius: "50%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                bgcolor: isCompleted ? SUCCESS_GREEN : (isActive ? PRIMARY_BLUE : "#eee"),
+                color: (isActive || isCompleted) ? "#fff" : "#aaa",
+                fontWeight: 900,
+                fontSize: "0.9rem",
+                transition: "all 0.3s ease",
+              }}
+            >
+              {isCompleted ? <CheckIcon sx={{ fontSize: 18 }} /> : step.index}
+            </Box>
+            <Typography
+              sx={{
+                fontWeight: 800,
+                color: isCompleted ? SUCCESS_GREEN : (isActive ? PRIMARY_BLUE : "#aaa"),
+                fontSize: "0.9rem",
+                display: { xs: "none", sm: "block" }
+              }}
+            >
+              {step.label}
+            </Typography>
+
+            {/* Active Progress Line Segment */}
+            {i < steps.length - 1 && isCompleted && (
+              <Box sx={{
+                position: "absolute",
+                top: "16px",
+                left: "100%",
+                width: "200px", // Approximate length to next step
+                height: "2px",
+                bgcolor: SUCCESS_GREEN,
+                zIndex: -1
+              }} />
+            )}
+          </Box>
+        );
+      })}
+    </Box>
+  );
+};
+
 const CreateProjectDialog = ({ open, onClose, onSubmit, initialData }) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
   const [activeStep, setActiveStep] = useState(0);
   const [projectData, setProjectData] = useState({
     title: "",
@@ -88,17 +171,10 @@ const CreateProjectDialog = ({ open, onClose, onSubmit, initialData }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const isTablet = useMediaQuery(theme.breakpoints.down("md"));
-
-  const steps = ["Project Details", "Add Tasks", "Assign Team"];
-
   // Reset or Popoulate state based on initialData
   useEffect(() => {
     if (open) {
       if (initialData) {
-        // Edit mode
         setProjectData({
           title: initialData.projectName || initialData.title || "",
           description: initialData.projectDesc || initialData.description || "",
@@ -106,8 +182,6 @@ const CreateProjectDialog = ({ open, onClose, onSubmit, initialData }) => {
           priority: initialData.priority || "Medium",
         });
         setTodos(initialData.tasks || initialData.todos || []);
-
-        // Map existing team members
         const team = (initialData.specialists || initialData.teamMembers || []).map(member => {
           const id = member.userId || member._id;
           const idStr = typeof id === 'object' ? id.$oid || id.toString() : String(id);
@@ -120,7 +194,6 @@ const CreateProjectDialog = ({ open, onClose, onSubmit, initialData }) => {
         });
         setSelectedTeam(team);
       } else {
-        // Create mode - reset everything
         setProjectData({ title: "", description: "", deadline: "", priority: "Medium" });
         setTodos([]);
         setSelectedTeam([]);
@@ -138,39 +211,25 @@ const CreateProjectDialog = ({ open, onClose, onSubmit, initialData }) => {
   const fetchEmployees = async () => {
     try {
       let token = localStorage.getItem("adminToken");
-      axios
-        .get("https://project-management-sodtware-backend-end.onrender.com/admin/employes", {
-          headers: {
-            Authorization: `${token}`,
-            "Content-Type": "application/json",
-          },
-        })
-        .then((data) => {
-          // Map backend data to expected format
-          const mappedEmployees = data.data.map((emp) => {
-            const empIdStr = typeof emp._id === 'object' ? emp._id.$oid || emp._id.toString() : String(emp._id);
-            return {
-              userId: empIdStr,
-              _id: empIdStr,
-              name: emp.name,
-              role: emp.department,
-              department: emp.department,
-              email: emp.email,
-              avatar: emp.name
-                .split(" ")
-                .map((n) => n[0])
-                .join("")
-                .toUpperCase()
-                .slice(0, 2),
-            };
-          });
-
-          // Filter out employees already in the team
-          const filteredEmployees = mappedEmployees.filter(
-            (emp) => !selectedTeam.some((member) => member.userId === emp.userId)
-          );
-          setAvailableEmployees(filteredEmployees);
-        });
+      const res = await axios.get("https://project-management-sodtware-backend-end.onrender.com/admin/employes", {
+        headers: { Authorization: `${token}`, "Content-Type": "application/json" },
+      });
+      const mappedEmployees = res.data.map((emp) => {
+        const empIdStr = typeof emp._id === 'object' ? emp._id.$oid || emp._id.toString() : String(emp._id);
+        return {
+          userId: empIdStr,
+          _id: empIdStr,
+          name: emp.name,
+          role: emp.department,
+          department: emp.department,
+          email: emp.email,
+          avatar: emp.name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2),
+        };
+      });
+      const filteredEmployees = mappedEmployees.filter(
+        (emp) => !selectedTeam.some((member) => member.userId === emp.userId)
+      );
+      setAvailableEmployees(filteredEmployees);
     } catch (error) {
       console.error("Error fetching employees:", error);
       setError("Failed to load employees");
@@ -189,7 +248,6 @@ const CreateProjectDialog = ({ open, onClose, onSubmit, initialData }) => {
 
   const handleAddTodo = () => {
     if (!newTodo.title.trim()) return;
-
     setTodos([
       ...todos,
       {
@@ -207,62 +265,31 @@ const CreateProjectDialog = ({ open, onClose, onSubmit, initialData }) => {
 
   const handleDragEnd = (result) => {
     if (!result.destination) return;
-
     const { source, destination } = result;
+    if (source.droppableId === destination.droppableId && source.index === destination.index) return;
 
-    // If dropped in the same position, do nothing
-    if (
-      source.droppableId === destination.droppableId &&
-      source.index === destination.index
-    ) {
-      return;
-    }
-
-    // Moving from available to team
-    if (
-      source.droppableId === "available" &&
-      destination.droppableId === "team"
-    ) {
+    if (source.droppableId === "available" && destination.droppableId === "team") {
       const employee = availableEmployees[source.index];
       const newAvailable = Array.from(availableEmployees);
       newAvailable.splice(source.index, 1);
-
       const newTeam = Array.from(selectedTeam);
       newTeam.splice(destination.index, 0, employee);
-
       setAvailableEmployees(newAvailable);
       setSelectedTeam(newTeam);
-    }
-    // Moving from team to available
-    else if (
-      source.droppableId === "team" &&
-      destination.droppableId === "available"
-    ) {
+    } else if (source.droppableId === "team" && destination.droppableId === "available") {
       const employee = selectedTeam[source.index];
       const newTeam = Array.from(selectedTeam);
       newTeam.splice(source.index, 1);
-
       const newAvailable = Array.from(availableEmployees);
       newAvailable.splice(destination.index, 0, employee);
-
       setSelectedTeam(newTeam);
       setAvailableEmployees(newAvailable);
-    }
-    // Reordering within available list
-    else if (
-      source.droppableId === "available" &&
-      destination.droppableId === "available"
-    ) {
+    } else if (source.droppableId === "available" && destination.droppableId === "available") {
       const newAvailable = Array.from(availableEmployees);
       const [removed] = newAvailable.splice(source.index, 1);
       newAvailable.splice(destination.index, 0, removed);
       setAvailableEmployees(newAvailable);
-    }
-    // Reordering within team list
-    else if (
-      source.droppableId === "team" &&
-      destination.droppableId === "team"
-    ) {
+    } else if (source.droppableId === "team" && destination.droppableId === "team") {
       const newTeam = Array.from(selectedTeam);
       const [removed] = newTeam.splice(source.index, 1);
       newTeam.splice(destination.index, 0, removed);
@@ -272,11 +299,7 @@ const CreateProjectDialog = ({ open, onClose, onSubmit, initialData }) => {
 
   const handleNext = () => {
     if (activeStep === 0) {
-      if (
-        !projectData.title.trim() ||
-        !projectData.description.trim() ||
-        !projectData.deadline
-      ) {
+      if (!projectData.title.trim() || !projectData.description.trim() || !projectData.deadline) {
         setError("Please fill in all project details");
         return;
       }
@@ -285,19 +308,15 @@ const CreateProjectDialog = ({ open, onClose, onSubmit, initialData }) => {
     setActiveStep((prev) => prev + 1);
   };
 
-  const handleBack = () => {
-    setActiveStep((prev) => prev - 1);
-  };
+  const handleBack = () => setActiveStep((prev) => prev - 1);
 
   const handleSubmit = async () => {
     if (selectedTeam.length === 0) {
       setError("Please assign at least one team member");
       return;
     }
-
     setLoading(true);
     setError(null);
-
     const finalData = {
       ...projectData,
       todos,
@@ -307,17 +326,12 @@ const CreateProjectDialog = ({ open, onClose, onSubmit, initialData }) => {
         role: emp.role,
       })),
     };
-
     try {
-      // TODO: Replace with actual API call
-      // await axios.post('/api/projects/create', finalData);
-
-      console.log("Project Data:", finalData);
       await onSubmit(finalData);
       handleClose();
     } catch (error) {
       console.error("Error creating project:", error);
-      setError("Failed to create project");
+      setError("Failed to finalize protocol");
     } finally {
       setLoading(false);
     }
@@ -325,31 +339,13 @@ const CreateProjectDialog = ({ open, onClose, onSubmit, initialData }) => {
 
   const handleClose = () => {
     setActiveStep(0);
-    setProjectData({
-      title: "",
-      description: "",
-      deadline: "",
-      priority: "Medium",
-    });
+    setProjectData({ title: "", description: "", deadline: "", priority: "Medium" });
     setTodos([]);
     setNewTodo({ title: "", priority: "Medium", dueDate: "" });
     setSelectedTeam([]);
     setAvailableEmployees([]);
     setError(null);
     onClose();
-  };
-
-  const getPriorityColor = (priority) => {
-    switch (priority) {
-      case "Critical":
-        return "#ff5b5b";
-      case "High":
-        return "#ffab00";
-      case "Medium":
-        return "#00d4ff";
-      default:
-        return "#00e676";
-    }
   };
 
   return (
@@ -360,233 +356,76 @@ const CreateProjectDialog = ({ open, onClose, onSubmit, initialData }) => {
       fullWidth
       PaperProps={{
         sx: {
-          background: `linear-gradient(135deg, ${PRIMARY_BG} 60%, ${SECONDARY_BG} 100%)`,
-          backdropFilter: "blur(60px) saturate(200%)",
-          borderRadius: isMobile ? "0px" : "40px",
-          border: isMobile ? "none" : "1px solid rgba(255, 255, 255, 0.6)",
-          boxShadow: "0 60px 140px -40px rgba(0, 0, 0, 0.2)",
-          minHeight: isMobile ? "100vh" : "720px",
-          maxHeight: isMobile ? "100vh" : "90vh",
+          background: "#fff",
+          borderRadius: isMobile ? "0px" : "32px",
+          maxHeight: "95vh",
           overflow: "hidden",
-          position: "relative",
-          margin: isMobile ? 0 : 2,
         },
       }}
       fullScreen={isMobile}
     >
-      {/* Background Mesh Blobs Internal */}
-      <Box sx={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, zIndex: 0, pointerEvents: "none", opacity: 0.6 }}>
-        <motion.div
-          animate={{ scale: [1, 1.1, 1], rotate: [0, 45, 0] }}
-          transition={{ duration: 20, repeat: Infinity }}
-          style={{
-            position: "absolute",
-            top: "-10%",
-            right: "-10%",
-            width: "50%",
-            height: "50%",
-            background: "radial-gradient(circle, rgba(255, 255, 255, 0.6) 0%, transparent 70%)",
-            filter: "blur(60px)",
-          }}
-        />
-        <motion.div
-          animate={{ scale: [1.1, 1, 1.1], rotate: [0, -45, 0] }}
-          transition={{ duration: 25, repeat: Infinity }}
-          style={{
-            position: "absolute",
-            bottom: "-10%",
-            left: "-10%",
-            width: "50%",
-            height: "50%",
-            background: "radial-gradient(circle, rgba(255, 255, 255, 0.4) 0%, transparent 70%)",
-            filter: "blur(60px)",
-          }}
-        />
-      </Box>
       {/* Header */}
-      <DialogTitle
-        component="div"
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          background: "rgba(255, 255, 255, 0.55)",
-          backdropFilter: "blur(30px)",
-          borderBottom: "1px solid rgba(255, 255, 255, 0.6)",
-          py: { xs: 2.5, md: 4 },
-          px: { xs: 3, md: 5 },
-          zIndex: 1,
-        }}
-      >
-        <Typography
-          variant="h5"
-          sx={{
-            color: "rgba(0,0,0,0.9)",
-            fontWeight: 1000,
-            display: "flex",
-            alignItems: "center",
-            gap: { xs: 2, md: 3 },
-            letterSpacing: "-0.05em",
-            fontSize: { xs: "1.4rem", md: "2rem" },
-          }}
-        >
-          <Box
-            sx={{
-              width: { xs: 44, md: 56 },
-              height: { xs: 44, md: 56 },
-              borderRadius: "20px",
-              background: "linear-gradient(135deg, #0f172a 0%, #334155 100%)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              boxShadow: "0 10px 20px rgba(0, 0, 0, 0.15)",
-              border: "1px solid rgba(255,255,255,0.3)",
-            }}
-          >
-            {initialData ? (
-              <EditIcon sx={{ color: "#fff", fontSize: { xs: 22, md: 28 } }} />
-            ) : (
-              <AddIcon sx={{ color: "#fff", fontSize: { xs: 28, md: 36 } }} />
-            )}
-          </Box>
-          {initialData ? "Refine Project Intelligence" : "Project Genesis"}
+      <DialogTitle sx={{ py: 4, px: { xs: 3, md: 6 }, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <Typography sx={formHeaderStyle}>
+          New Project
         </Typography>
-        <IconButton
-          onClick={handleClose}
-          sx={{
-            ...iPhoneGlassButton,
-            p: 1.5,
-            bgcolor: "rgba(255,255,255,0.6)",
-            borderRadius: "14px",
-          }}
-        >
-          <CloseIcon sx={{ color: "rgba(0,0,0,0.7)", fontSize: { xs: 20, md: 24 } }} />
+        <IconButton onClick={handleClose} sx={{ color: "#333", border: "1.5px solid #eee" }}>
+          <CloseIcon />
         </IconButton>
       </DialogTitle>
 
-      <DialogContent sx={{ py: { xs: 3, md: 5 }, px: { xs: 2.5, md: 5 }, overflowY: "auto", overflowX: "hidden" }}>
-        {/* Stepper */}
-        <Stepper
-          activeStep={activeStep}
-          orientation={isMobile ? "vertical" : "horizontal"}
-          sx={{
-            mb: { xs: 4, md: 7 },
-            zIndex: 1,
-            position: "relative",
-            "& .MuiStepConnector-line": {
-              borderColor: "rgba(0,0,0,0.1)",
-              borderWidth: "2px",
-            }
-          }}
-        >
-          {steps.map((label) => (
-            <Step key={label}>
-              <StepLabel
-                sx={{
-                  "& .MuiStepLabel-label": {
-                    color: "rgba(0,0,0,0.5)",
-                    fontWeight: 1000,
-                    fontSize: { xs: "0.7rem", md: "0.85rem" },
-                    textTransform: "uppercase",
-                    letterSpacing: "2px",
-                    mt: { xs: 0, md: 1.5 },
-                  },
-                  "& .MuiStepLabel-label.Mui-active": {
-                    color: "rgba(0,0,0,0.9)",
-                  },
-                  "& .MuiStepLabel-label.Mui-completed": {
-                    color: "#10b981",
-                  },
-                  "& .MuiStepIcon-root": {
-                    width: { xs: 26, md: 32 },
-                    height: { xs: 26, md: 32 },
-                    color: "rgba(0,0,0,0.08)",
-                    border: "2px solid rgba(255,255,255,0.5)",
-                    borderRadius: "50%",
-                    "&.Mui-active": { color: "#00d4ff", boxShadow: "0 0 20px rgba(0, 212, 255, 0.4)" },
-                    "&.Mui-completed": { color: "#10b981" },
-                    "& .MuiStepIcon-text": { fontWeight: 1000, fill: "rgba(0,0,0,0.4)" }
-                  }
-                }}
-              >
-                {label}
-              </StepLabel>
-            </Step>
-          ))}
-        </Stepper>
+      <DialogContent sx={{ px: { xs: 3, md: 6 }, pb: 6, overflowY: "auto" }}>
+        <CustomStepper activeStep={activeStep} />
 
-        {/* Error Alert */}
         {error && (
-          <Alert
-            severity="error"
-            onClose={() => setError(null)}
-            sx={{
-              mb: 3,
-              background: "rgba(239, 68, 68, 0.08)",
-              color: "#ef4444",
-              fontWeight: 700,
-              borderRadius: "12px",
-              border: "1px solid rgba(239, 68, 68, 0.1)"
-            }}
-          >
+          <Alert severity="error" onClose={() => setError(null)} sx={{ mb: 4, borderRadius: "12px", border: "1px solid #fecaca", bgcolor: "#fef2f2", color: "#b91c1c" }}>
             {error}
           </Alert>
         )}
 
-        {/* Step Content */}
         <AnimatePresence mode="wait">
           {activeStep === 0 && (
-            <motion.div
-              key="step1"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.3 }}
-            >
-              <Box sx={{ display: "flex", flexDirection: "column", gap: { xs: 3, md: 5 }, position: "relative", zIndex: 1 }}>
+            <motion.div key="step1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
+              <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
                 <TextField
-                  label="Project Title"
+                  fullWidth
+                  placeholder="Project Title"
                   name="title"
                   value={projectData.title}
                   onChange={handleProjectChange}
-                  fullWidth
-                  required
-                  placeholder="e.g., Quantum Edge Infrastructure"
-                  InputLabelProps={{ sx: { color: "rgba(0,0,0,0.6)", fontWeight: 1000, textTransform: "uppercase", letterSpacing: 2, fontSize: { xs: "0.65rem", md: "0.8rem" } } }}
-                  sx={{
-                    input: { color: "rgba(0,0,0,0.9)", fontWeight: 800, fontSize: { xs: "1rem", md: "1.25rem" }, py: 2 },
-                    "& .MuiOutlinedInput-root": {
-                      background: "rgba(255,255,255,0.45)",
-                      backdropFilter: "blur(20px)",
-                      borderRadius: "22px",
-                      px: 1.5,
-                      "& fieldset": { borderColor: "rgba(255,255,255,0.7)" },
-                      "&:hover fieldset": { borderColor: "rgba(255,255,255,1)" },
-                      "&.Mui-focused fieldset": { borderColor: "#00d4ff", borderWidth: "2.5px" },
-                    },
-                  }}
+                  sx={inputStyle}
                 />
-
                 <TextField
                   select
+                  fullWidth
                   label="Department"
                   name="description"
                   value={projectData.description}
                   onChange={handleProjectChange}
-                  fullWidth
-                  required
-                  InputLabelProps={{ sx: { color: "rgba(0,0,0,0.6)", fontWeight: 1000, textTransform: "uppercase", letterSpacing: 2, fontSize: { xs: "0.65rem", md: "0.8rem" } } }}
                   sx={{
-                    "& .MuiOutlinedInput-root": {
-                      color: "rgba(0,0,0,0.85)",
-                      background: "rgba(255,255,255,0.45)",
-                      backdropFilter: "blur(20px)",
-                      borderRadius: "24px",
-                      fontWeight: 800,
-                      "& fieldset": { borderColor: "rgba(255,255,255,0.7)" },
-                      "&:hover fieldset": { borderColor: "rgba(255,255,255,1)" },
-                      "&.Mui-focused fieldset": { borderColor: "#00d4ff", borderWidth: "2.5px" },
-                    },
+                    ...inputStyle,
+                    "& .MuiSelect-select": {
+                      display: "flex",
+                      alignItems: "center",
+                    }
+                  }}
+                  SelectProps={{
+                    MenuProps: {
+                      PaperProps: {
+                        sx: {
+                          bgcolor: "#fff",
+                          boxShadow: "0 10px 30px rgba(0,0,0,0.1)",
+                          mt: 1,
+                          "& .MuiMenuItem-root": {
+                            color: "#000",
+                            fontWeight: 700,
+                            "&:hover": {
+                              bgcolor: "#f5f5f5"
+                            }
+                          }
+                        }
+                      }
+                    }
                   }}
                 >
                   {[
@@ -599,63 +438,57 @@ const CreateProjectDialog = ({ open, onClose, onSubmit, initialData }) => {
                     "Accounts",
                     "Sales"
                   ].map((dept) => (
-                    <MenuItem key={dept} value={dept} sx={{ fontWeight: 800, color: "rgba(0,0,0,0.8)" }}>
+                    <MenuItem key={dept} value={dept}>
                       {dept}
                     </MenuItem>
                   ))}
                 </TextField>
-
-                <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, gap: { xs: 3, md: 4 } }}>
+                <Box sx={{ display: "flex", gap: 3 }}>
                   <TextField
-                    label="Temporal Limit (Deadline)"
+                    fullWidth
+                    label="Deadline"
                     name="deadline"
                     type="date"
                     value={projectData.deadline}
                     onChange={handleProjectChange}
-                    sx={{
-                      flex: 1.2,
-                      input: {
-                        color: "rgba(0,0,0,0.9)",
-                        fontWeight: 900,
-                        fontSize: "1.1rem",
-                        colorScheme: "light"
-                      },
-                      "& .MuiOutlinedInput-root": {
-                        background: "rgba(255,255,255,0.45)",
-                        borderRadius: "20px",
-                        p: 0.5,
-                        "& fieldset": { borderColor: "rgba(255,255,255,0.7)" },
-                        "&:hover fieldset": { borderColor: "rgba(255,255,255,1)" },
-                        "&.Mui-focused fieldset": { borderColor: "#00d4ff", borderWidth: "2.5px" },
-                      },
-                      "& .MuiInputBase-input::-webkit-calendar-picker-indicator": { filter: "invert(0.1)", transform: "scale(1.2)", cursor: "pointer" },
+                    InputLabelProps={{ shrink: true }}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <CalendarTodayIcon sx={{ fontSize: 20, color: "#aaa" }} />
+                        </InputAdornment>
+                      ),
                     }}
-                    InputLabelProps={{ shrink: true, sx: { color: "rgba(0,0,0,0.6)", fontWeight: 1000, textTransform: "uppercase", letterSpacing: 2, fontSize: { xs: "0.65rem", md: "0.8rem" } } }}
+                    sx={inputStyle}
                   />
-
                   <TextField
                     select
-                    label="Priority Vector"
+                    fullWidth
                     name="priority"
                     value={projectData.priority}
                     onChange={handleProjectChange}
                     sx={{
-                      flex: 1,
-                      "& .MuiOutlinedInput-root": {
-                        color: getPriorityColor(projectData.priority),
-                        background: "rgba(255,255,255,0.45)",
-                        borderRadius: "20px",
-                        fontWeight: 1000,
-                        fontSize: "1.1rem",
-                        "& fieldset": { borderColor: "rgba(255,255,255,0.7)" },
-                        "&:hover fieldset": { borderColor: "rgba(255,255,255,1)" },
-                        "&.Mui-focused fieldset": { borderColor: "#00d4ff", borderWidth: "2.5px" },
-                      },
+                      ...inputStyle,
+                      "& .MuiSelect-select": {
+                        display: "flex",
+                        alignItems: "center",
+                      }
                     }}
-                    InputLabelProps={{ sx: { color: "rgba(0,0,0,0.6)", fontWeight: 1000, textTransform: "uppercase", letterSpacing: 2, fontSize: { xs: "0.65rem", md: "0.8rem" } } }}
                   >
                     {["Low", "Medium", "High", "Critical"].map(p => (
-                      <MenuItem key={p} value={p} sx={{ fontWeight: 1000, color: getPriorityColor(p), py: 2 }}>{p}</MenuItem>
+                      <MenuItem key={p} value={p} sx={{ fontWeight: 800 }}>
+                        <Typography sx={{
+                          bgcolor: alpha(PRIMARY_BLUE, 0.1),
+                          color: "#00d4ff",
+                          px: 1.5,
+                          py: 0.2,
+                          borderRadius: "4px",
+                          fontSize: "0.8rem",
+                          fontWeight: 900
+                        }}>
+                          {p}
+                        </Typography>
+                      </MenuItem>
                     ))}
                   </TextField>
                 </Box>
@@ -664,606 +497,310 @@ const CreateProjectDialog = ({ open, onClose, onSubmit, initialData }) => {
           )}
 
           {activeStep === 1 && (
-            <motion.div
-              key="step2"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.3 }}
-            >
+            <motion.div key="step2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
               <Box>
-                {/* Add Todo Form */}
-                <Paper
-                  sx={{
-                    p: { xs: 3, md: 5 },
-                    mb: 4,
-                    background: "rgba(255, 255, 255, 0.55)",
-                    backdropFilter: "blur(30px)",
-                    border: "1px solid rgba(255, 255, 255, 0.7)",
-                    borderRadius: "32px",
-                    boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.08)",
-                    position: "relative",
-                    zIndex: 1,
-                  }}
-                >
-                  <Typography
-                    variant="subtitle1"
-                    sx={{ color: "rgba(0,0,0,0.9)", mb: 4, fontWeight: 1000, letterSpacing: "-0.05em", fontSize: { xs: "1.2rem", md: "1.5rem" } }}
-                  >
-                    Task Intelligence Architect
-                  </Typography>
-                  <Box
-                    sx={{ display: "flex", flexDirection: "column", gap: { xs: 3, md: 4 } }}
-                  >
+                <Typography sx={{ fontWeight: 1000, fontSize: "1.2rem", color: "#444", mb: 3 }}>Task Manager</Typography>
+                <Box sx={{ display: "flex", flexDirection: "column", gap: 3, mb: 4 }}>
+                  <TextField
+                    fullWidth
+                    placeholder="Task Title"
+                    name="title"
+                    value={newTodo.title}
+                    onChange={handleTodoChange}
+                    sx={inputStyle}
+                  />
+                  <Box sx={{ display: "flex", gap: 3, alignItems: "center" }}>
                     <TextField
-                      label="Protocol Title"
-                      name="title"
-                      value={newTodo.title}
-                      onChange={handleTodoChange}
                       fullWidth
-                      size="medium"
-                      placeholder="e.g., Deploy Neural Gateway"
-                      InputLabelProps={{ sx: { color: "rgba(0,0,0,0.6)", fontWeight: 1000, textTransform: "uppercase", letterSpacing: 2, fontSize: "0.75rem" } }}
-                      sx={{
-                        input: { color: "rgba(0,0,0,0.9)", fontWeight: 800, fontSize: "1rem" },
-                        "& .MuiOutlinedInput-root": {
-                          background: "rgba(255,255,255,0.4)",
-                          borderRadius: "18px",
-                          "& fieldset": { borderColor: "rgba(255,255,255,0.7)" },
-                          "&:hover fieldset": { borderColor: "rgba(255,255,255,1)" },
-                        },
+                      label="Deadline"
+                      name="dueDate"
+                      type="date"
+                      value={newTodo.dueDate}
+                      onChange={handleTodoChange}
+                      InputLabelProps={{ shrink: true }}
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <CalendarTodayIcon sx={{ fontSize: 20, color: "#aaa" }} />
+                          </InputAdornment>
+                        ),
                       }}
+                      sx={inputStyle}
                     />
-                    <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, gap: 3 }}>
-                      <TextField
-                        select
-                        label="Priority Vector"
-                        name="priority"
-                        value={newTodo.priority}
-                        onChange={handleTodoChange}
-                        size="medium"
-                        sx={{
-                          flex: 1,
-                          "& .MuiOutlinedInput-root": {
-                            color: getPriorityColor(newTodo.priority),
-                            background: "rgba(255,255,255,0.4)",
-                            borderRadius: "18px",
-                            fontWeight: 1000,
-                            "& fieldset": { borderColor: "rgba(255,255,255,0.7)" },
-                            "&:hover fieldset": { borderColor: "rgba(255,255,255,1)" },
-                          },
-                        }}
-                        InputLabelProps={{ sx: { color: "rgba(0,0,0,0.6)", fontWeight: 1000, textTransform: "uppercase", letterSpacing: 2, fontSize: "0.75rem" } }}
-                      >
-                        <MenuItem value="Low" sx={{ fontWeight: 1000, color: getPriorityColor("Low") }}>Low</MenuItem>
-                        <MenuItem value="Medium" sx={{ fontWeight: 1000, color: getPriorityColor("Medium") }}>Medium</MenuItem>
-                        <MenuItem value="High" sx={{ fontWeight: 1000, color: getPriorityColor("High") }}>High</MenuItem>
-                        <MenuItem value="Critical" sx={{ fontWeight: 1000, color: getPriorityColor("Critical") }}>Critical</MenuItem>
-                      </TextField>
-                      <TextField
-                        label="Temporal Limit"
-                        name="dueDate"
-                        type="date"
-                        value={newTodo.dueDate}
-                        onChange={handleTodoChange}
-                        size="medium"
-                        sx={{
-                          flex: 1,
-                          input: {
-                            color: "rgba(0,0,0,0.9)",
-                            fontWeight: 900,
-                            colorScheme: "light"
-                          },
-                          "& .MuiOutlinedInput-root": {
-                            background: "rgba(255,255,255,0.4)",
-                            borderRadius: "18px",
-                            "& fieldset": { borderColor: "rgba(255,255,255,0.7)" },
-                            "&:hover fieldset": { borderColor: "rgba(255,255,255,1)" },
-                          },
-                          "& .MuiInputBase-input::-webkit-calendar-picker-indicator": { filter: "invert(0.1)" },
-                        }}
-                        InputLabelProps={{
-                          shrink: true,
-                          sx: { color: "rgba(0,0,0,0.6)", fontWeight: 1000, textTransform: "uppercase", letterSpacing: 2, fontSize: "0.75rem" }
-                        }}
-                      />
-                    </Box>
+                    <TextField
+                      select
+                      fullWidth
+                      name="priority"
+                      value={newTodo.priority}
+                      onChange={handleTodoChange}
+                      sx={inputStyle}
+                    >
+                      {["Low", "Medium", "High", "Critical"].map(p => (
+                        <MenuItem key={p} value={p} sx={{ fontWeight: 800 }}>
+                          <Typography sx={{
+                            bgcolor: alpha(PRIMARY_BLUE, 0.1),
+                            color: "#00d4ff",
+                            px: 1.5,
+                            py: 0.2,
+                            borderRadius: "4px",
+                            fontSize: "0.8rem",
+                            fontWeight: 900
+                          }}>
+                            {p}
+                          </Typography>
+                        </MenuItem>
+                      ))}
+                    </TextField>
                     <Button
                       variant="contained"
-                      startIcon={<AddIcon sx={{ fontSize: 24 }} />}
                       onClick={handleAddTodo}
                       sx={{
-                        ...iPhoneGlassButton,
-                        background: "linear-gradient(135deg, #0f172a 0%, #334155 100%)",
-                        color: "#fff",
-                        py: 2.5,
-                        mt: 1,
-                        fontSize: "1rem",
-                        "&:hover": {
-                          background: "linear-gradient(135deg, #1e293b 0%, #475569 100%)",
-                          transform: "translateY(-4px)",
-                          boxShadow: "0 20px 40px rgba(0,0,0,0.2)"
-                        },
+                        borderRadius: "10px",
+                        textTransform: "none",
+                        fontWeight: 1000,
+                        fontSize: "1.4rem",
+                        bgcolor: SECONDARY_BLUE,
+                        background: `linear-gradient(135deg, ${SECONDARY_BLUE} 0%, ${PRIMARY_BLUE} 100%)`,
+                        height: "56px",
+                        minWidth: "140px",
+                        "&:hover": { transform: "translateY(-2px)" }
                       }}
                     >
-                      Add Task
+                      Add +
                     </Button>
                   </Box>
-                </Paper>
+                </Box>
 
-                {/* Todos List */}
-                <Typography
-                  variant="subtitle1"
-                  sx={{ color: "rgba(0,0,0,0.9)", mb: 3, fontWeight: 1000, fontSize: "1.25rem", position: "relative", zIndex: 1, letterSpacing: "-0.04em" }}
-                >
-                  Registry Backlog <Box component="span" sx={{ color: "rgba(0,0,0,0.4)", fontWeight: 800, ml: 1, fontSize: "0.9rem" }}>| {todos.length} Protocols</Box>
+                <Typography sx={{ color: "#777", fontWeight: 1000, fontSize: "0.85rem", mb: 2 }}>
+                  Registry Backlog <Box component="span" sx={{ color: "#aaa", fontWeight: 700, fontSize: "0.75rem" }}>| {todos.length} Protocols</Box>
                 </Typography>
-                <Box sx={{
-                  maxHeight: isMobile ? 400 : 500,
-                  overflowY: "auto",
-                  pr: 1.5,
-                  zIndex: 1,
-                  position: "relative",
-                  "&::-webkit-scrollbar": { width: "6px" },
-                  "&::-webkit-scrollbar-thumb": { background: "rgba(0,0,0,0.1)", borderRadius: "10px" }
-                }}>
-                  {todos.length === 0 ? (
-                    <Typography
-                      variant="body2"
-                      sx={{ color: "rgba(0,0,0,0.4)", textAlign: "center", py: 10, fontWeight: 800, fontStyle: "italic", fontSize: "1rem" }}
+
+                <Box sx={{ maxHeight: 350, overflowY: "auto", pr: 1, "&::-webkit-scrollbar": { width: 4 }, "&::-webkit-scrollbar-thumb": { bgcolor: "#eee", borderRadius: 2 } }}>
+                  {todos.map((todo) => (
+                    <Paper
+                      key={todo._id}
+                      elevation={0}
+                      sx={{
+                        p: 3,
+                        mb: 2,
+                        borderRadius: "12px",
+                        border: "1px solid #f0f0f0",
+                        display: "flex",
+                        flexDirection: "column",
+                        background: "#fff",
+                        boxShadow: "0 6px 20px rgba(0,0,0,0.03)",
+                        position: "relative",
+                        "&:hover": { borderColor: PRIMARY_BLUE }
+                      }}
                     >
-                      The registry is currently optimized. Define protocols above.
-                    </Typography>
-                  ) : (
-                    todos.map((todo) => (
-                      <Paper
-                        key={todo._id}
-                        sx={{
-                          p: 3,
-                          mb: 2.5,
-                          background: "rgba(255, 255, 255, 0.45)",
-                          backdropFilter: "blur(15px)",
-                          border: "1px solid rgba(255, 255, 255, 0.6)",
-                          borderRadius: "24px",
-                          display: "flex",
-                          justifyContent: "space-between",
-                          alignItems: "center",
-                          boxShadow: "0 10px 30px rgba(0, 0, 0, 0.04)",
-                          transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
-                          "&:hover": {
-                            background: "rgba(255, 255, 255, 0.75)",
-                            transform: "scale(1.02) translateX(10px)",
-                            boxShadow: "0 20px 50px rgba(0, 0, 0, 0.12)",
-                            borderColor: "#00d4ff",
-                          }
-                        }}
-                      >
-                        <Box sx={{ flex: 1 }}>
-                          <Typography
-                            variant="body1"
-                            sx={{ color: "rgba(0,0,0,0.9)", fontWeight: 1000, mb: 1.5, fontSize: "1.1rem", letterSpacing: "-0.02em" }}
-                          >
-                            {todo.title}
+                      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 1.5 }}>
+                        <Typography sx={{ fontWeight: 1000, color: "#222", fontSize: "1.15rem" }}>
+                          {todo.title}
+                        </Typography>
+                        <Typography sx={{
+                          bgcolor: "#fee2e2",
+                          color: "#ef4444",
+                          px: 1.5,
+                          py: 0.3,
+                          borderRadius: "4px",
+                          fontSize: "0.75rem",
+                          fontWeight: 1000
+                        }}>
+                          {todo.priority}
+                        </Typography>
+                      </Box>
+
+                      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
+                        <Box sx={{ display: "flex", flexDirection: "column" }}>
+                          <Typography sx={{ color: "#999", fontSize: "0.85rem", fontWeight: 700 }}>
+                            Deadline <Box component="span" sx={{ color: "#555", fontWeight: 1000, ml: 1 }}>{getDaysLeft(todo.dueDate)}</Box>
                           </Typography>
-                          <Box sx={{ display: "flex", gap: 1.5 }}>
-                            <Chip
-                              label={todo.priority}
-                              size="small"
-                              sx={{
-                                background: `rgba(${todo.priority === "Critical" ? "255, 77, 79" : "0, 212, 255"}, 0.12)`,
-                                color: getPriorityColor(todo.priority),
-                                fontWeight: 1000,
-                                fontSize: "0.7rem",
-                                borderRadius: "8px",
-                                border: `1px solid ${getPriorityColor(todo.priority)}30`,
-                                textTransform: "uppercase",
-                              }}
-                            />
-                            {todo.dueDate && (
-                              <Chip
-                                label={`Protocol Due: ${new Date(todo.dueDate).toLocaleDateString()}`}
-                                size="small"
-                                sx={{
-                                  background: "rgba(255, 255, 255, 0.4)",
-                                  color: "rgba(0,0,0,0.5)",
-                                  fontSize: "0.7rem",
-                                  fontWeight: 900,
-                                  borderRadius: "8px",
-                                  border: "1px solid rgba(0,0,0,0.05)",
-                                }}
-                              />
-                            )}
-                          </Box>
                         </Box>
                         <IconButton
                           onClick={() => handleDeleteTodo(todo._id)}
                           sx={{
-                            color: alpha("#ff5b5b", 0.4),
-                            "&:hover": { color: "#ff5b5b", background: "rgba(255, 91, 91, 0.1)" }
+                            color: "#ef4444",
+                            p: 0,
+                            "&:hover": { bgcolor: "transparent", color: "#dc2626" }
                           }}
                         >
-                          <DeleteIcon />
+                          <DeleteIcon sx={{ fontSize: 24 }} />
                         </IconButton>
-                      </Paper>
-                    ))
-                  )}
+                      </Box>
+                    </Paper>
+                  ))}
                 </Box>
               </Box>
             </motion.div>
           )}
 
           {activeStep === 2 && (
-            <motion.div
-              key="step3"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.3 }}
-            >
+            <Box key="step3">
               <DragDropContext onDragEnd={handleDragEnd}>
-                <Box sx={{ display: "flex", flexDirection: { xs: "column", md: "row" }, gap: { xs: 4, md: 5 }, minHeight: 450 }}>
-                  {/* Available Employees */}
-                  <Box sx={{ flex: 1, position: "relative", zIndex: 1 }}>
-                    <Box
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 1.5,
-                        mb: 2.5,
-                      }}
-                    >
-                      <PersonAddIcon sx={{ color: "rgba(0,0,0,0.45)", fontSize: 28 }} />
-                      <Typography
-                        variant="subtitle1"
-                        sx={{ color: "rgba(0,0,0,0.85)", fontWeight: 1000, letterSpacing: "-0.02em", fontSize: "1.2rem" }}
-                      >
-                        Available Employees ({availableEmployees.length})
-                      </Typography>
-                    </Box>
+                <Box sx={{ display: "flex", gap: 4, minHeight: 450 }}>
+                  <Box sx={{ flex: 1 }}>
+                    <Typography sx={{ fontWeight: 1000, mb: 2, color: "#444", fontSize: "1.2rem" }}>Team Directory({availableEmployees.length})</Typography>
                     <Droppable droppableId="available">
                       {(provided, snapshot) => (
-                        <Paper
+                        <Box
                           ref={provided.innerRef}
                           {...provided.droppableProps}
                           sx={{
-                            p: { xs: 2.5, md: 4 },
-                            minHeight: 400,
-                            background: snapshot.isDraggingOver
-                              ? "rgba(0, 212, 255, 0.08)"
-                              : "rgba(255, 255, 255, 0.25)",
-                            border: snapshot.isDraggingOver
-                              ? "2px dashed #00d4ff"
-                              : "2px dashed rgba(255, 255, 255, 0.6)",
-                            borderRadius: "32px",
-                            transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
-                            backdropFilter: "blur(20px)",
-                            boxShadow: snapshot.isDraggingOver ? "inset 0 0 40px rgba(0, 212, 255, 0.1)" : "none"
+                            p: 2,
+                            borderRadius: "16px",
+                            bgcolor: "#fff",
+                            border: "1.5px solid #f5f5f5",
+                            height: "100%",
+                            maxHeight: 450,
+                            overflowY: "auto",
+                            "&::-webkit-scrollbar": { width: 4 },
+                            "&::-webkit-scrollbar-thumb": { bgcolor: "#eee", borderRadius: 2 }
                           }}
                         >
-                          {availableEmployees.map((employee, index) => (
-                            <Draggable
-                              key={employee._id}
-                              draggableId={employee._id}
-                              index={index}
-                            >
-                              {(provided, snapshot) => {
-                                const child = (
-                                  <Paper
-                                    ref={provided.innerRef}
-                                    {...provided.draggableProps}
-                                    {...provided.dragHandleProps}
+                          {availableEmployees.map((emp, index) => (
+                            <Draggable key={emp._id} draggableId={emp._id} index={index}>
+                              {(provided, snapshot) => (
+                                <Paper
+                                  ref={provided.innerRef}
+                                  {...provided.draggableProps}
+                                  {...provided.dragHandleProps}
+                                  style={provided.draggableProps.style}
+                                  sx={{
+                                    p: 2,
+                                    mb: 1.5,
+                                    borderRadius: "12px",
+                                    border: snapshot.isDragging ? `2px solid ${PRIMARY_BLUE}` : "1.5px solid #f8f8f8",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: 2,
+                                    bgcolor: "#fff",
+                                    boxShadow: snapshot.isDragging ? "0 10px 30px rgba(0,0,0,0.1)" : "none",
+                                    "&:hover": { borderColor: "#eee" },
+                                    ...(snapshot.isDragging && { zIndex: 9999 })
+                                  }}
+                                >
+                                  <Avatar
                                     sx={{
-                                      p: 2,
-                                      mb: 2,
-                                      background: snapshot.isDragging
-                                        ? "rgba(255, 255, 255, 0.95)"
-                                        : "rgba(255, 255, 255, 0.45)",
-                                      backdropFilter: "blur(15px)",
-                                      border: "1px solid rgba(255,255,255,0.6)",
-                                      borderRadius: "18px",
-                                      display: "flex",
-                                      alignItems: "center",
-                                      gap: 2,
-                                      cursor: snapshot.isDragging ? "grabbing" : "grab",
-                                      transition: "all 0.3s cubic-bezier(0.25, 1, 0.5, 1)",
-                                      boxShadow: snapshot.isDragging
-                                        ? "0 30px 60px -12px rgba(0, 0, 0, 0.25)"
-                                        : "0 4px 15px rgba(0, 0, 0, 0.02)",
-                                      transform: snapshot.isDragging ? "scale(1.05) rotate(2deg)" : "none",
-                                      "&:hover": {
-                                        background: "rgba(255, 255, 255, 0.6)",
-                                        transform: snapshot.isDragging ? "scale(1.05) rotate(2deg)" : "translateY(-2px)",
-                                        boxShadow: "0 10px 25px rgba(0, 0, 0, 0.08)",
-                                      },
-                                    }}
-                                  >
-                                    <Avatar
-                                      sx={{
-                                        background: "linear-gradient(135deg, #0f172a 0%, #334155 100%)",
-                                        width: 40,
-                                        height: 40,
-                                        fontSize: "0.85rem",
-                                        fontWeight: 900,
-                                        boxShadow: "0 4px 8px rgba(0,0,0,0.1)"
-                                      }}
-                                    >
-                                      {employee.avatar}
-                                    </Avatar>
-                                    <Box sx={{ flex: 1 }}>
-                                      <Typography
-                                        variant="body2"
-                                        sx={{
-                                          color: "rgba(0,0,0,0.85)",
-                                          fontWeight: 1000,
-                                          fontSize: "0.95rem"
-                                        }}
-                                      >
-                                        {employee.name}
-                                      </Typography>
-                                      <Typography
-                                        variant="caption"
-                                        sx={{ color: "rgba(0,0,0,0.45)", fontWeight: 800, textTransform: "uppercase", letterSpacing: 0.5 }}
-                                      >
-                                        {employee.department}
-                                      </Typography>
-                                    </Box>
-                                  </Paper>
-                                );
-
-                                if (snapshot.isDragging) {
-                                  return ReactDOM.createPortal(
-                                    child,
-                                    document.body,
-                                  );
-                                }
-                                return child;
-                              }}
+                                      background: SECONDARY_BLUE,
+                                      fontSize: "0.8rem",
+                                      fontWeight: 1000,
+                                      width: 40,
+                                      height: 40
+                                    }}>
+                                    {emp.avatar}
+                                  </Avatar>
+                                  <Box>
+                                    <Typography sx={{ fontWeight: 1000, color: "#333", fontSize: "0.95rem" }}>{emp.name}</Typography>
+                                    <Typography sx={{ fontSize: "0.75rem", color: "#999", fontWeight: 900 }}>{emp.department}</Typography>
+                                  </Box>
+                                </Paper>
+                              )}
                             </Draggable>
                           ))}
                           {provided.placeholder}
-                          {availableEmployees.length === 0 && (
-                            <Typography
-                              variant="body2"
-                              sx={{
-                                color: "rgba(0,0,0,0.35)",
-                                textAlign: "center",
-                                py: 8,
-                                fontWeight: 800,
-                                fontStyle: "italic"
-                              }}
-                            >
-                              All intelligence nodes deployed.
-                            </Typography>
-                          )}
-                        </Paper>
+                        </Box>
                       )}
                     </Droppable>
                   </Box>
 
-                  {/* Selected Team */}
-                  <Box sx={{ flex: 1, position: "relative", zIndex: 1 }}>
-                    <Box
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 1.5,
-                        mb: 2.5,
-                      }}
-                    >
-                      <GroupsIcon sx={{ color: "#4ade80", fontSize: 28 }} />
-                      <Typography
-                        variant="subtitle1"
-                        sx={{ color: "rgba(0,0,0,0.85)", fontWeight: 1000, letterSpacing: "-0.02em", fontSize: "1.2rem" }}
-                      >
-                        Selected Team ({selectedTeam.length})
-                      </Typography>
-                    </Box>
+                  <Box sx={{ flex: 1 }}>
+                    <Typography sx={{ fontWeight: 1000, mb: 2, color: "#444", fontSize: "1.2rem" }}>Team Members({selectedTeam.length})</Typography>
                     <Droppable droppableId="team">
                       {(provided, snapshot) => (
-                        <Paper
+                        <Box
                           ref={provided.innerRef}
                           {...provided.droppableProps}
                           sx={{
-                            p: { xs: 2.5, md: 4 },
-                            minHeight: 400,
-                            background: snapshot.isDraggingOver
-                              ? "rgba(16, 185, 129, 0.1)"
-                              : "rgba(16, 185, 129, 0.04)",
-                            border: snapshot.isDraggingOver
-                              ? "2px dashed #10b981"
-                              : "2px dashed rgba(16, 185, 129, 0.3)",
-                            borderRadius: "32px",
-                            transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
-                            backdropFilter: "blur(20px)",
-                            boxShadow: snapshot.isDraggingOver ? "inset 0 0 40px rgba(16, 185, 129, 0.1)" : "none"
+                            p: 2,
+                            borderRadius: "16px",
+                            bgcolor: "#edeff2",
+                            border: "1.5px solid transparent",
+                            height: "100%",
+                            maxHeight: 450,
+                            overflowY: "auto",
+                            "&::-webkit-scrollbar": { width: 4 },
+                            "&::-webkit-scrollbar-thumb": { bgcolor: "#ddd", borderRadius: 2 }
                           }}
                         >
-                          {selectedTeam.map((employee, index) => (
-                            <Draggable
-                              key={employee._id}
-                              draggableId={employee._id}
-                              index={index}
-                            >
-                              {(provided, snapshot) => {
-                                const child = (
-                                  <Paper
-                                    ref={provided.innerRef}
-                                    {...provided.draggableProps}
-                                    {...provided.dragHandleProps}
+                          {selectedTeam.map((emp, index) => (
+                            <Draggable key={emp._id} draggableId={emp._id} index={index}>
+                              {(provided, snapshot) => (
+                                <Paper
+                                  ref={provided.innerRef}
+                                  {...provided.draggableProps}
+                                  {...provided.dragHandleProps}
+                                  style={provided.draggableProps.style}
+                                  sx={{
+                                    p: 2.5,
+                                    mb: 1.5,
+                                    borderRadius: "13px",
+                                    border: isMobile ? "none" : (snapshot.isDragging ? `2px solid ${PRIMARY_BLUE}` : "none"),
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: 2,
+                                    bgcolor: "#d9dee6",
+                                    boxShadow: snapshot.isDragging ? "0 10px 30px rgba(0,0,0,0.1)" : "none",
+                                    ...(snapshot.isDragging && { zIndex: 9999 })
+                                  }}
+                                >
+                                  <Avatar
                                     sx={{
-                                      p: 2,
-                                      mb: 2,
-                                      background: snapshot.isDragging
-                                        ? "rgba(255, 255, 255, 0.95)"
-                                        : "rgba(255, 255, 255, 0.55)",
-                                      backdropFilter: "blur(15px)",
-                                      border: snapshot.isDragging
-                                        ? "2px solid #4ade80"
-                                        : "1px solid rgba(255,255,255,0.7)",
-                                      borderRadius: "18px",
-                                      display: "flex",
-                                      alignItems: "center",
-                                      gap: 2,
-                                      cursor: snapshot.isDragging ? "grabbing" : "grab",
-                                      transition: "all 0.3s cubic-bezier(0.25, 1, 0.5, 1)",
-                                      boxShadow: snapshot.isDragging
-                                        ? "0 30px 60px -12px rgba(16, 185, 129, 0.25)"
-                                        : "0 4px 15px rgba(16, 185, 129, 0.02)",
-                                      transform: snapshot.isDragging ? "scale(1.05) rotate(-2deg)" : "none",
-                                      "&:hover": {
-                                        background: "rgba(255, 255, 255, 0.7)",
-                                        borderColor: "#4ade80",
-                                        transform: snapshot.isDragging ? "scale(1.05) rotate(-2deg)" : "translateY(-2px)",
-                                      },
-                                    }}
-                                  >
-                                    <Avatar
-                                      sx={{
-                                        background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
-                                        width: 44,
-                                        height: 44,
-                                        fontSize: "0.9rem",
-                                        fontWeight: 1000,
-                                        boxShadow: "0 6px 15px rgba(16, 185, 129, 0.25)"
-                                      }}
-                                    >
-                                      {employee.avatar}
-                                    </Avatar>
-                                    <Box sx={{ flex: 1 }}>
-                                      <Typography
-                                        variant="body2"
-                                        sx={{
-                                          color: "rgba(0,0,0,0.9)",
-                                          fontWeight: 1000,
-                                          fontSize: "1rem"
-                                        }}
-                                      >
-                                        {employee.name}
-                                      </Typography>
-                                      <Typography
-                                        variant="caption"
-                                        sx={{ color: "rgba(0,0,0,0.5)", fontWeight: 1000, textTransform: "uppercase", letterSpacing: 1 }}
-                                      >
-                                        {employee.department}
-                                      </Typography>
-                                    </Box>
-                                    <CheckCircleIcon
-                                      sx={{ color: "#10b981", fontSize: 22 }}
-                                    />
-                                  </Paper>
-                                );
-
-                                if (snapshot.isDragging) {
-                                  return ReactDOM.createPortal(
-                                    child,
-                                    document.body,
-                                  );
-                                }
-                                return child;
-                              }}
+                                      background: SECONDARY_BLUE,
+                                      fontSize: "0.8rem",
+                                      fontWeight: 1000,
+                                      width: 40,
+                                      height: 40
+                                    }}>
+                                    {emp.avatar}
+                                  </Avatar>
+                                  <Box>
+                                    <Typography sx={{ fontWeight: 1000, color: "#333", fontSize: "0.95rem" }}>{emp.name}</Typography>
+                                    <Typography sx={{ fontSize: "0.75rem", color: "#888", fontWeight: 1000 }}>{emp.department}</Typography>
+                                  </Box>
+                                </Paper>
+                              )}
                             </Draggable>
                           ))}
                           {provided.placeholder}
-                          {selectedTeam.length === 0 && (
-                            <Typography
-                              variant="body2"
-                              sx={{
-                                color: "rgba(0,0,0,0.35)",
-                                textAlign: "center",
-                                py: 8,
-                                fontWeight: 800,
-                                fontStyle: "italic"
-                              }}
-                            >
-                              Consortium is empty. Deploy intelligence units here.
-                            </Typography>
-                          )}
-                        </Paper>
+                        </Box>
                       )}
                     </Droppable>
                   </Box>
                 </Box>
               </DragDropContext>
-            </motion.div>
+            </Box>
           )}
         </AnimatePresence>
 
-        {/* Navigation Buttons */}
-        <Box sx={{
-          display: "flex",
-          flexDirection: { xs: "column-reverse", sm: "row" },
-          justifyContent: "space-between",
-          gap: 3,
-          mt: 4,
-          pt: 4,
-          borderTop: "1px solid rgba(255,255,255,0.5)",
-          zIndex: 1,
-          position: "relative"
-        }}>
+        {/* Navigation */}
+        <Box sx={{ display: "flex", justifyContent: "space-between", mt: 8 }}>
           <Button
             onClick={handleBack}
             disabled={activeStep === 0}
             sx={{
-              ...iPhoneGlassButton,
-              px: { xs: 3, md: 5 },
-              py: 2,
+              ...navButtonStyle,
+              color: "#333",
+              border: "1.5px solid #eee",
               opacity: activeStep === 0 ? 0 : 1,
-              bgcolor: "rgba(255,255,255,0.5)",
-              fontSize: "0.9rem",
-              width: { xs: "100%", sm: "auto" }
+              "&:hover": { bgcolor: "#fdfdfd", borderColor: "#ddd" }
             }}
           >
             Back
           </Button>
-          <Box sx={{ display: "flex", gap: 3, width: { xs: "100%", sm: "auto" } }}>
-            {activeStep < steps.length - 1 ? (
-              <Button
-                variant="contained"
-                onClick={handleNext}
-                fullWidth={isMobile}
-                sx={{
-                  ...iPhoneGlassButton,
-                  background: "linear-gradient(135deg, #0f172a 0%, #334155 100%)",
-                  color: "#fff",
-                  px: { xs: 4, md: 7 },
-                  py: 2,
-                  fontSize: "1rem",
-                  width: { xs: "100%", sm: "auto" },
-                  "&:hover": {
-                    background: "linear-gradient(135deg, #1e293b 0%, #475569 100%)",
-                    transform: "translateY(-4px)",
-                    boxShadow: "0 20px 40px rgba(0,0,0,0.2)"
-                  },
-                }}
-              >
-                Next
-              </Button>
-            ) : (
-              <Button
-                variant="contained"
-                onClick={handleSubmit}
-                disabled={loading}
-                fullWidth={isMobile}
-                sx={{
-                  ...iPhoneGlassButton,
-                  background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
-                  color: "#fff",
-                  px: { xs: 4, md: 7 },
-                  py: 2,
-                  fontSize: "1rem",
-                  width: { xs: "100%", sm: "auto" },
-                  "&:hover": {
-                    background: "linear-gradient(135deg, #34d399 0%, #10b981 100%)",
-                    transform: "translateY(-4px)",
-                    boxShadow: "0 20px 40px rgba(16, 185, 129, 0.4)",
-                  },
-                  "&:disabled": { opacity: 0.6 },
-                }}
-              >
-                {loading ? "Initializing..." : (initialData ? "Refine Synthesis" : "Finalize Protocol")}
-              </Button>
-            )}
-          </Box>
+          <Button
+            variant="contained"
+            onClick={activeStep === 2 ? handleSubmit : handleNext}
+            disabled={loading}
+            sx={{
+              ...navButtonStyle,
+              bgcolor: PRIMARY_BLUE,
+              background: `linear-gradient(135deg, ${PRIMARY_BLUE} 0%, ${SECONDARY_BLUE} 100%)`,
+              minWidth: "180px",
+              boxShadow: activeStep === 2 ? `0 12px 24px ${alpha(PRIMARY_BLUE, 0.4)}` : "none"
+            }}
+          >
+            {loading ? "Processing..." : (activeStep === 2 ? "Completed" : "Next")}
+          </Button>
         </Box>
       </DialogContent>
     </Dialog>

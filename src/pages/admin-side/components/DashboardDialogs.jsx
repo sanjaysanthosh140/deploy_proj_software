@@ -19,7 +19,37 @@ import {
 import WarningIcon from "@mui/icons-material/Warning";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
-import { glassEffect, iPhoneGlassButton } from "./SharedStyles";
+import CloseIcon from "@mui/icons-material/Close";
+
+const formTextFieldStyle = {
+  "& .MuiOutlinedInput-root": {
+    borderRadius: "10px",
+    background: "#fff",
+    "& fieldset": { borderColor: "#e5e7eb" },
+    "&:hover fieldset": { borderColor: "#d1d5db" },
+    "&.Mui-focused fieldset": { borderColor: "#1e40af" },
+  },
+  "& .MuiInputLabel-root": { color: "#6b7280", fontSize: "0.9rem" },
+  "& .MuiInputBase-input": {
+    color: "#1f2937",
+    fontWeight: 500,
+  },
+};
+
+const actionButtonStyle = {
+  height: 48,
+  background: "linear-gradient(90deg, #0f172a 0%, #1e40af 100%)",
+  color: "#fff",
+  borderRadius: "10px",
+  textTransform: "none",
+  fontWeight: 600,
+  fontSize: "1rem",
+  boxShadow: "0 4px 12px rgba(30, 58, 138, 0.2)",
+  "&:hover": {
+    background: "linear-gradient(90deg, #020617 0%, #1e3a8a 100%)",
+    boxShadow: "0 6px 16px rgba(30, 58, 138, 0.3)",
+  }
+};
 
 const DashboardDialogs = ({
   // User Dialog Props
@@ -75,79 +105,56 @@ const DashboardDialogs = ({
         transitionDuration={400}
         PaperProps={{
           sx: {
-            ...glassEffect,
-            background: "rgba(255, 255, 255, 0.4)",
-            backdropFilter: "blur(50px) saturate(180%)",
-            border: "1px solid rgba(255, 255, 255, 0.5)",
-            borderRadius: "32px",
-            boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.2)",
-            overflow: "hidden"
+            background: "#ffffff",
+            borderRadius: "20px",
+            boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
+            overflow: "hidden",
+            width: "100%",
+            maxWidth: "420px !important"
           },
         }}
-        fullWidth
-        maxWidth="sm"
       >
-        <DialogTitle sx={{
-          p: 3,
-          fontWeight: 900,
-          fontSize: "1.25rem",
-          color: "rgba(0,0,0,0.85)",
-          borderBottom: "1px solid rgba(255, 255, 255, 0.3)",
-        }}>
-          {editingUser ? "Edit Profile" : "New Onboarding"}
-        </DialogTitle>
-        <DialogContent sx={{ p: 4, mt: 1 }}>
-          <Stack spacing={3}>
+        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", p: 3, pb: 1 }}>
+          <Typography sx={{ fontWeight: 700, fontSize: "1.5rem", color: "#374151" }}>
+            {editingUser ? "Edit Profile" : "User Management"}
+          </Typography>
+          <IconButton onClick={handleUserDialogClose} size="small" sx={{ color: "#9ca3af" }}>
+            <CloseIcon />
+          </IconButton>
+        </Box>
+        <DialogContent sx={{ p: 4, pt: 2 }}>
+          <Stack spacing={2.5}>
             <TextField
-              label="Full Name"
+              placeholder="Enter your name"
               value={userForm.name}
               onChange={(e) => setUserForm({ ...userForm, name: e.target.value })}
               fullWidth
-              sx={{
-                "& .MuiOutlinedInput-root": {
-                  borderRadius: "14px",
-                  background: "rgba(255, 255, 255, 0.3)",
-                  "& fieldset": { borderColor: "rgba(255, 255, 255, 0.4)" },
-                },
-                "& .MuiInputLabel-root": { color: "#000", fontWeight: 700 },
-                "& .MuiInputBase-input": {
-                  color: "#000",
-                  fontWeight: 800,
-                },
-              }}
+              size="medium"
+              sx={formTextFieldStyle}
             />
             <TextField
-              label="Email Address"
+              placeholder="Enter your email address"
               value={userForm.email}
               onChange={(e) => setUserForm({ ...userForm, email: e.target.value })}
               fullWidth
-              sx={{
-                "& .MuiOutlinedInput-root": {
-                  borderRadius: "14px",
-                  background: "rgba(255, 255, 255, 0.3)",
-                },
-                "& .MuiInputLabel-root": { color: "#000", fontWeight: 700 },
-                "& .MuiInputBase-input": {
-                  color: "#000",
-                  fontWeight: 800,
-                },
-              }}
+              sx={formTextFieldStyle}
             />
             <FormControl fullWidth>
-              <InputLabel sx={{ color: "#000", fontWeight: 700 }}>Department</InputLabel>
               <Select
                 value={userForm.department}
                 onChange={(e) => setUserForm({ ...userForm, department: e.target.value })}
-                label="Department"
+                displayEmpty
                 sx={{
-                  borderRadius: "14px",
-                  background: "rgba(255, 255, 255, 0.3)",
+                  borderRadius: "10px",
+                  background: "#fff",
                   "& .MuiSelect-select": {
-                    color: "#000",
-                    fontWeight: 800,
-                  }
+                    color: userForm.department ? "#1f2937" : "#9ca3af",
+                    fontWeight: 500,
+                  },
+                  "& fieldset": { borderColor: "#e5e7eb" },
                 }}
               >
+                <MenuItem value="" disabled>Department</MenuItem>
                 {DEPARTMENTS.map((dept) => (
                   <MenuItem key={dept} value={dept}>{dept}</MenuItem>
                 ))}
@@ -155,7 +162,7 @@ const DashboardDialogs = ({
             </FormControl>
             {!editingUser && (
               <TextField
-                label="Password"
+                placeholder="Password"
                 type={showPasswordUser ? "text" : "password"}
                 value={userForm.password}
                 onChange={(e) => setUserForm({ ...userForm, password: e.target.value })}
@@ -166,41 +173,23 @@ const DashboardDialogs = ({
                       <IconButton
                         onClick={() => setShowPasswordUser(!showPasswordUser)}
                         edge="end"
-                        sx={{ color: "rgba(0,0,0,0.4)" }}
+                        sx={{ color: "#9ca3af" }}
                       >
                         {showPasswordUser ? <VisibilityOff /> : <Visibility />}
                       </IconButton>
                     </InputAdornment>
                   ),
                 }}
-                sx={{
-                  "& .MuiOutlinedInput-root": {
-                    borderRadius: "14px",
-                    background: "rgba(255, 255, 255, 0.3)",
-                  },
-                  "& .MuiInputLabel-root": { color: "#000", fontWeight: 700 },
-                  "& .MuiInputBase-input": {
-                    color: "#000",
-                    fontWeight: 800,
-                    "&::-ms-reveal": { display: "none" },
-                    "&::-ms-clear": { display: "none" },
-                  },
-                }}
+                sx={formTextFieldStyle}
               />
             )}
             <Button
               variant="contained"
               onClick={handleUserSubmit}
               fullWidth
-              sx={{
-                ...iPhoneGlassButton,
-                height: 50,
-                background: "rgba(0,0,0,0.8)",
-                color: "#fff",
-                "&:hover": { background: "#000" }
-              }}
+              sx={actionButtonStyle}
             >
-              {editingUser ? "Push Updates" : "Initialize Agent"}
+              {editingUser ? "Apply Update" : "Initiate Process"}
             </Button>
           </Stack>
         </DialogContent>
@@ -214,73 +203,61 @@ const DashboardDialogs = ({
         transitionDuration={400}
         PaperProps={{
           sx: {
-            ...glassEffect,
-            background: "rgba(255, 255, 255, 0.4)",
-            backdropFilter: "blur(50px) saturate(180%)",
-            borderRadius: "32px",
+            background: "#ffffff",
+            borderRadius: "20px",
+            boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
+            width: "100%",
+            maxWidth: "420px !important"
           },
         }}
-        fullWidth
-        maxWidth="sm"
       >
-        <DialogTitle sx={{ p: 3, fontWeight: 900, borderBottom: "1px solid rgba(255, 255, 255, 0.3)" }}>
-          {editingAdmin ? "Protocol_Update • Responsible" : "Node_init • Responsible"}
-        </DialogTitle>
-        <DialogContent sx={{ p: 4, mt: 1 }}>
-          <Stack spacing={3}>
+        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", p: 3, pb: 1 }}>
+          <Typography sx={{ fontWeight: 700, fontSize: "1.5rem", color: "#374151" }}>
+            {editingAdmin ? "Edit Profile" : "User Management"}
+          </Typography>
+          <IconButton onClick={handleResponsibleDialogClose} size="small" sx={{ color: "#9ca3af" }}>
+            <CloseIcon />
+          </IconButton>
+        </Box>
+        <DialogContent sx={{ p: 4, pt: 2 }}>
+          <Stack spacing={2.5}>
             <TextField
-              label="Full Name"
+              placeholder="Enter your name"
               value={responsibleForm.name}
               onChange={(e) => setResponsibleForm({ ...responsibleForm, name: e.target.value })}
               fullWidth
-              sx={{
-                "& .MuiOutlinedInput-root": { borderRadius: "14px", background: "rgba(255, 255, 255, 0.3)" },
-                "& .MuiInputLabel-root": { color: "#000", fontWeight: 700 },
-                "& .MuiInputBase-input": { color: "#000", fontWeight: 800 }
-              }}
+              sx={formTextFieldStyle}
             />
             <TextField
-              label="Gmail Address"
+              placeholder="Enter your email address"
               value={responsibleForm.email}
               onChange={(e) => setResponsibleForm({ ...responsibleForm, email: e.target.value })}
               fullWidth
-              sx={{
-                "& .MuiOutlinedInput-root": { borderRadius: "14px", background: "rgba(255, 255, 255, 0.3)" },
-                "& .MuiInputLabel-root": { color: "#000", fontWeight: 700 },
-                "& .MuiInputBase-input": { color: "#000", fontWeight: 800 }
-              }}
+              sx={formTextFieldStyle}
+            />
+            <TextField
+              placeholder="Enter your role"
+              value={responsibleForm.post}
+              onChange={(e) => setResponsibleForm({ ...responsibleForm, post: e.target.value })}
+              fullWidth
+              sx={formTextFieldStyle}
             />
             <FormControl fullWidth>
-              <InputLabel sx={{ color: "#000", fontWeight: 700 }}>Role Designation</InputLabel>
-              <Select
-                value={responsibleForm.post}
-                onChange={(e) => setResponsibleForm({ ...responsibleForm, post: e.target.value })}
-                label="Role Designation"
-                sx={{
-                  borderRadius: "14px",
-                  background: "rgba(255, 255, 255, 0.3)",
-                  "& .MuiSelect-select": { color: "#000", fontWeight: 800 }
-                }}
-              >
-                {POSTS.map((post) => (
-                  <MenuItem key={post} value={post}>
-                    {post.charAt(0).toUpperCase() + post.slice(1)}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-            <FormControl fullWidth>
-              <InputLabel sx={{ color: "#000", fontWeight: 700 }}>Department</InputLabel>
               <Select
                 value={responsibleForm.department}
                 onChange={(e) => setResponsibleForm({ ...responsibleForm, department: e.target.value })}
-                label="Department"
+                displayEmpty
                 sx={{
-                  borderRadius: "14px",
-                  background: "rgba(255, 255, 255, 0.3)",
-                  "& .MuiSelect-select": { color: "#000", fontWeight: 800 }
+                  borderRadius: "10px",
+                  background: "#fff",
+                  "& .MuiSelect-select": {
+                    color: responsibleForm.department ? "#1f2937" : "#9ca3af",
+                    fontWeight: 500,
+                  },
+                  "& fieldset": { borderColor: "#e5e7eb" },
                 }}
               >
+                <MenuItem value="" disabled>Department</MenuItem>
                 {DEPARTMENTS.map((dept) => (
                   <MenuItem key={dept} value={dept}>{dept}</MenuItem>
                 ))}
@@ -288,7 +265,7 @@ const DashboardDialogs = ({
             </FormControl>
             {!editingAdmin && (
               <TextField
-                label="Password"
+                placeholder="Security Key"
                 type={showPasswordResponsible ? "text" : "password"}
                 value={responsibleForm.password}
                 onChange={(e) => setResponsibleForm({ ...responsibleForm, password: e.target.value })}
@@ -299,38 +276,23 @@ const DashboardDialogs = ({
                       <IconButton
                         onClick={() => setShowPasswordResponsible(!showPasswordResponsible)}
                         edge="end"
-                        sx={{ color: "rgba(0,0,0,0.4)" }}
+                        sx={{ color: "#9ca3af" }}
                       >
                         {showPasswordResponsible ? <VisibilityOff /> : <Visibility />}
                       </IconButton>
                     </InputAdornment>
                   ),
                 }}
-                sx={{
-                  "& .MuiOutlinedInput-root": { borderRadius: "14px", background: "rgba(255, 255, 255, 0.3)" },
-                  "& .MuiInputLabel-root": { color: "#000", fontWeight: 700 },
-                  "& .MuiInputBase-input": {
-                    color: "#000",
-                    fontWeight: 800,
-                    "&::-ms-reveal": { display: "none" },
-                    "&::-ms-clear": { display: "none" },
-                  },
-                }}
+                sx={formTextFieldStyle}
               />
             )}
             <Button
               variant="contained"
               onClick={handleResponsibleSubmit}
               fullWidth
-              sx={{
-                ...iPhoneGlassButton,
-                height: 50,
-                background: "rgba(0,0,0,0.8)",
-                color: "#fff",
-                "&:hover": { background: "#000" }
-              }}
+              sx={actionButtonStyle}
             >
-              {editingAdmin ? "Update Configuration" : "Deploy Command Node"}
+              {editingAdmin ? "Apply Update" : "Initiate Process"}
             </Button>
           </Stack>
         </DialogContent>
@@ -343,22 +305,26 @@ const DashboardDialogs = ({
         TransitionComponent={Fade}
         PaperProps={{
           sx: {
-            ...glassEffect,
-            background: "rgba(255, 255, 255, 0.4)",
-            backdropFilter: "blur(50px) saturate(180%)",
-            borderRadius: "32px",
+            background: "#ffffff",
+            borderRadius: "20px",
+            boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
+            width: "100%",
+            maxWidth: "400px !important"
           },
         }}
-        fullWidth
-        maxWidth="sm"
       >
-        <DialogTitle sx={{ p: 3, fontWeight: 900, borderBottom: "1px solid rgba(255, 255, 255, 0.3)" }}>
-          {editingDept ? "Configure Cluster" : "Provision Cluster"}
-        </DialogTitle>
-        <DialogContent sx={{ p: 4, mt: 1 }}>
-          <Stack spacing={3}>
+        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", p: 3, pb: 1 }}>
+          <Typography sx={{ fontWeight: 700, fontSize: "1.5rem", color: "#374151" }}>
+            {editingDept ? "Configure Cluster" : "Provision Cluster"}
+          </Typography>
+          <IconButton onClick={handleDeptDialogClose} size="small" sx={{ color: "#9ca3af" }}>
+            <CloseIcon />
+          </IconButton>
+        </Box>
+        <DialogContent sx={{ p: 4, pt: 2 }}>
+          <Stack spacing={2.5}>
             <TextField
-              label="Cluster ID"
+              placeholder="Cluster ID"
               value={deptForm.id || deptForm.Dep_id}
               onChange={(e) => setDeptForm({ ...deptForm, id: e.target.value })}
               fullWidth
@@ -407,13 +373,7 @@ const DashboardDialogs = ({
               variant="contained"
               onClick={handleDeptSubmit}
               fullWidth
-              sx={{
-                ...iPhoneGlassButton,
-                height: 50,
-                background: "rgba(0,0,0,0.8)",
-                color: "#fff",
-                "&:hover": { background: "#000" }
-              }}
+              sx={actionButtonStyle}
             >
               Verify Configuration
             </Button>
@@ -427,11 +387,10 @@ const DashboardDialogs = ({
         onClose={cancelDeleteUser}
         PaperProps={{
           sx: {
-            ...glassEffect,
-            background: "rgba(255, 255, 255, 0.1)",
-            backdropFilter: "blur(60px)",
-            borderRadius: "32px",
-            p: 2
+            background: "#ffffff",
+            borderRadius: "16px",
+            boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
+            p: 1
           },
         }}
       >
@@ -481,28 +440,23 @@ const DashboardDialogs = ({
         transitionDuration={400}
         PaperProps={{
           sx: {
-            ...glassEffect,
-            background: "rgba(255, 255, 255, 0.4)",
-            backdropFilter: "blur(50px) saturate(180%)",
-            border: "1px solid rgba(255, 255, 255, 0.5)",
-            borderRadius: "32px",
-            boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.2)",
-            overflow: "hidden"
+            background: "#ffffff",
+            borderRadius: "20px",
+            boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
+            width: "100%",
+            maxWidth: "400px !important"
           },
         }}
-        fullWidth
-        maxWidth="xs"
       >
-        <DialogTitle sx={{
-          p: 3,
-          fontWeight: 900,
-          fontSize: "1.25rem",
-          color: "rgba(0,0,0,0.85)",
-          borderBottom: "1px solid rgba(255, 255, 255, 0.3)",
-        }}>
-          Reset Access Key
-        </DialogTitle>
-        <DialogContent sx={{ p: 4, mt: 1 }}>
+        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", p: 3, pb: 1 }}>
+          <Typography sx={{ fontWeight: 700, fontSize: "1.5rem", color: "#374151" }}>
+            Reset Access Key
+          </Typography>
+          <IconButton onClick={handlePasswordDialogClose} size="small" sx={{ color: "#9ca3af" }}>
+            <CloseIcon />
+          </IconButton>
+        </Box>
+        <DialogContent sx={{ p: 4, pt: 2 }}>
           <Stack spacing={3}>
             <TextField
               label="Employee Email"
@@ -564,17 +518,7 @@ const DashboardDialogs = ({
               variant="contained"
               onClick={handlePasswordSubmit}
               fullWidth
-              sx={{
-                ...iPhoneGlassButton,
-                height: 50,
-                background: "linear-gradient(135deg, #6366f1 0%, #4338ca 100%)",
-                color: "#fff",
-                boxShadow: "0 10px 20px -5px rgba(67, 56, 202, 0.3)",
-                "&:hover": {
-                  background: "linear-gradient(135deg, #4f46e5 0%, #3730a3 100%)",
-                  transform: "translateY(-2px)"
-                }
-              }}
+              sx={actionButtonStyle}
             >
               Update Credentials
             </Button>

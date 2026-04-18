@@ -4,24 +4,21 @@ import {
   Typography,
   Button,
   Grid,
-  CardContent,
   alpha,
   Fade,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
-import GlassCard from "./GlassCard";
-import { iPhoneGlassButton } from "./SharedStyles";
 
 const DepartmentManager = ({
   departments,
   onAddDepartment,
   onEditDepartment,
   onDeleteDepartment,
-  getDeptColor,
 }) => {
   return (
     <Fade in={true}>
-      <Box>
+      <Box sx={{ width: "100%" }}>
+        {/* Header Section */}
         <Box
           sx={{
             display: "flex",
@@ -30,7 +27,7 @@ const DepartmentManager = ({
             mb: 4,
           }}
         >
-          <Typography variant="h5" sx={{ fontWeight: 900, color: "rgba(0,0,0,0.8)" }}>
+          <Typography variant="h5" sx={{ fontWeight: 800, color: "#1e293b" }}>
             Departments
           </Typography>
           <Button
@@ -38,92 +35,93 @@ const DepartmentManager = ({
             startIcon={<AddIcon />}
             onClick={onAddDepartment}
             sx={{
-              ...iPhoneGlassButton,
-              background: "linear-gradient(135deg, #f472b6 0%, #db2777 100%)",
+              background: "#0f4c81",
               color: "#fff",
+              borderRadius: "8px",
               px: 3,
-              "&:hover": {
-                ...iPhoneGlassButton["&:hover"],
-                background: "linear-gradient(135deg, #ec4899 0%, #be185d 100%)",
-              }
+              py: 1,
+              textTransform: "none",
+              fontWeight: 700,
+              boxShadow: "none",
+              "&:hover": { background: "#0c3d68" }
             }}
           >
             Add Department
           </Button>
         </Box>
-        <Grid container spacing={4}>
+
+        {/* Grid Section */}
+        <Grid container spacing={3}>
           {departments.map((dept) => (
-            <Grid item xs={12} sm={6} md={4} key={dept.id || dept._id}>
-              <GlassCard
-                hoverEffect={true}
+            <Grid item xs={12} sm={6} md={4} lg={3} key={dept.id || dept._id}>
+              <Box
                 sx={{
-                  position: "relative",
+                  background: "#fff",
+                  borderRadius: "12px",
                   overflow: "hidden",
+                  boxShadow: "0 2px 12px rgba(0,0,0,0.04)",
+                  border: "1px solid #f1f5f9",
                   height: "100%",
                   display: "flex",
                   flexDirection: "column",
-                  background: "rgba(255, 255, 255, 0.45)",
+                  transition: "all 0.2s ease",
+                  "&:hover": {
+                    transform: "translateY(-4px)",
+                    boxShadow: "0 12px 30px rgba(0,0,0,0.08)",
+                  }
                 }}
               >
+                {/* Top Border Indicator */}
                 <Box
                   sx={{
-                    height: "6px",
+                    height: "4px",
+                    width: "100%",
                     background: dept.color || "#38bdf8",
-                    boxShadow: `0 0 15px ${dept.color || "#38bdf8"}30`,
                   }}
                 />
-                <CardContent sx={{ p: 4, flexGrow: 1 }}>
-                  <Box
-                    sx={{
-                      width: 60,
-                      height: 60,
-                      borderRadius: "14px",
-                      background: alpha(dept.color || "#38bdf8", 0.1),
-                      color: dept.color || "#38bdf8",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      mb: 3,
-                    }}
-                  >
-                    <Typography variant="h4" fontWeight="bold">
-                      {dept.title
-                        ? dept.title.charAt(0).toUpperCase()
-                        : "#"}
-                    </Typography>
-                  </Box>
+
+                <Box sx={{ p: 3, flexGrow: 1 }}>
                   <Typography
-                    variant="h5"
-                    sx={{ fontWeight: 900, color: "rgba(0,0,0,0.85)", mb: 1 }}
+                    variant="h6"
+                    sx={{ fontWeight: 800, color: "#1e293b", mb: 0.5, fontSize: "1.05rem" }}
                   >
-                    {dept.title}
+                    {dept.title || "Untitled"}
                   </Typography>
                   <Typography
                     variant="body2"
-                    sx={{ color: "#64748b", fontWeight: 600, mb: 3 }}
+                    sx={{ color: "#64748b", fontWeight: 500, lineHeight: 1.6, fontSize: "0.85rem" }}
                   >
-                    {dept.description}
+                    {dept.description || "even stone to become precious"}
                   </Typography>
-                </CardContent>
+                </Box>
+
+                {/* Card Actions - Aligned to Right */}
                 <Box
                   sx={{
                     p: 2,
-                    px: 3,
-                    borderTop: "1px solid rgba(255, 255, 255, 0.3)",
                     display: "flex",
                     justifyContent: "flex-end",
                     gap: 1.5,
-                    background: "rgba(255, 255, 255, 0.2)",
                   }}
                 >
                   <Button
                     size="small"
                     onClick={() => onEditDepartment(dept)}
                     sx={{
-                      color: dept.color || "#38bdf8",
-                      fontWeight: 800,
-                      borderRadius: "10px",
-                      "&:hover": { background: alpha(dept.color || "#38bdf8", 0.1) }
+                      minWidth: "70px",
+                      background: "#fff",
+                      color: "#1e40af",
+                      border: "1px solid #e5e7eb",
+                      fontWeight: 700,
+                      borderRadius: "6px",
+                      textTransform: "none",
+                      fontSize: "0.8rem",
+                      boxShadow: "none",
+                      "&:hover": {
+                        background: "#f8fafc",
+                        borderColor: "#d1d5db",
+                        boxShadow: "none"
+                      }
                     }}
                   >
                     Edit
@@ -132,16 +130,26 @@ const DepartmentManager = ({
                     size="small"
                     onClick={() => onDeleteDepartment(dept._id)}
                     sx={{
+                      minWidth: "70px",
+                      background: "#fff",
                       color: "#ef4444",
-                      fontWeight: 800,
-                      borderRadius: "10px",
-                      "&:hover": { background: alpha("#ef4444", 0.1) }
+                      border: "1px solid #e5e7eb",
+                      fontWeight: 700,
+                      borderRadius: "6px",
+                      textTransform: "none",
+                      fontSize: "0.8rem",
+                      boxShadow: "none",
+                      "&:hover": {
+                        background: "#fef2f2",
+                        borderColor: "#fca5a5",
+                        boxShadow: "none"
+                      }
                     }}
                   >
                     Delete
                   </Button>
                 </Box>
-              </GlassCard>
+              </Box>
             </Grid>
           ))}
         </Grid>

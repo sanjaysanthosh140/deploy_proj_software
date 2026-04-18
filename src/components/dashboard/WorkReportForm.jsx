@@ -238,6 +238,38 @@ const WorkReportForm = ({ deptId, profile, onReportSubmitted }) => {
               },
             }}
           />
+          <Box sx={{ display: "flex", justifyContent: "flex-start", mt: 1.5 }}>
+            <Button
+              type="submit"
+              variant="contained"
+              disabled={loading}
+              endIcon={
+                loading ? (
+                  <CircularProgress size={14} color="inherit" />
+                ) : (
+                  <SendIcon sx={{ fontSize: 14 }} />
+                )
+              }
+              sx={{
+                background: "linear-gradient(135deg,#1a2d5a 0%,#0f3a8a 100%)",
+                color: "#fff",
+                fontWeight: 700,
+                fontSize: "0.85rem",
+                borderRadius: "10px",
+                px: 3,
+                py: 0.9,
+                textTransform: "none",
+                boxShadow: "0 4px 14px rgba(15,42,100,0.25)",
+                "&:hover": { background: "linear-gradient(135deg,#0f1f42 0%,#0a2a6e 100%)" },
+                "&.Mui-disabled": {
+                  background: alpha(SECONDARY, 0.1),
+                  color: alpha(SECONDARY, 0.3),
+                },
+              }}
+            >
+              {loading ? "Submitting..." : "Submit Report"}
+            </Button>
+          </Box>
         </Box>
 
         {/* RIGHT — submitted reports */}
@@ -393,39 +425,7 @@ const WorkReportForm = ({ deptId, profile, onReportSubmitted }) => {
         </Box>
       </Box>
 
-      {/* ── Submit button — centered below ── */}
-      <Box sx={{ display: "flex", justifyContent: "center", mt: 2.5 }}>
-        <Button
-          type="submit"
-          variant="contained"
-          disabled={loading}
-          endIcon={
-            loading ? (
-              <CircularProgress size={14} color="inherit" />
-            ) : (
-              <SendIcon sx={{ fontSize: 14 }} />
-            )
-          }
-          sx={{
-            background: "linear-gradient(135deg,#1a2d5a 0%,#0f3a8a 100%)",
-            color: "#fff",
-            fontWeight: 700,
-            fontSize: "0.85rem",
-            borderRadius: "10px",
-            px: 4,
-            py: 1,
-            textTransform: "none",
-            boxShadow: "0 4px 14px rgba(15,42,100,0.25)",
-            "&:hover": { background: "linear-gradient(135deg,#0f1f42 0%,#0a2a6e 100%)" },
-            "&.Mui-disabled": {
-              background: alpha(SECONDARY, 0.1),
-              color: alpha(SECONDARY, 0.3),
-            },
-          }}
-        >
-          {loading ? "Submitting..." : "Submit Report"}
-        </Button>
-      </Box>
+
 
       {/* ── Delete confirmation dialog ── */}
       <Dialog
@@ -433,6 +433,8 @@ const WorkReportForm = ({ deptId, profile, onReportSubmitted }) => {
         onClose={handleDeleteCancel}
         PaperProps={{
           sx: {
+            width: "340px",
+            maxWidth: "90vw",
             borderRadius: "20px",
             background: "rgba(255,255,255,0.97)",
             backdropFilter: "blur(24px)",

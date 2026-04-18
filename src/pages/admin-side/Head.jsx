@@ -34,6 +34,15 @@ import AddIcon from "@mui/icons-material/Add";
 import FolderIcon from "@mui/icons-material/Folder";
 import AssessmentIcon from "@mui/icons-material/Assessment";
 import DashboardCustomizeIcon from "@mui/icons-material/DashboardCustomize";
+import AssignmentIcon from "@mui/icons-material/Assignment";
+import HistoryIcon from "@mui/icons-material/History";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
+import BarChartIcon from "@mui/icons-material/BarChart";
+import GridViewIcon from "@mui/icons-material/GridView";
+import NotesIcon from "@mui/icons-material/Notes";
+import CheckBoxIcon from "@mui/icons-material/CheckBox";
 
 import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
@@ -85,30 +94,30 @@ const Head = () => {
 
   // Sample tasks data
   const [tasks, setTasks] = useState([
-    // {
-    //   id: 101,
-    //   title: "Design Landing Page",
-    //   priority: "High",
-    //   deadline: "Today",
-    //   status: "in_progress",
-    //   desc: "Create high-fidelity mockups for main landing page.",
-    // },
-    // {
-    //   id: 102,
-    //   title: "Setup Database",
-    //   priority: "Critical",
-    //   deadline: "Tomorrow",
-    //   status: "pending",
-    //   desc: "Configure MongoDB and create necessary schemas.",
-    // },
-    // {
-    //   id: 103,
-    //   title: "API Documentation",
-    //   priority: "Medium",
-    //   deadline: "2025-01-20",
-    //   status: "completed",
-    //   desc: "Document all REST endpoints with examples.",
-    // },
+    {
+      id: 101,
+      title: "Design Landing Page",
+      priority: "High",
+      deadline: "2 days left",
+      status: "in_progress",
+      desc: "Create high-fidelity mockups for main landing page.",
+    },
+    {
+      id: 102,
+      title: "Setup Database",
+      priority: "High",
+      deadline: "23/05/2026",
+      status: "in_progress",
+      desc: "Configure MongoDB and create necessary schemas.",
+    },
+    {
+      id: 103,
+      title: "API Documentation",
+      priority: "High",
+      deadline: "2 days left",
+      status: "in_progress",
+      desc: "Document all REST endpoints with examples.",
+    },
   ]);
 
   const [openDialog, setOpenDialog] = useState(false);
@@ -252,294 +261,254 @@ const Head = () => {
         sx={{
           height: "100%",
           minHeight: "100vh",
-          background: `linear-gradient(135deg, ${PRIMARY_BG} 0%, ${SECONDARY_BG} 50%, ${TERTIARY_BG} 100%)`,
-          position: "relative",
-          overflow: "hidden",
-          p: { xs: 2, sm: 3, md: 4 },
+          backgroundColor: "#fcfcfc",
+          p: 0,
           color: "#1a1a1a",
+          position: "relative",
         }}
       >
-        {/* Background Mesh Blobs */}
-        <Box sx={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, zIndex: 0, pointerEvents: "none" }}>
-          <motion.div
-            animate={{ scale: [1, 1.2, 1], rotate: [0, 90, 0] }}
-            transition={{ duration: 20, repeat: Infinity }}
-            style={{
-              position: "absolute",
-              top: "-5%",
-              right: "5%",
-              width: "60vw",
-              maxWidth: "100%",
-              height: "60vw",
-              maxHeight: "100%",
-              background: "radial-gradient(circle, rgba(255, 255, 255, 1) 0%, transparent 70%)",
-              filter: "blur(100px)",
-            }}
-          />
-        </Box>
         {/* Error and Success Alerts */}
-        {error && (
-          <Alert
-            severity="error"
-            onClose={() => setError(null)}
-            sx={{ mb: 3, background: "#ff4d4f20", color: "#ff4d4f" }}
-          >
-            {error}
-          </Alert>
-        )}
-        {success && (
-          <Alert
-            severity="success"
-            onClose={() => setSuccess(null)}
-            sx={{ mb: 3, background: "#4ade8020", color: "#4ade80" }}
-          >
-            {success}
-          </Alert>
-        )}
+        <Box sx={{ position: "fixed", top: 20, right: 20, zIndex: 2000, maxWidth: "400px" }}>
+          {error && (
+            <Alert
+              severity="error"
+              onClose={() => setError(null)}
+              sx={{ mb: 2, boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }}
+            >
+              {error}
+            </Alert>
+          )}
+          {success && (
+            <Alert
+              severity="success"
+              onClose={() => setSuccess(null)}
+              sx={{ mb: 2, boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }}
+            >
+              {success}
+            </Alert>
+          )}
+        </Box>
 
         {/* Header Section */}
-        <Fade in={true} timeout={1000}>
-          <Box sx={{ mb: 6, position: "relative", zIndex: 1 }}>
-            <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: { xs: 2, sm: 3 } }}>
-              {/* Left: Icon + Title */}
-              <Box sx={{ display: "flex", alignItems: "center", gap: { xs: 2, sm: 3 } }}>
+        <Box
+          sx={{
+            py: 4,
+            backgroundColor: "#fff",
+            borderBottom: "1px solid #e0e0e0",
+          }}
+        >
+          <Box
+            sx={{
+              width: "95%",
+              maxWidth: "1800px",
+              mx: "auto",
+              px: { xs: 1, md: 2 },
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <Box>
+              <Typography variant="h3" sx={{ fontWeight: 700, color: "#444", mb: 0.5, fontSize: "2.2rem" }}>
+                Head Operations
+              </Typography>
+              <Typography variant="body1" sx={{ color: "#777", fontWeight: 500, fontSize: "1rem" }}>
+                Workspace Hub
+              </Typography>
+            </Box>
+            <Button
+              onClick={handleLogout}
+              variant="outlined"
+              sx={{
+                color: "#555",
+                borderColor: "#e0e0e0",
+                borderRadius: "12px",
+                textTransform: "none",
+                fontWeight: 600,
+                px: 3,
+                "&:hover": { backgroundColor: "#f5f5f5", borderColor: "#ccc" },
+              }}
+            >
+              Logout
+            </Button>
+          </Box>
+        </Box>
+
+        <Box sx={{ width: "95%", maxWidth: "1800px", mx: "auto", px: { xs: 1, md: 2 }, pt: 6, pb: 10 }}>
+          {/* Status Cards Section */}
+          <Grid container spacing={4} sx={{ mb: 6, width: "100%", justifyContent: "space-between" }}>
+            {[
+              { title: "Active Tasks", value: "03", icon: <AssignmentIcon /> },
+              { title: "Processing", value: "01", icon: <NotesIcon /> },
+              { title: "Approved", value: "01", icon: <CheckBoxIcon /> },
+              { title: "Pending", value: "01", icon: <AccessTimeIcon /> },
+            ].map((stat, idx) => (
+              <Grid item xs={12} sm={6} md={3} key={idx} sx={{ display: "flex", flexGrow: 1 }}>
                 <Box
                   sx={{
-                    width: 80,
-                    height: 80,
-                    borderRadius: "22px",
-                    background: "rgba(255, 255, 255, 0.3)",
-                    backdropFilter: "blur(20px)",
-                    border: "1px solid rgba(255, 255, 255, 0.5)",
+                    width: "100%",
+                    flexGrow: 1,
+                    background: "linear-gradient(90deg, #0d254a 0%, #1e4db7 100%)",
+                    borderRadius: "8px",
+                    p: 3,
+                    color: "#fff",
+                    minHeight: "150px", // Maintains landscape shape
                     display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    boxShadow: "0 8px 20px rgba(0,0,0,0.05)",
+                    flexDirection: "column",
+                    justifyContent: "space-between",
+                    boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+                    position: "relative",
+                    overflow: "hidden",
+                    // Top Right Circle
+                    "&::before": {
+                      content: '""',
+                      position: "absolute",
+                      top: "-20%",
+                      right: "-10%",
+                      width: "120px",
+                      height: "120px",
+                      background: "rgba(255,255,255,0.06)",
+                      borderRadius: "50%",
+                    },
+                    // Bottom Left Circle
+                    "&::after": {
+                      content: '""',
+                      position: "absolute",
+                      bottom: "-20%",
+                      left: "-10%",
+                      width: "100px",
+                      height: "100px",
+                      background: "rgba(255,255,255,0.06)",
+                      borderRadius: "50%",
+                    },
                   }}
                 >
-                  <DashboardCustomizeIcon sx={{ fontSize: 40, color: "rgba(0,0,0,0.7)" }} />
-                </Box>
-                <Box>
-                  <Typography
-                    variant="h2"
-                    sx={{
-                      fontWeight: 900,
-                      fontSize: { xs: "2.5rem", md: "3.5rem" },
-                      color: "#1a1a1a",
-                      letterSpacing: "-2px",
-                      lineHeight: 1,
-                    }}
-                  >
-                    Head Operations
-                  </Typography>
-                  <Typography
-                    variant="body1"
-                    sx={{
-                      color: "rgba(0,0,0,0.4)",
-                      fontWeight: 800,
-                      textTransform: "uppercase",
-                      letterSpacing: "4px",
-                      fontSize: "0.9rem",
-                      mt: 1
-                    }}
-                  >
-                    {/* Command Center Intelligence Suite */}
+                  {/* Top Right Label & Icon */}
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1, alignSelf: "flex-end", mt: 1, zIndex: 1 }}>
+                    {React.cloneElement(stat.icon, { sx: { fontSize: 24, opacity: 0.95 } })}
+                    <Typography sx={{ fontWeight: 600, fontSize: "1.1rem", opacity: 0.95 }}>
+                      {stat.title}
+                    </Typography>
+                  </Box>
+                  {/* Bottom Left Number */}
+                  <Typography variant="h2" sx={{ fontWeight: 700, fontSize: "4.2rem", mb: -0.5, ml: 1, letterSpacing: -2, zIndex: 1 }}>
+                    {stat.value}
                   </Typography>
                 </Box>
-              </Box>
+              </Grid>
+            ))}
+          </Grid>
 
-              {/* Logout Button */}
-              <Box
-                component="button"
-                onClick={handleLogout}
+          {/* Action Grid Buttons */}
+          <Box sx={{ display: "flex", gap: 3, mb: 8, flexWrap: "wrap", justifyContent: "space-between", width: "100%" }}>
+            {[
+              { label: "New Project", icon: <FolderIcon />, onClick: () => setOpenProjectDialog(true) },
+              { label: "Project Hub", icon: <BarChartIcon />, onClick: () => navigate("/head/projects") },
+              { label: "Analytics Dashboard", icon: <GridViewIcon />, onClick: () => navigate("/head/project-overview") },
+            ].map((action, idx) => (
+              <Button
+                key={idx}
+                variant="outlined"
+                startIcon={action.icon}
+                onClick={action.onClick}
                 sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 1,
-                  px: { xs: 2.5, sm: 3.5 },
-                  py: { xs: 1.2, sm: 1.5 },
-                  background: "rgba(255, 255, 255, 0.7)",
-                  backdropFilter: "blur(20px)",
-                  border: "1px solid rgba(255, 255, 255, 0.8)",
-                  borderRadius: "20px",
-                  boxShadow: "0 8px 25px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,1)",
-                  color: "#c0392b",
-                  fontWeight: 800,
-                  fontSize: { xs: "0.8rem", sm: "0.9rem" },
-                  cursor: "pointer",
-                  letterSpacing: "0.5px",
-                  transition: "all 0.35s cubic-bezier(0.23,1,0.32,1)",
-                  whiteSpace: "nowrap",
-                  flexShrink: 0,
+                  flex: 1,
+                  minWidth: { xs: "100%", sm: "280px" },
+                  color: "#555",
+                  borderColor: "#e0e0e0",
+                  borderRadius: "8px",
+                  textTransform: "none",
+                  px: 4,
+                  py: 2,
+                  fontWeight: 600,
+                  fontSize: "1.1rem",
+                  backgroundColor: "#fff",
+                  boxShadow: "0 2px 4px rgba(0,0,0,0.03)",
                   "&:hover": {
-                    background: "#c0392b",
-                    color: "#fff",
-                    borderColor: "#c0392b",
-                    transform: "translateY(-3px)",
-                    boxShadow: "0 15px 35px rgba(192,57,43,0.22)",
+                    backgroundColor: "#f9f9f9",
+                    borderColor: "#ccc",
                   },
                 }}
               >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                  <polyline points="16 17 21 12 16 7" />
-                  <line x1="21" y1="12" x2="9" y2="12" />
-                </svg>
-                Logout
-              </Box>
-            </Box>
+                {action.label}
+              </Button>
+            ))}
           </Box>
-        </Fade>
 
-        {/* Stats Cards (Control Center Widgets) */}
-        {/* <Grid container spacing={{ xs: 3, md: 5 }} sx={{ mb: 8, position: "relative", zIndex: 1 }}>
-          {[
-            { title: "Active Protocols", value: tasks.length, color: "#4ade80", icon: <AssessmentIcon /> },
-            { title: "Processing", value: tasks.filter((t) => t.status === "in_progress").length, color: "#38bdf8", icon: <FolderIcon /> },
-            { title: "Validated", value: tasks.filter((t) => t.status === "completed").length, color: "#4ade80", icon: <AssessmentIcon /> },
-            { title: "Queued", value: tasks.filter((t) => t.status === "pending").length, color: "#f59e0b", icon: <AddIcon /> },
-          ].map((stat, idx) => (
-            <Grid item xs={12} sm={6} md={3} key={idx}>
-              <Box sx={{
-                ...glassEffect,
-                p: { xs: 3.5, md: 4.5 },
-                textAlign: "center",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                "&:hover": {
-                  background: "rgba(255, 255, 255, 1)",
-                  transform: "translateY(-10px)",
-                  boxShadow: "0 30px 60px rgba(0,0,0,0.08)"
-                }
-              }}>
-                <Box sx={{
-                  width: 64,
-                  height: 64,
-                  borderRadius: "20px",
-                  background: alpha(stat.color, 0.1),
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  mb: 2.5,
-                  color: stat.color,
-                  "& svg": { fontSize: 32 }
-                }}>
-                  {stat.icon}
-                </Box>
-                <Typography variant="h3" sx={{ fontWeight: 1000, color: "#1e293b", lineHeight: 1, mb: 1, fontSize: "2.5rem" }}>
-                  {stat.value}
-                </Typography>
-                <Typography sx={{ color: "rgba(30,40,70,0.45)", fontWeight: 900, fontSize: "0.85rem", textTransform: "uppercase", letterSpacing: "2px" }}>
-                  {stat.title}
-                </Typography>
-              </Box>
-            </Grid>
-          ))}
-        </Grid> */}
-
-        {/* Action Suite (Edge Mirror Buttons) */}
-        <Box
-          sx={{
-            mb: 8,
-            display: "flex",
-            gap: 3,
-            justifyContent: "center",
-            flexWrap: "wrap",
-            position: "relative",
-            zIndex: 1,
-          }}
-        >
-          {/* <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={() => setOpenDialog(true)}
-            sx={{ ...iPhoneGlassButton, px: 5, py: 2.2, minWidth: "220px" }}
+          {/* Task Overview Section */}
+          <Typography
+            variant="h4"
+            sx={{ mb: 6, fontWeight: 700, color: "#444", letterSpacing: "-1px" }}
           >
-            Initialize Task
-          </Button> */}
-          <Button
-            variant="contained"
-            startIcon={<FolderIcon />}
-            onClick={() => setOpenProjectDialog(true)}
-            sx={{ ...iPhoneGlassButton, px: 5, py: 2.2, minWidth: "220px" }}
-          >
-            New Project
-          </Button>
-          <Button
-            variant="contained"
-            startIcon={<AssessmentIcon />}
-            onClick={() => navigate("/head/projects")}
-            sx={{ ...iPhoneGlassButton, px: 5, py: 2.2, minWidth: "220px" }}
-          >
-            Project Hub
-          </Button>
-          <Button
-            variant="contained"
-            startIcon={<DashboardCustomizeIcon />}
-            onClick={() => navigate("/head/project-overview")}
-            sx={{ ...iPhoneGlassButton, px: 5, py: 2.2, minWidth: "220px" }}
-          >
-            Project Progress
-          </Button>
-        </Box>
-
-        {/* Protocols Intelligence (Tasks Table) */}
-        {/* table removed  */}
-        {/* Protocols Intelligence (Tasks Cards) */}
-        <Box sx={{ position: "relative", zIndex: 1 }}>
-          <Typography variant="h5" sx={{ mb: 4, fontWeight: 1000, color: "#1e293b", letterSpacing: "-1px" }}>
-            Active Protocols Registry
+            Task Overview
           </Typography>
-          <Grid container spacing={3}>
+          <Grid container spacing={4}>
             {tasks.map((task) => (
               <Grid item xs={12} sm={6} md={4} key={task.id}>
-                <Box sx={{
-                  ...glassEffect,
-                  p: 4,
-                  "&:hover": {
-                    background: "rgba(255, 255, 255, 1)",
-                    transform: "scale(1.02)",
-                    boxShadow: "0 25px 55px rgba(0,0,0,0.12)"
-                  }
-                }}>
-                  <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 2.5 }}>
+                <Box
+                  sx={{
+                    bgcolor: "#fff",
+                    borderRadius: "12px",
+                    p: 4,
+                    boxShadow: "0 2px 10px rgba(0,0,0,0.04)",
+                    border: "1px solid #eee",
+                    height: "100%",
+                    display: "flex",
+                    flexDirection: "column",
+                  }}
+                >
+                  <Box sx={{ display: "flex", justifyContent: "space-between", mb: 3, alignItems: "flex-start" }}>
+                    <Typography sx={{ fontWeight: 700, color: "#333", fontSize: "1.4rem", lineHeight: 1.2 }}>{task.title}</Typography>
                     <Chip
-                      label={`ID: ${task.id}`}
+                      label="High"
                       size="small"
-                      sx={{ bgcolor: "rgba(30,40,70,0.06)", color: "rgba(30,40,70,0.5)", fontWeight: 1000, borderRadius: "10px" }}
+                      sx={{
+                        bgcolor: "#fff1f0",
+                        color: "#ff4d4f",
+                        fontWeight: 700,
+                        fontSize: "0.8rem",
+                        height: "24px",
+                        borderRadius: "4px",
+                      }}
                     />
-                    <Typography sx={{ color: "rgba(30,40,70,0.4)", fontSize: "0.85rem", fontWeight: 800 }}>
+                  </Box>
+                  <Typography
+                    sx={{
+                      color: "#666",
+                      fontSize: "1.1rem",
+                      mb: 4,
+                      lineHeight: 1.6,
+                      flexGrow: 1,
+                    }}
+                  >
+                    {task.desc}
+                  </Typography>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      mb: 2,
+                    }}
+                  >
+                    <Typography sx={{ color: "#aaa", fontSize: "1rem", fontWeight: 500 }}>
+                      Deadline
+                    </Typography>
+                    <Typography sx={{ color: "#333", fontSize: "1rem", fontWeight: 700 }}>
                       {task.deadline}
                     </Typography>
                   </Box>
-                  <Typography sx={{ color: "#1e293b", fontWeight: 1000, mb: 1.5, fontSize: "1.35rem", letterSpacing: "-0.5px" }}>
-                    {task.title}
-                  </Typography>
-                  <Typography sx={{ color: "rgba(30,40,70,0.5)", mb: 4, fontSize: "0.95rem", lineHeight: 1.6, fontWeight: 600, height: "3.2em", overflow: "hidden" }}>
-                    {task.desc}
-                  </Typography>
-                  <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
-                    <Chip
-                      label={task.priority}
-                      size="small"
-                      sx={{
-                        bgcolor: alpha(priorityColors[task.priority], 0.1),
-                        color: priorityColors[task.priority],
-                        fontWeight: 1000,
-                        borderRadius: "10px",
-                        px: 1
-                      }}
-                    />
+                  <Box>
                     <Chip
                       label={task.status.replace("_", " ")}
                       size="small"
                       sx={{
-                        bgcolor: alpha(statusColors[task.status], 0.1),
-                        color: statusColors[task.status],
-                        fontWeight: 1000,
-                        borderRadius: "10px",
-                        px: 1
+                        bgcolor: task.status === "in_progress" ? "#e6fffb" : "#fff7e6",
+                        color: task.status === "in_progress" ? "#13c2c2" : "#faad14",
+                        fontWeight: 700,
+                        fontSize: "0.9rem",
+                        borderRadius: "4px",
+                        px: 1,
                       }}
                     />
                   </Box>
@@ -549,165 +518,33 @@ const Head = () => {
           </Grid>
         </Box>
 
-        <Dialog
-          open={openDialog}
-          onClose={handleCloseDialog}
-          TransitionComponent={Fade}
-          transitionDuration={400}
-          PaperProps={{
-            sx: {
-              ...glassEffect,
-              background: "rgba(255, 255, 255, 0.6)",
-              backdropFilter: "blur(50px) saturate(180%)",
-              p: 1.5,
-            },
-          }}
-          fullWidth
-          maxWidth="sm"
-        >
-          <DialogTitle sx={{ p: 4, pb: 1, textAlign: "center" }}>
-            <Typography variant="h4" sx={{ fontWeight: 950, color: "rgba(0,0,0,0.85)", letterSpacing: "-1px" }}>
-              {editingId ? "Update Intelligence" : "Initialize Protocol"}
-            </Typography>
-            <Typography variant="caption" sx={{ color: "rgba(0,0,0,0.35)", fontWeight: 800, textTransform: "uppercase", letterSpacing: "2px" }}>
-              Tactical Operation Parameters
-            </Typography>
-          </DialogTitle>
-
-          <DialogContent sx={{ py: 4, px: { xs: 2, md: 3 } }}>
-            <Stack spacing={3} mt={1}>
-              <TextField
-                label="Protocol Title"
-                name="title"
-                value={formData.title}
-                onChange={handleInputChange}
-                fullWidth
-                variant="outlined"
-                sx={{
-                  "& .MuiOutlinedInput-root": {
-                    borderRadius: "16px",
-                    bgcolor: "rgba(255, 255, 255, 0.45)",
-                    fontWeight: 700,
-                    "& fieldset": { borderColor: "rgba(0,0,0,0.05)" },
-                    "&.Mui-focused fieldset": { borderColor: "rgba(0,0,0,0.8)" },
-                  },
-                  "& .MuiInputLabel-root": { color: "rgba(0,0,0,0.35)", fontWeight: 700 },
-                }}
-              />
-
-              <TextField
-                label="Description"
-                name="desc"
-                value={formData.desc}
-                onChange={handleInputChange}
-                fullWidth
-                multiline
-                rows={3}
-                sx={{
-                  "& .MuiOutlinedInput-root": {
-                    borderRadius: "14px",
-                    color: "#0f172a",
-                    "& fieldset": { borderColor: "rgba(10, 15, 25, 0.1)" },
-                    "&.Mui-focused fieldset": { borderColor: "#38bdf8" },
-                  },
-                  "& .MuiInputLabel-root": { color: "#475569" },
-                }}
-              />
-
-              <TextField
-                select
-                label="Priority"
-                name="priority"
-                value={formData.priority}
-                onChange={handleInputChange}
-                fullWidth
-                sx={{
-                  "& .MuiOutlinedInput-root": {
-                    borderRadius: "14px",
-                    color: "#0f172a",
-                    "& fieldset": { borderColor: "rgba(10, 15, 25, 0.1)" },
-                  },
-                  "& .MuiInputLabel-root": { color: "#475569" },
-                }}
-              >
+        {/* --- Dialogs --- */}
+        <Dialog open={openDialog} onClose={handleCloseDialog} fullWidth maxWidth="sm">
+          <DialogTitle sx={{ fontWeight: 700 }}>{editingId ? "Update Task" : "Add Task"}</DialogTitle>
+          <DialogContent>
+            <Stack spacing={3} sx={{ mt: 1 }}>
+              <TextField label="Title" name="title" value={formData.title} onChange={handleInputChange} fullWidth variant="outlined" />
+              <TextField label="Description" name="desc" value={formData.desc} onChange={handleInputChange} fullWidth multiline rows={3} variant="outlined" />
+              <TextField select label="Priority" name="priority" value={formData.priority} onChange={handleInputChange} fullWidth variant="outlined">
                 <MenuItem value="Low">Low</MenuItem>
                 <MenuItem value="Medium">Medium</MenuItem>
                 <MenuItem value="High">High</MenuItem>
                 <MenuItem value="Critical">Critical</MenuItem>
               </TextField>
-
-              <TextField
-                select
-                label="Status"
-                name="status"
-                value={formData.status}
-                onChange={handleInputChange}
-                fullWidth
-                sx={{
-                  "& .MuiOutlinedInput-root": {
-                    borderRadius: "14px",
-                    color: "#0f172a",
-                    "& fieldset": { borderColor: "rgba(10, 15, 25, 0.1)" },
-                  },
-                  "& .MuiInputLabel-root": { color: "#475569" },
-                }}
-              >
+              <TextField select label="Status" name="status" value={formData.status} onChange={handleInputChange} fullWidth variant="outlined">
                 <MenuItem value="pending">Pending</MenuItem>
                 <MenuItem value="in_progress">In Progress</MenuItem>
                 <MenuItem value="completed">Completed</MenuItem>
               </TextField>
-
-              <TextField
-                label="Deadline"
-                name="deadline"
-                value={formData.deadline}
-                onChange={handleInputChange}
-                fullWidth
-                sx={{
-                  "& .MuiOutlinedInput-root": {
-                    borderRadius: "14px",
-                    color: "#0f172a",
-                    "& fieldset": { borderColor: "rgba(10, 15, 25, 0.1)" },
-                    "&.Mui-focused fieldset": { borderColor: "#38bdf8" },
-                  },
-                  "& .MuiInputLabel-root": { color: "#475569" },
-                }}
-              />
-
-              <Button
-                onClick={handleAddOrUpdateTask}
-                disabled={loading}
-                fullWidth
-                variant="contained"
-                sx={{
-                  mt: 2,
-                  py: 2.2,
-                  borderRadius: "18px",
-                  bgcolor: "rgba(0,0,0,0.9)",
-                  color: "#fff",
-                  fontWeight: 900,
-                  fontSize: "1rem",
-                  textTransform: "none",
-                  boxShadow: "0 10px 30px rgba(0,0,0,0.2)",
-                  "&:hover": {
-                    bgcolor: "#000",
-                    transform: "translateY(-2px)",
-                    boxShadow: "0 15px 35px rgba(0,0,0,0.3)",
-                  },
-                }}
-              >
-                {loading ? "Processing..." : (editingId ? "Commit Changes" : "Initialize Strategic Asset")}
+              <TextField label="Deadline" name="deadline" value={formData.deadline} onChange={handleInputChange} fullWidth variant="outlined" />
+              <Button onClick={handleAddOrUpdateTask} disabled={loading} fullWidth variant="contained" sx={{ py: 1.5, fontWeight: 700, borderRadius: "8px" }}>
+                {loading ? "Processing..." : (editingId ? "Update Task" : "Add Task")}
               </Button>
             </Stack>
           </DialogContent>
         </Dialog>
 
-        {/* Create Project Dialog */}
-        <CreateProjectDialog
-          open={openProjectDialog}
-          onClose={() => setOpenProjectDialog(false)}
-          onSubmit={handleCreateProject}
-        />
+        <CreateProjectDialog open={openProjectDialog} onClose={() => setOpenProjectDialog(false)} onSubmit={handleCreateProject} />
       </Box>
 
       {/* Floating TeamChat Bubble */}

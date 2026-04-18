@@ -80,6 +80,8 @@ const HRDashboard = () => {
   const [userForPassword, setUserForPassword] = useState(null);
   const [editingDept, setEditingDept] = useState(null);
 
+  const [projectsCount, setProjectsCount] = useState(0);
+
   // Form States
   const [userForm, setUserForm] = useState({
     name: "",
@@ -135,11 +137,21 @@ const HRDashboard = () => {
         fetchDepartments(),
         fetchReports(),
         fetchLogs(),
+        fetchProjects(),
       ]);
       setLoading(false);
     };
     loadData();
   }, []);
+
+  const fetchProjects = async () => {
+    try {
+      const res = await axios.get("https://project-management-sodtware-backend-end.onrender.com/projects/get_projects");
+      setProjectsCount(res.data.length);
+    } catch (err) {
+      console.error("Error fetching projects:", err);
+    }
+  };
 
   const fetchUsers = async () => {
     try {
@@ -266,10 +278,10 @@ const HRDashboard = () => {
       delete payload.post;
       if (editingAdmin) {
         await axios.put(`https://project-management-sodtware-backend-end.onrender.com/admin/update_admin/${editingAdmin._id}`, payload);
-        setAlertMessage(`Responsible User ${responsibleForm.name} updated successfully`);
+        setAlertMessage(`Head User ${responsibleForm.name} updated successfully`);
       } else {
         await axios.post("https://project-management-sodtware-backend-end.onrender.com/admin/add_admins", payload);
-        setAlertMessage(`Responsible User ${responsibleForm.name} added successfully`);
+        setAlertMessage(`Head User ${responsibleForm.name} added successfully`);
       }
       setAlertOpen(true);
       fetchAdmins();
@@ -321,7 +333,7 @@ const HRDashboard = () => {
       let id = adminToDelete._id;
       await axios.delete(`https://project-management-sodtware-backend-end.onrender.com/admin/delete_admin/${id}`);
       fetchAdmins();
-      setAlertMessage(`Responsible User deleted successfully`);
+      setAlertMessage(`Head User deleted successfully`);
       setAlertOpen(true);
       setTimeout(() => setAlertOpen(false), 3000);
     } catch (err) {
@@ -356,10 +368,10 @@ const HRDashboard = () => {
   const pendingReportsCount = Math.max(0, users.length - uniqueSubmittersToday.size);
 
   const stats = [
-    { title: "Total Employees", value: users.length, icon: PeopleIcon, color: "#38bdf8" },
-    // { title: "Active Nodes", value: users.length, icon: CheckCircleIcon, color: "#4ade80" },
-    { title: "Departments", value: departments.length, icon: FolderIcon, color: "#f472b6" },
-    // { title: "Pending Reports", value: pendingReportsCount, icon: AssessmentIcon, color: "#fbbf24" },
+    { title: "Total Employees", value: users.length, icon: PeopleIcon, color: "#fff" },
+    { title: "Active Now", value: 0, icon: CheckCircleIcon, color: "#fff" },
+    { title: "Departments", value: departments.length, icon: FolderIcon, color: "#fff" },
+    { title: "Active Projects", value: projectsCount, icon: AssessmentIcon, color: "#fff" },
   ];
 
   const normalizedDepartmentOptions = Array.from(new Set(DEPARTMENTS.map(normalizeDeptName)));
@@ -387,11 +399,11 @@ const HRDashboard = () => {
         <Fade in={true} timeout={800}>
           <Box sx={{ mb: 6, pl: 1, display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
             <Box>
-              <Typography variant="h2" sx={{ fontWeight: 1000, color: "rgba(0,0,0,0.85)", fontSize: { xs: "2rem", md: "3.5rem" }, lineHeight: 1 }}>
-                HR Command Center
+              <Typography variant="h2" sx={{ fontWeight: 800, color: "#1f2937", fontSize: { xs: "1.8rem", md: "2.5rem" }, mb: 0.5 }}>
+                HR Workspace
               </Typography>
-              <Typography variant="caption" sx={{ color: alpha("#000", 0.3), fontWeight: 900, letterSpacing: "4px", textTransform: "uppercase" }}>
-                {/* • Advanced Management Interface • */}
+              <Typography variant="body1" sx={{ color: "#64748b", fontWeight: 600 }}>
+                Management Dashboard
               </Typography>
             </Box>
 
@@ -466,8 +478,8 @@ const HRDashboard = () => {
               <Tab label="Departments" />
               <Tab label="Work Reports" />
               <Tab label="Attendance" />
-              <Tab label="Intelligence" />
-              <Tab label="Responsibles" />
+              <Tab label="Project Progress" />
+              <Tab label="Heads" />
             </Tabs>
           </Box>
 
@@ -484,7 +496,7 @@ const HRDashboard = () => {
                   setDepartmentFilter={setDepartmentFilter}
                   departmentsList={DEPARTMENTS}
                   onAddEmployee={() => handleUserDialogOpen()}
-                  onAddResponsible={() => {
+                  onAddHead={() => {
                     setResponsibleForm({
                       name: "",
                       email: "",
@@ -510,7 +522,7 @@ const HRDashboard = () => {
                   setDepartmentFilter={setDepartmentFilter}
                   departmentsList={POSTS}
                   onAddEmployee={() => handleUserDialogOpen()}
-                  onAddResponsible={() => handleAdminDialogOpen()}
+                  onAddHead={() => handleAdminDialogOpen()}
                   onEditUser={handleAdminDialogOpen}
                   onEditPassword={(admin) => handlePasswordDialogOpen(admin, "admin")}
                   onDeleteUser={(admin) => { setAdminToDelete(admin); setUserToDelete(null); setOpenDeleteDialog(true); }}

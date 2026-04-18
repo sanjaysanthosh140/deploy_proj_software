@@ -2,23 +2,21 @@ import React from "react";
 import {
   Box,
   Typography,
-  Chip,
   Stack,
   FormControl,
-  InputLabel,
   Select,
   MenuItem,
   TextField,
-  Button,
   Grid,
-  CardContent,
   Fade,
   Avatar,
   alpha,
   useTheme,
   useMediaQuery,
+  InputAdornment,
 } from "@mui/material";
-import { iPhoneGlassButton, whiteCard } from "./SharedStyles";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 
 const toLocalISO = (date) => {
   const d = new Date(date);
@@ -41,6 +39,7 @@ const ReportManager = ({
 }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+
   const filteredReports = reports.filter((report) => {
     const matchesDate = !reportDate
       ? true
@@ -67,26 +66,27 @@ const ReportManager = ({
 
   return (
     <Fade in={true}>
-      <Box sx={{ maxHeight: "calc(100vh - 300px)", overflowY: "auto", pr: 1, "&::-webkit-scrollbar": { width: "8px" }, "&::-webkit-scrollbar-track": { background: "transparent" }, "&::-webkit-scrollbar-thumb": { background: "rgba(0,0,0,0.1)", borderRadius: "4px" } }}>
+      <Box sx={{ width: "100%" }}>
+        {/* Header Section */}
         <Box
           sx={{
             display: "flex",
             flexDirection: { xs: "column", lg: "row" },
             justifyContent: "space-between",
-            alignItems: { xs: "stretch", lg: "center" },
+            alignItems: { xs: "flex-start", lg: "center" },
             mb: 4,
             gap: 3,
           }}
         >
           <Box>
             <Typography
-              variant={isMobile ? "h5" : "h4"}
-              sx={{ fontWeight: 1000, color: "rgba(0,0,0,0.85)", letterSpacing: "-0.025em" }}
+              variant="h5"
+              sx={{ fontWeight: 800, color: "#1e293b", mb: 0.5 }}
             >
               Daily Activity Reports
             </Typography>
-            <Typography variant="caption" sx={{ color: "#64748b", fontWeight: 700, textTransform: "uppercase", letterSpacing: "1px" }}>
-              Tracking Command Node Intelligence
+            <Typography variant="body2" sx={{ color: "#64748b", fontWeight: 600 }}>
+              Track Activity
             </Typography>
           </Box>
 
@@ -96,103 +96,94 @@ const ReportManager = ({
             alignItems={{ xs: "stretch", sm: "center" }}
             sx={{ width: { xs: "100%", lg: "auto" } }}
           >
+            {/* Dept Filter */}
             <FormControl
               size="small"
               sx={{
-                minWidth: { xs: "100%", sm: 200 },
+                minWidth: { xs: "100%", sm: 180 },
                 "& .MuiOutlinedInput-root": {
-                  borderRadius: "14px",
+                  borderRadius: "10px",
                   background: "#fff",
-                  boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
-                  "& fieldset": { borderColor: "rgba(0,0,0,0.08)" },
-                  "& .MuiSelect-select": {
-                    color: "#000",
-                    fontWeight: 800,
+                  "& fieldset": { borderColor: "#e2e8f0" },
+                  "& .MuiSelect-select": { 
+                    color: "#1e293b", 
+                    fontWeight: 600,
                   },
                 },
               }}
             >
-              <InputLabel>Department</InputLabel>
               <Select
                 value={reportDeptFilter}
-                label="Department"
                 onChange={(e) => setReportDeptFilter(e.target.value)}
+                IconComponent={KeyboardArrowDownIcon}
+                displayEmpty
               >
                 <MenuItem value="ALL">All Departments</MenuItem>
                 {normalizedDepartmentOptions.map((dept) => (
-                  <MenuItem key={dept} value={dept}>
-                    {dept}
-                  </MenuItem>
+                  <MenuItem key={dept} value={dept}>{dept}</MenuItem>
                 ))}
               </Select>
             </FormControl>
+
+            {/* Date Picker */}
             <TextField
               type="date"
-              label="Filter by Date"
               value={reportDate}
               onChange={(e) => setReportDate(e.target.value)}
-              InputLabelProps={{ shrink: true }}
-              variant="outlined"
               size="small"
               sx={{
+                width: { xs: "100%", sm: "180px" },
                 "& .MuiOutlinedInput-root": {
-                  borderRadius: "14px",
+                  borderRadius: "10px",
                   background: "#fff",
-                  boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
-                  "& fieldset": { borderColor: "rgba(0,0,0,0.08)" },
-                  width: { xs: "100%", sm: "200px" },
-                  "& .MuiInputBase-input": {
-                    color: "#000",
-                    fontWeight: 800,
-                  }
+                  "& fieldset": { borderColor: "#e2e8f0" },
+                  "& .MuiInputBase-input": { color: "#64748b", fontWeight: 500 },
                 },
               }}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <CalendarTodayIcon sx={{ color: "#94a3b8", fontSize: "1rem" }} />
+                  </InputAdornment>
+                ),
+              }}
             />
-            {reportDate && (
-              <Button
-                size="small"
-                onClick={() => setReportDate("")}
-                sx={{
-                  ...iPhoneGlassButton,
-                  color: "#ef4444",
-                  background: "rgba(244, 63, 94, 0.1)",
-                  height: "40px",
-                  minWidth: "80px"
-                }}
-              >
-                Clear
-              </Button>
-            )}
           </Stack>
         </Box>
 
+        {/* Reports Content */}
         {Object.entries(groupedReports).map(([category, categoryReports]) => (
           <Box key={category} sx={{ mb: 6 }}>
             <Typography
               variant="h6"
               sx={{
                 mb: 3,
-                color: getDeptColor(category),
-                fontWeight: 900,
-                textTransform: "uppercase",
-                letterSpacing: "0.1em",
-                borderLeft: `4px solid ${getDeptColor(category)}`,
+                color: "#1e293b",
+                fontWeight: 800,
+                fontSize: "1.1rem",
+                borderLeft: `3px solid ${getDeptColor(category)}`,
                 pl: 2,
               }}
             >
               {category}
             </Typography>
-            <Grid container spacing={4}>
+            <Grid container spacing={3}>
               {categoryReports.map((report) => (
-                <Grid item xs={12} md={6} lg={4} key={report._id || report.id}>
+                <Grid item xs={12} sm={6} md={4} lg={3} key={report._id || report.id}>
                   <Box
                     sx={{
-                      ...whiteCard,
+                      background: "#fff",
+                      borderRadius: "12px",
+                      overflow: "hidden",
+                      boxShadow: "0 2px 12px rgba(0,0,0,0.04)",
+                      border: "1px solid #f1f5f9",
                       height: "100%",
                       display: "flex",
                       flexDirection: "column",
-                      position: "relative",
-                      overflow: "hidden",
+                      transition: "all 0.2s ease",
+                      "&:hover": {
+                        boxShadow: "0 8px 24px rgba(0,0,0,0.06)",
+                      }
                     }}
                   >
                     {/* Top Accent Bar */}
@@ -204,100 +195,54 @@ const ReportManager = ({
                       }}
                     />
 
-                    <CardContent sx={{ p: 3, flexGrow: 1, display: "flex", flexDirection: "column" }}>
-                      {/* Card Header */}
-                      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 2 }}>
-                        <Stack direction="row" spacing={1.5} alignItems="center">
-                          <Avatar
-                            sx={{
-                              width: 36,
-                              height: 36,
-                              fontSize: "0.9rem",
-                              fontWeight: 900,
-                              background: alpha(getDeptColor(category), 0.1),
-                              color: getDeptColor(category),
-                              border: `1px solid ${alpha(getDeptColor(category), 0.2)}`,
-                            }}
-                          >
-                            {report.username?.charAt(0) || "R"}
-                          </Avatar>
-                          <Box>
-                            <Typography variant="subtitle2" sx={{ fontWeight: 800, color: "rgba(0,0,0,0.8)", lineHeight: 1.2 }}>
-                              {report.username || "System Log"}
-                            </Typography>
-                            <Typography variant="caption" sx={{ color: "#94a3b8", fontWeight: 700 }}>
-                              {new Date(report.date).toLocaleDateString("en-US", {
-                                month: "short",
-                                day: "numeric",
-                                year: "numeric",
-                              })}
-                            </Typography>
-                          </Box>
-                        </Stack>
-                        <Chip
-                          label={category}
-                          size="small"
+                    <Box sx={{ p: 2.5, flexGrow: 1 }}>
+                      {/* Card Header (Avatar + Name + Date) */}
+                      <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 2.5 }}>
+                        <Avatar
                           sx={{
-                            height: "20px",
-                            fontSize: "0.65rem",
-                            fontWeight: 900,
-                            textTransform: "uppercase",
-                            background: alpha(getDeptColor(category), 0.08),
+                            width: 32,
+                            height: 32,
+                            fontSize: "0.8rem",
+                            fontWeight: 700,
+                            background: alpha(getDeptColor(category), 0.1),
                             color: getDeptColor(category),
-                            borderRadius: "6px",
                           }}
-                        />
+                        >
+                          {(report.username || "U").charAt(0).toUpperCase()}
+                        </Avatar>
+                        <Box>
+                          <Typography sx={{ fontWeight: 700, color: "#1e293b", fontSize: "0.85rem", lineHeight: 1.2 }}>
+                            {report.username || "Team Member"}
+                          </Typography>
+                          <Typography variant="caption" sx={{ color: "#94a3b8", fontWeight: 500 }}>
+                            {new Date(report.date).toLocaleDateString("en-US", {
+                              month: "short",
+                              day: "numeric",
+                              year: "numeric",
+                            })}
+                          </Typography>
+                        </Box>
                       </Box>
 
                       {/* Content Area */}
                       <Typography
+                        variant="subtitle2"
+                        sx={{ fontWeight: 800, color: "#1e293b", mb: 1, fontSize: "0.85rem" }}
+                      >
+                        Daily Work Report
+                      </Typography>
+                      <Typography
                         variant="body2"
                         sx={{
                           color: "#475569",
-                          fontWeight: 600,
-                          lineHeight: 1.8,
-                          fontSize: "0.95rem",
+                          fontWeight: 500,
+                          lineHeight: 1.6,
+                          fontSize: "0.85rem",
                           whiteSpace: "pre-wrap",
-                          display: "-webkit-box",
-                          WebkitLineClamp: 8,
-                          WebkitBoxOrient: "vertical",
-                          overflow: "hidden",
-                          mt: 1,
                         }}
                       >
                         {report.desc || report.content || "No description provided."}
                       </Typography>
-                    </CardContent>
-
-                    {/* Footer / Meta */}
-                    <Box
-                      sx={{
-                        p: 2,
-                        px: 3,
-                        borderTop: "1px solid rgba(0,0,0,0.04)",
-                        background: "rgba(0,0,0,0.01)",
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center"
-                      }}
-                    >
-                      <Typography variant="caption" sx={{ color: "#94a3b8", fontWeight: 700 }}>
-                        INTERNAL REPORT
-                      </Typography>
-                      <Button
-                        size="small"
-                        sx={{
-                          minWidth: 0,
-                          p: 0,
-                          color: getDeptColor(category),
-                          fontWeight: 800,
-                          fontSize: "0.75rem",
-                          textTransform: "none",
-                          "&:hover": { background: "transparent", opacity: 0.8 }
-                        }}
-                      >
-                        View Full Details
-                      </Button>
                     </Box>
                   </Box>
                 </Grid>
